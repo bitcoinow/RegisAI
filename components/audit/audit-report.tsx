@@ -1,0 +1,175 @@
+'use client'
+
+import type { Audit, Finding, RiskLevel } from '@/types'
+import { RiskBadge } from '@/components/ui/risk-badge'
+
+// Sort order for risk levels in findings list
+const RISK_ORDER: Record<RiskLevel, number> = { High: 0, Medium: 1, Low: 2 }
+
+function StatBox({ value, label, color }: { value: number; label: string; color: string }) {
+  return (
+    <div className="border border-rule p-6 bg-bg-2 text-center">
+      <div className="font-serif text-4xl mb-1" style={{ color }}>
+        {value}
+      </div>
+      <div className="font-mono text-xs tracking-widest uppercase text-ink-3">{label}</div>
+    </div>
+  )
+}
+
+function FindingCard({ finding }: { finding: Finding }) {
+  return (
+    <details className="border border-rule bg-bg-2 group">
+      <summary className="flex items-start justify-between gap-4 px-6 py-4 cursor-pointer list-none">
+        <div className="min-w-0">
+          <p className="font-mono text-xs text-ink-3 mb-1">{finding.rule}</p>
+          <p className="text-ink text-sm font-medium">{finding.requirement}</p>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0 pt-0.5">
+          <RiskBadge risk={finding.risk} />
+          <span className="text-ink-3 text-xs group-open:rotate-180 transition-transform select-none">
+            ▾
+          </span>
+        </div>
+      </summary>
+
+      <div className="border-t border-rule px-6 py-5 space-y-4 text-sm">
+        <Section label="Policy says" content={finding.policy_says} />
+        <Section label="Gap" content={finding.gap} />
+        <Section label="Recommendation" content={finding.recommendation} />
+      </div>
+    </details>
+  )
+}
+
+function Section({ label, content }: { label: string; content: string }) {
+  return (
+    <div>
+      <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-1">{label}</p>
+      <p className="text-ink-2 leading-relaxed">{content}</p>
+    </div>
+  )
+}
+
+interface AuditReportProps {
+  audit: Audit
+  isDemo?: boolean
+}
+
+export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
+  const sortedFindings = [...audit.findings].sort(
+    (a, b) => RISK_ORDER[a.risk]! - RISK_ORDER[b.risk]!
+  )
+
+  const formattedDate = new Date(audit.created_at).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+
+  return (
+    <div className="max-w-content mx-auto px-6 py-10">
+
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <div className="mb-10 pb-8 border-b border-rule flex justify-between items-start">
+        <div>
+          {isDemo && (
+            <div className="inline-block font-mono text-xs tracking-widest uppercase border border-gold px-3 py-1 text-gold mb-4">
+              Demo Report
+            </div>
+          )}
+          <h1 className="font-serif text-4xl text-ink mb-2">{audit.firm_name}</h1>
+          <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
+            Regulatory Gap Analysis &nbsp;·&nbsp; {formattedDate}
+          </p>
+        </div>
+        <button
+          onClick={() => window.print()}
+          className="print:hidden border border-rule px-4 py-2 font-mono text-xs tracking-widest uppercase text-ink hover:bg-bg-2 transition-colors"
+        >
+          Download PDF
+        </button>
+      </div>
+
+      {/* ── Executive Summary ──────────────────────────────────────────────── */}
+      <section className="mb-10">
+        <SectionHeading>Executive Summary</SectionHeading>
+        <div className="border-l-2 border-green pl-6 py-1">
+          <p className="text-ink-2 leading-relaxed">{audit.exec_summary}</p>
+        </div>
+      </section>
+
+      {/* ── Stats ──────────────────────────────────────────────────────────── */}
+      <section className="mb-10">
+        <SectionHeading>Compliance Overview</SectionHeading>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <StatBox value={audit.total_gaps} label="Total Gaps" color="var(--ink)" />
+          <StatBox value={audit.high_risk} label="High Risk" color="var(--red)" />
+          <StatBox value={audit.medium_risk} label="Medium Risk" color="var(--amber)" />
+          <StatBox value={audit.low_risk} label="Low Risk" color="var(--blue)" />
+        </div>
+      </section>
+
+      {/* ── Priority Actions ───────────────────────────────────────────────── */}
+      {audit.priority_actions.length > 0 && (
+        <section className="mb-10">
+          <SectionHeading>Priority Actions</SectionHeading>
+          <div className="border border-rule bg-bg-2 p-6 space-y-3">
+            {audit.priority_actions.map((action, i) => (
+              <div key={i} className="flex gap-4">
+                <span className="font-mono text-xs text-green mt-1 flex-shrink-0 w-5">
+                  {i + 1}.
+                </span>
+                <p className="text-ink-2 text-sm leading-relaxed">{action}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Findings ───────────────────────────────────────────────────────── */}
+      <section className="mb-10">
+        <SectionHeading>
+          Findings{' '}
+          <span className="font-mono text-base text-ink-3 font-normal">
+            ({audit.total_gaps})
+          </span>
+        </SectionHeading>
+        <div className="space-y-2">
+          {sortedFindings.map((finding) => (
+            <FindingCard key={finding.id} finding={finding} />
+          ))}
+        </div>
+      </section>
+
+      {/* ── Strengths ──────────────────────────────────────────────────────── */}
+      {audit.strengths.length > 0 && (
+        <section className="mb-10">
+          <SectionHeading>Areas of Compliance</SectionHeading>
+          <div className="border border-rule bg-bg-2 p-6 space-y-2">
+            {audit.strengths.map((strength, i) => (
+              <div key={i} className="flex gap-3 items-start">
+                <span className="text-green mt-0.5 flex-shrink-0">✓</span>
+                <p className="text-ink-2 text-sm leading-relaxed">{strength}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Footer ─────────────────────────────────────────────────────────── */}
+      <div className="pt-8 border-t border-rule">
+        <p className="font-mono text-xs text-ink-3">
+          Prepared by Regis &nbsp;·&nbsp; All findings are recommendations, not legal advice.
+          High-risk findings require human review before remediation.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="font-serif text-2xl text-ink mb-4">{children}</h2>
+  )
+}

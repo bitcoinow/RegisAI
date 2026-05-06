@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --green:      #1a3a2a;
+  --green-2:    #2d5c44;
+  --green-tint: #e4efe8;
+  --bg:         #f5f0e8;
+  --bg-2:       #ede7d9;
+  --ink:        #1a1714;
+  --ink-2:      #3d3830;
+  --ink-3:      #7a7268;
+  --rule:       #ccc4b8;
+  --red:        #8b2020;
+  --amber:      #8b5a10;
+  --blue:       #1a3060;
+  --gold:       #b8820a;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-inter), sans-serif;
+}
