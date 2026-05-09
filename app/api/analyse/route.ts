@@ -30,13 +30,16 @@ export async function POST(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // ── 2. Fetch document ──────────────────────────────────────────────────────
-  const { data: document, error: docError } = await supabase
-    .from('documents')
-    .select('id, user_id, file_name, extracted_text, status')
-    .eq('id', document_id)
-    .eq('user_id', user.id)
-    .single()
+  // ── 2. Fetch document + profile in parallel ────────────────────────────────
+  const [{ data: document, error: docError }, { data: profile }] = await Promise.all([
+    supabase
+      .from('documents')
+      .select('id, user_id, file_name, extracted_text, status')
+      .eq('id', document_id)
+      .eq('user_id', user.id)
+      .single(),
+    supabase.from('profiles').select('firm_name').eq('id', user.id).single(),
+  ])
 
   if (docError || !document) {
     return NextResponse.json({ error: 'Document not found' }, { status: 404 })
@@ -55,13 +58,6 @@ export async function POST(
       { status: 409 }
     )
   }
-
-  // ── 3. Fetch firm name from profile ────────────────────────────────────────
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('firm_name')
-    .eq('id', user.id)
-    .single()
 
   const firmName = profile?.firm_name ?? undefined
 

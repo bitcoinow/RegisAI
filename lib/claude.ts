@@ -7,19 +7,26 @@ import type { AuditResult } from '@/types'
 const MODEL = 'claude-sonnet-4-20250514'
 const MAX_DOCUMENT_CHARS = 12_000
 
+let _client: Anthropic | null = null
+
 function getClient(): Anthropic {
+  if (_client) return _client
   const apiKey = process.env['ANTHROPIC_API_KEY']
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set')
-  return new Anthropic({ apiKey })
+  _client = new Anthropic({ apiKey })
+  return _client
 }
 
+let _systemPrompt: string | null = null
+
 function buildSystemPrompt(): string {
+  if (_systemPrompt) return _systemPrompt
   const requirementsContext = REGULATORY_LIBRARY.map(
     (req) =>
       `${req.id} | ${req.rule} | ${req.framework} | ${req.requirement}\n${req.description}`
   ).join('\n\n')
 
-  return `You are a senior compliance analyst with 15 years of experience in financial services regulation. You specialise in FINRA, SEC, AML/BSA, Regulation Best Interest, and business continuity requirements for mid-market firms.
+  const prompt = `You are a senior compliance analyst with 15 years of experience in financial services regulation. You specialise in FINRA, SEC, AML/BSA, Regulation Best Interest, and business continuity requirements for mid-market firms.
 
 You are performing a regulatory gap analysis on a compliance manual submitted by a financial services firm. You will evaluate the document against the following 32 regulatory requirements:
 
@@ -53,6 +60,8 @@ OUTPUT FORMAT (strict JSON, no markdown fences):
   "strengths": ["array of short strings describing areas of clear compliance"],
   "priority_actions": ["ordered array of the top 3-5 most urgent remediation actions"]
 }`
+  _systemPrompt = prompt
+  return _systemPrompt
 }
 
 export async function runGapAnalysis(
@@ -74,7 +83,13 @@ export async function runGapAnalysis(
   const message = await client.messages.create({
     model: MODEL,
     max_tokens: 8096,
-    system: buildSystemPrompt(),
+    system: [
+      {
+        type: 'text',
+        text: buildSystemPrompt(),
+        cache_control: { type: 'ephemeral' },
+      },
+    ],
     messages: [{ role: 'user', content: userMessage }],
   })
 
