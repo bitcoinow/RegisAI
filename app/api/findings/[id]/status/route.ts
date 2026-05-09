@@ -34,10 +34,10 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  // Verify the finding belongs to the authenticated user via audit ownership
+  // Verify the finding exists and belongs to the authenticated user via audit ownership
   const { data: finding } = await supabase
     .from('findings')
-    .select('id, audits!inner(user_id)')
+    .select('id, audit_id')
     .eq('id', params.id)
     .single()
 
@@ -45,8 +45,14 @@ export async function PATCH(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const auditUserId = (finding.audits as { user_id: string }).user_id
-  if (auditUserId !== user.id) {
+  const { data: audit } = await supabase
+    .from('audits')
+    .select('id')
+    .eq('id', finding.audit_id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!audit) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
