@@ -1,10 +1,53 @@
 'use client'
 
-import type { Audit, Finding, RiskLevel } from '@/types'
+import { useState } from 'react'
+import type { Audit, Finding, FindingStatus, RiskLevel } from '@/types'
 import { RiskBadge } from '@/components/ui/risk-badge'
 
-// Sort order for risk levels in findings list
 const RISK_ORDER: Record<RiskLevel, number> = { High: 0, Medium: 1, Low: 2 }
+
+const STATUS_CONFIG: Record<FindingStatus, { label: string; color: string }> = {
+  open: { label: 'Open', color: 'text-ink-3' },
+  in_progress: { label: 'In Progress', color: 'text-amber' },
+  resolved: { label: 'Resolved', color: 'text-green' },
+}
+
+function StatusBadge({ status }: { status: FindingStatus }) {
+  const { label, color } = STATUS_CONFIG[status]
+  return (
+    <span className={`font-mono text-[10px] tracking-widest uppercase ${color}`}>{label}</span>
+  )
+}
+
+function StatusToggle({
+  status,
+  onUpdate,
+  disabled,
+}: {
+  status: FindingStatus
+  onUpdate: (s: FindingStatus) => void
+  disabled: boolean
+}) {
+  return (
+    <div className="flex border border-rule divide-x divide-rule">
+      {(Object.keys(STATUS_CONFIG) as FindingStatus[]).map((s) => {
+        const { label, color } = STATUS_CONFIG[s]
+        const active = s === status
+        return (
+          <button
+            key={s}
+            disabled={disabled}
+            onClick={() => onUpdate(s)}
+            className={`px-3 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-colors disabled:opacity-50
+              ${active ? `bg-bg ${color}` : 'text-ink-3/50 hover:text-ink-3 hover:bg-bg'}`}
+          >
+            {label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 function StatBox({ value, label, color }: { value: number; label: string; color: string }) {
   return (
@@ -17,7 +60,29 @@ function StatBox({ value, label, color }: { value: number; label: string; color:
   )
 }
 
-function FindingCard({ finding }: { finding: Finding }) {
+function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean }) {
+  const [status, setStatus] = useState<FindingStatus>(finding.status ?? 'open')
+  const [saving, setSaving] = useState(false)
+
+  async function updateStatus(next: FindingStatus) {
+    if (next === status || saving || !finding.id) return
+    const prev = status
+    setStatus(next)
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/findings/${finding.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: next }),
+      })
+      if (!res.ok) setStatus(prev)
+    } catch {
+      setStatus(prev)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <details className="border border-rule bg-bg-2 group">
       <summary className="flex items-start justify-between gap-4 px-6 py-4 cursor-pointer list-none">
@@ -26,6 +91,7 @@ function FindingCard({ finding }: { finding: Finding }) {
           <p className="text-ink text-sm font-medium">{finding.requirement}</p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0 pt-0.5">
+          <StatusBadge status={status} />
           <RiskBadge risk={finding.risk} />
           <span className="text-ink-3 text-xs group-open:rotate-180 transition-transform select-none">
             ▾
@@ -34,6 +100,12 @@ function FindingCard({ finding }: { finding: Finding }) {
       </summary>
 
       <div className="border-t border-rule px-6 py-5 space-y-4 text-sm">
+        {!isDemo && (
+          <div>
+            <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-2">Status</p>
+            <StatusToggle status={status} onUpdate={updateStatus} disabled={saving} />
+          </div>
+        )}
         <Section label="Policy says" content={finding.policy_says} />
         <Section label="Gap" content={finding.gap} />
         <Section label="Recommendation" content={finding.recommendation} />
@@ -137,7 +209,7 @@ export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
         </SectionHeading>
         <div className="space-y-2">
           {sortedFindings.map((finding) => (
-            <FindingCard key={finding.id} finding={finding} />
+            <FindingCard key={finding.id} finding={finding} isDemo={isDemo} />
           ))}
         </div>
       </section>

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { AuditReport } from '@/components/audit/audit-report'
-import type { Audit, Finding, RiskLevel } from '@/types'
+import type { Audit, Finding, FindingStatus, RiskLevel } from '@/types'
 
 interface PageProps {
   params: { id: string }
@@ -22,7 +22,7 @@ export default async function AuditReportPage({ params }: PageProps) {
     .select(
       `id, firm_name, exec_summary, total_gaps, high_risk, medium_risk, low_risk,
        strengths, priority_actions, created_at, document_id,
-       findings (req_id, rule, requirement, policy_says, gap, risk, recommendation)`
+       findings (id, req_id, rule, requirement, policy_says, gap, risk, recommendation, status)`
     )
     .eq('id', params.id)
     .eq('user_id', user.id)
@@ -34,13 +34,14 @@ export default async function AuditReportPage({ params }: PageProps) {
     (raw: unknown) => {
       const f = raw as Record<string, unknown>
       return {
-        id: (f['req_id'] as string) ?? '',
+        id: (f['id'] as string) ?? '',
         rule: (f['rule'] as string) ?? '',
         requirement: (f['requirement'] as string) ?? '',
         policy_says: (f['policy_says'] as string) ?? '',
         gap: (f['gap'] as string) ?? '',
         risk: (f['risk'] as RiskLevel) ?? 'Low',
         recommendation: (f['recommendation'] as string) ?? '',
+        status: (f['status'] as FindingStatus) ?? 'open',
       }
     }
   )

@@ -31,6 +31,7 @@ export interface Finding {
   gap: string
   risk: RiskLevel
   recommendation: string
+  status?: FindingStatus
 }
 
 export interface AuditResult {
