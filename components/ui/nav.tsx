@@ -11,7 +11,7 @@ export function Nav({ email }: NavProps) {
     <nav className="border-b border-rule bg-bg-2">
       <div className="max-w-content mx-auto px-6 h-14 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center hover:opacity-80 transition-opacity">
-          <Image src="/logo.png" alt="Regis" width={36} height={40} priority />
+          <Image src="/logo.png" alt="Regis" width={71} height={40} priority />
         </Link>
 
         <div className="flex items-center gap-6">
