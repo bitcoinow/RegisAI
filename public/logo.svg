@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none">
+  <!-- Serif R using path -->
+  <text
+    x="10"
+    y="180"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="200"
+    fill="#1D3D2F"
+    letter-spacing="-4"
+  >R</text>
+  <!-- Gold dot -->
+  <circle cx="158" cy="183" r="18" fill="#C49A2A"/>
+</svg>
