@@ -55,13 +55,17 @@ RegisAI/
 │   │   ├── audit/
 │   │   │   ├── new/page.tsx          # Upload + trigger analysis
 │   │   │   └── [id]/page.tsx         # Audit report view
-│   │   └── monitoring/page.tsx       # Regulatory feed (Phase 2 stub)
+│   │   └── monitoring/page.tsx       # Regulatory feed — live FINRA + SEC feed
 │   ├── (auth)/
 │   │   ├── layout.tsx
 │   │   └── login/page.tsx            # Magic link OTP login
 │   ├── api/
 │   │   ├── analyse/route.ts          # POST — runs gap analysis pipeline
-│   │   └── documents/route.ts        # POST — PDF upload + text extraction
+│   │   ├── documents/route.ts        # POST — PDF upload + text extraction
+│   │   ├── findings/[id]/status/route.ts  # PATCH — update finding status
+│   │   └── monitoring/
+│   │       ├── feed/route.ts         # GET — returns stored regulatory updates
+│   │       └── refresh/route.ts      # POST — fetches RSS feeds + upserts to DB
 │   ├── auth/callback/route.ts        # Supabase PKCE callback handler
 │   ├── demo/clearview/page.tsx       # Public demo — no login required
 │   ├── globals.css                   # Design tokens + global styles
@@ -79,6 +83,7 @@ RegisAI/
 │   ├── claude.ts                     # Anthropic client + gap analysis prompt
 │   ├── demo-data.ts                  # Pre-seeded Clearview Capital demo audit
 │   ├── env.ts                        # Runtime env validation
+│   ├── monitoring.ts                 # RSS parser + relevance scoring (no new deps)
 │   ├── pdf.ts                        # PDF text extraction wrapper
 │   ├── regulatory-library.ts         # 32 regulatory requirements (typed)
 │   └── supabase/
@@ -87,7 +92,10 @@ RegisAI/
 ├── middleware.ts                     # Auth session refresh on every request
 ├── supabase/
 │   └── migrations/
-│       └── 20260504000000_initial.sql  # Full schema migration
+│       ├── 20260504000000_initial.sql            # Full schema
+│       ├── 20260509000001_findings_update_policy.sql  # RLS update policy for findings
+│       ├── 20260511000000_regulatory_updates_rls.sql  # RLS + read policy for regulatory_updates
+│       └── 20260511000001_regulatory_updates_unique_url.sql  # Unique constraint on url
 ├── types/
 │   └── index.ts                      # Shared domain types
 ├── .env.example                      # Environment variable template
@@ -169,7 +177,7 @@ regulatory_updates (
 )
 ```
 
-Row-level security is enabled on all tables — users can only access their own data.
+Row-level security is enabled on all tables. `regulatory_updates` is a shared feed — authenticated users can read all rows but cannot write directly (writes go through the service role in the refresh API route).
 
 ---
 
@@ -191,6 +199,23 @@ Accepts `{ document_id: string }`.
 6. Returns `{ audit_id }`
 
 All Claude API calls are centralised in `lib/claude.ts`. Never call the Anthropic SDK from components or API routes directly.
+
+### `PATCH /api/findings/[id]/status`
+Accepts `{ status: 'open' | 'in_progress' | 'resolved' }`.
+1. Verifies auth and that the finding belongs to the authenticated user (via audit ownership)
+2. Updates `findings.status` in Supabase
+3. Returns `{ status }`
+
+### `POST /api/monitoring/refresh`
+No body required.
+1. Fetches RSS feeds from SEC (proposed rules, final rules, enforcement) and FINRA (regulatory notices)
+2. Parses XML with a zero-dependency regex parser in `lib/monitoring.ts`
+3. Scores each item 1–5 for relevance and extracts affected rule citations
+4. Upserts into `regulatory_updates` (deduped on `url`)
+5. Returns `{ inserted: number }`
+
+### `GET /api/monitoring/feed`
+Returns all stored `regulatory_updates` ordered by `published_at` descending, limited to 100 rows.
 
 ---
 
@@ -308,8 +333,8 @@ Or manually run `supabase/migrations/20260504000000_initial.sql` in the Supabase
 - [x] Deployed to Vercel (auto-deploy from `main`)
 
 ### Phase 2 — Design partner onboarding (in progress)
-- [ ] Finding status tracking (open / in-progress / resolved toggle on finding cards)
-- [ ] Regulatory monitoring feed (FINRA + SEC RSS → `/monitoring`)
+- [x] Finding status tracking (open / in-progress / resolved toggle on finding cards)
+- [x] Regulatory monitoring feed (FINRA + SEC RSS → `/monitoring`)
 - [ ] PDF export of audit report (browser `window.print()` with print stylesheet)
 - [ ] Weekly email digest of regulatory updates (Resend — already installed)
 
