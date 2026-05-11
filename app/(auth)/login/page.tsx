@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { RegisLogo } from '@/components/ui/logo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -34,7 +35,7 @@ export default function LoginPage() {
     return (
       <div className="w-full max-w-md text-center">
         <div className="mb-10">
-          <h1 className="font-serif text-4xl text-green mb-1">Regis</h1>
+          <RegisLogo className="text-4xl" />
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Compliance Operations
           </p>
