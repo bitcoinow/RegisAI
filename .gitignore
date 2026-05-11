@@ -38,3 +38,5 @@ next-env.d.ts
 # Word temp files
 ~$*.docx
 *.docx
+
+.vercel
