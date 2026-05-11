@@ -20,7 +20,7 @@ export async function POST(): Promise<NextResponse<{ inserted: number; parsed: n
     return NextResponse.json({ inserted: 0, parsed: 0 })
   }
 
-  const serviceClient = await createServiceClient()
+  const serviceClient = createServiceClient()
   const { error } = await serviceClient
     .from('regulatory_updates')
     .upsert(updates, { onConflict: 'url', ignoreDuplicates: true })
