@@ -57,8 +57,12 @@ function extractTag(block: string, tag: string): string | null {
   return plain?.[1] != null ? plain[1].trim() : null
 }
 
-function parseItems(xml: string): { title: string; link: string; description: string; pubDate: string }[] {
-  const items: { title: string; link: string; description: string; pubDate: string }[] = []
+type ParsedItem = { title: string; link: string; description: string; pubDate: string }
+
+function parseItems(xml: string): ParsedItem[] {
+  const items: ParsedItem[] = []
+
+  // RSS 2.0: <item>
   for (const m of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
     const block = m[1]
     if (!block) continue
@@ -72,6 +76,25 @@ function parseItems(xml: string): { title: string; link: string; description: st
       pubDate: extractTag(block, 'pubDate') ?? extractTag(block, 'dc:date') ?? '',
     })
   }
+
+  // Atom: <entry> (fallback if no RSS items found)
+  if (items.length === 0) {
+    for (const m of xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)) {
+      const block = m[1]
+      if (!block) continue
+      const title = extractTag(block, 'title')
+      const linkMatch = block.match(/<link[^>]+href="([^"]+)"/)
+      const link = linkMatch?.[1] ?? extractTag(block, 'id')
+      if (!title || !link) continue
+      items.push({
+        title,
+        link,
+        description: extractTag(block, 'summary') ?? extractTag(block, 'content') ?? '',
+        pubDate: extractTag(block, 'updated') ?? extractTag(block, 'published') ?? '',
+      })
+    }
+  }
+
   return items
 }
 

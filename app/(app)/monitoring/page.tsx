@@ -87,6 +87,7 @@ export default function MonitoringPage() {
   const [updates, setUpdates] = useState<Update[]>([])
   const [fetching, setFetching] = useState(true)
   const [refreshState, setRefreshState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const [refreshDetail, setRefreshDetail] = useState<string | null>(null)
 
   async function loadFeed() {
     const res = await fetch('/api/monitoring/feed')
@@ -101,15 +102,22 @@ export default function MonitoringPage() {
 
   async function handleRefresh() {
     setRefreshState('loading')
+    setRefreshDetail(null)
     try {
       const res = await fetch('/api/monitoring/refresh', { method: 'POST' })
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        setRefreshDetail(body.error ?? `HTTP ${res.status}`)
+        throw new Error()
+      }
+      const body = await res.json() as { parsed: number; inserted: number }
       await loadFeed()
+      setRefreshDetail(`${body.parsed} items fetched`)
       setRefreshState('done')
     } catch {
       setRefreshState('error')
     } finally {
-      setTimeout(() => setRefreshState('idle'), 3000)
+      setTimeout(() => { setRefreshState('idle'); setRefreshDetail(null) }, 4000)
     }
   }
 
@@ -146,13 +154,20 @@ export default function MonitoringPage() {
             )}
           </p>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshState === 'loading'}
-          className="bg-green text-white text-sm px-5 py-2.5 hover:bg-green-2 transition-colors disabled:opacity-50"
-        >
-          {refreshLabel}
-        </button>
+        <div className="flex flex-col items-end gap-1">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshState === 'loading'}
+            className="bg-green text-white text-sm px-5 py-2.5 hover:bg-green-2 transition-colors disabled:opacity-50"
+          >
+            {refreshLabel}
+          </button>
+          {refreshDetail && (
+            <span className={`font-mono text-xs ${refreshState === 'error' ? 'text-red' : 'text-ink-3'}`}>
+              {refreshDetail}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ── Stats ──────────────────────────────────────────────────────────── */}
