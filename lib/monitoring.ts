@@ -9,15 +9,18 @@ export interface ParsedUpdate {
   raw_content: string
 }
 
-const FEEDS: { regulator: string; url: string }[] = [
-  { regulator: 'SEC', url: 'https://www.sec.gov/rss/rules/proposed.xml' },
-  { regulator: 'SEC', url: 'https://www.sec.gov/rss/rules/final.xml' },
-  { regulator: 'SEC', url: 'https://www.sec.gov/rss/litigation/litreleases.xml' },
-  {
-    regulator: 'FINRA',
-    url: 'https://www.finra.org/rules-guidance/notices/regulatory-notices.rss',
-  },
-]
+// Federal Register API — public, no auth required, no bot blocking
+const FR_API = 'https://www.federalregister.gov/api/v1/articles.json'
+
+interface FRArticle {
+  title: string
+  abstract: string | null
+  html_url: string
+  publication_date: string
+  type: string
+}
+
+const FINRA_RE = /FINRA|Financial\s+Industry\s+Regulatory/i
 
 const RULE_KEYWORDS: { pattern: RegExp; rule: string }[] = [
   { pattern: /FINRA\s+Rule\s+3110/i, rule: 'FINRA Rule 3110' },
@@ -48,56 +51,6 @@ const HIGH_RELEVANCE =
   /supervisory|compliance\s+program|enforcement\s+action|penalty|fine|censure|violation|broker-dealer|investment\s+adviser|registered\s+representative/i
 const MED_RELEVANCE = /disclosure|registration|reporting|examination|inspection|custod/i
 
-function extractTag(block: string, tag: string): string | null {
-  const cdata = block.match(
-    new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, 'i')
-  )
-  if (cdata?.[1] != null) return cdata[1].trim()
-  const plain = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'))
-  return plain?.[1] != null ? plain[1].trim() : null
-}
-
-type ParsedItem = { title: string; link: string; description: string; pubDate: string }
-
-function parseItems(xml: string): ParsedItem[] {
-  const items: ParsedItem[] = []
-
-  // RSS 2.0: <item>
-  for (const m of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
-    const block = m[1]
-    if (!block) continue
-    const title = extractTag(block, 'title')
-    const link = extractTag(block, 'link') ?? extractTag(block, 'guid')
-    if (!title || !link) continue
-    items.push({
-      title,
-      link,
-      description: extractTag(block, 'description') ?? '',
-      pubDate: extractTag(block, 'pubDate') ?? extractTag(block, 'dc:date') ?? '',
-    })
-  }
-
-  // Atom: <entry> (fallback if no RSS items found)
-  if (items.length === 0) {
-    for (const m of xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)) {
-      const block = m[1]
-      if (!block) continue
-      const title = extractTag(block, 'title')
-      const linkMatch = block.match(/<link[^>]+href="([^"]+)"/)
-      const link = linkMatch?.[1] ?? extractTag(block, 'id')
-      if (!title || !link) continue
-      items.push({
-        title,
-        link,
-        description: extractTag(block, 'summary') ?? extractTag(block, 'content') ?? '',
-        pubDate: extractTag(block, 'updated') ?? extractTag(block, 'published') ?? '',
-      })
-    }
-  }
-
-  return items
-}
-
 function scoreRelevance(text: string): number {
   if (HIGH_RELEVANCE.test(text)) return 5
   if (MED_RELEVANCE.test(text)) return 3
@@ -112,45 +65,49 @@ function extractAffectedRules(text: string): string[] {
   return Array.from(found)
 }
 
-function parseDate(raw: string): string | null {
-  if (!raw) return null
-  try {
-    const d = new Date(raw)
-    return isNaN(d.getTime()) ? null : d.toISOString()
-  } catch {
-    return null
-  }
+// Strip the verbose "Self-Regulatory Organizations; ORG; " prefix common in FR titles
+function cleanTitle(title: string): string {
+  return title.replace(/^Self-Regulatory\s+Organizations;\s+[^;]+;\s*/i, '').trim()
 }
 
 export async function fetchAndParseFeeds(): Promise<ParsedUpdate[]> {
-  const results: ParsedUpdate[] = []
+  const params = new URLSearchParams({
+    'conditions[agencies][]': 'securities-and-exchange-commission',
+    per_page: '80',
+    order: 'newest',
+  })
+  // Request only the fields we need
+  const fields = ['title', 'abstract', 'html_url', 'publication_date', 'type']
+  for (const f of fields) params.append('fields[]', f)
 
-  await Promise.allSettled(
-    FEEDS.map(async ({ regulator, url }) => {
-      const res = await fetch(url, {
-        headers: { 'User-Agent': 'Regis-Compliance/1.0 (compliance monitoring)' },
-        next: { revalidate: 0 },
-      })
-      if (!res.ok) return
+  const res = await fetch(`${FR_API}?${params.toString()}`, {
+    next: { revalidate: 0 },
+  })
 
-      const xml = await res.text()
-      const items = parseItems(xml)
+  if (!res.ok) {
+    console.error(`Federal Register fetch failed: ${res.status}`)
+    return []
+  }
 
-      for (const item of items.slice(0, 20)) {
-        const text = `${item.title} ${item.description}`
-        results.push({
-          regulator,
-          title: item.title.slice(0, 500),
-          summary: item.description.replace(/<[^>]+>/g, '').slice(0, 1000),
-          url: item.link,
-          published_at: parseDate(item.pubDate),
-          relevance_score: scoreRelevance(text),
-          affected_rules: extractAffectedRules(text),
-          raw_content: item.description.slice(0, 5000),
-        })
-      }
-    })
-  )
+  const data = (await res.json()) as { results?: FRArticle[] }
+  const articles = data.results ?? []
 
-  return results
+  return articles.map((article) => {
+    const title = cleanTitle(article.title)
+    const summary = article.abstract ?? article.type ?? ''
+    const text = `${title} ${summary}`
+
+    return {
+      regulator: FINRA_RE.test(article.title) ? 'FINRA' : 'SEC',
+      title: title.slice(0, 500),
+      summary: summary.slice(0, 1000),
+      url: article.html_url,
+      published_at: article.publication_date
+        ? new Date(article.publication_date).toISOString()
+        : null,
+      relevance_score: scoreRelevance(text),
+      affected_rules: extractAffectedRules(text),
+      raw_content: summary.slice(0, 5000),
+    }
+  })
 }
