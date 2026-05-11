@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
@@ -35,7 +34,8 @@ export default function LoginPage() {
     return (
       <div className="w-full max-w-md text-center">
         <div className="mb-10 text-center">
-          <Image src="/logo.svg" alt="Regis" width={153} height={90} className="mx-auto mb-2" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="Regis" width={153} height={90} className="mx-auto mb-2" />
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Compliance Operations
           </p>
@@ -59,7 +59,8 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-md">
       <div className="mb-10 text-center">
-        <Image src="/logo.svg" alt="Regis" width={153} height={90} className="mx-auto mb-2" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.svg" alt="Regis" width={153} height={90} className="mx-auto mb-2" />
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
           Compliance Operations
         </p>

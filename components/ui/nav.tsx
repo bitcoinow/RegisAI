@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { SignOutButton } from '@/components/ui/sign-out-button'
 
 interface NavProps {
@@ -11,7 +10,8 @@ export function Nav({ email }: NavProps) {
     <nav className="border-b border-rule bg-bg-2">
       <div className="max-w-content mx-auto px-6 h-14 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center hover:opacity-80 transition-opacity">
-          <Image src="/logo.svg" alt="Regis" width={68} height={40} priority />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="Regis" width={68} height={40} />
         </Link>
 
         <div className="flex items-center gap-6">
