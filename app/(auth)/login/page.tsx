@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
-import { RegisLogo } from '@/components/ui/logo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -34,8 +34,8 @@ export default function LoginPage() {
   if (state === 'sent') {
     return (
       <div className="w-full max-w-md text-center">
-        <div className="mb-10">
-          <RegisLogo className="text-4xl" />
+        <div className="mb-10 text-center">
+          <Image src="/logo.svg" alt="Regis" width={153} height={90} className="mx-auto mb-2" />
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Compliance Operations
           </p>
@@ -58,8 +58,8 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="mb-10">
-        <h1 className="font-serif text-4xl text-green mb-1">Regis</h1>
+      <div className="mb-10 text-center">
+        <Image src="/logo.svg" alt="Regis" width={153} height={90} className="mx-auto mb-2" />
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
           Compliance Operations
         </p>

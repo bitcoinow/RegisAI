@@ -4,14 +4,11 @@ import type { ApiError, FindingStatus } from '@/types'
 
 const VALID_STATUSES: FindingStatus[] = ['open', 'in_progress', 'resolved']
 
-interface RouteContext {
-  params: { id: string }
-}
-
 export async function PATCH(
   req: NextRequest,
-  { params }: RouteContext
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<{ status: FindingStatus } | ApiError>> {
+  const { id } = await params
   const supabase = await createServiceClient()
 
   const {
@@ -38,7 +35,7 @@ export async function PATCH(
   const { data: finding } = await supabase
     .from('findings')
     .select('id, audit_id')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!finding) {
@@ -59,7 +56,7 @@ export async function PATCH(
   const { error: updateError } = await supabase
     .from('findings')
     .update({ status })
-    .eq('id', params.id)
+    .eq('id', id)
 
   if (updateError) {
     return NextResponse.json({ error: 'Update failed' }, { status: 500 })
