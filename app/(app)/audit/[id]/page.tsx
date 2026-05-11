@@ -5,10 +5,11 @@ import { AuditReport } from '@/components/audit/audit-report'
 import type { Audit, Finding, FindingStatus, RiskLevel } from '@/types'
 
 interface PageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function AuditReportPage({ params }: PageProps) {
+  const { id } = await params
   const supabase = await createClient()
 
   const {
@@ -24,7 +25,7 @@ export default async function AuditReportPage({ params }: PageProps) {
        strengths, priority_actions, created_at, document_id,
        findings (id, req_id, rule, requirement, policy_says, gap, risk, recommendation, status)`
     )
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
