@@ -35,7 +35,7 @@ export default function LoginPage() {
     return (
       <div className="w-full max-w-md text-center">
         <div className="mb-10 text-center">
-          <Image src="/logo.png" alt="Regis" width={214} height={120} className="mx-auto mb-2" />
+          <Image src="/logo.svg" alt="Regis" width={194} height={100} className="mx-auto mb-2" />
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Compliance Operations
           </p>
@@ -59,7 +59,7 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-md">
       <div className="mb-10 text-center">
-        <Image src="/logo.png" alt="Regis" width={214} height={120} className="mx-auto mb-2" />
+        <Image src="/logo.svg" alt="Regis" width={194} height={100} className="mx-auto mb-2" />
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
           Compliance Operations
         </p>

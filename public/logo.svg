@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 165">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&display=swap');
+      .wm{font-family:'Bodoni Moda',serif;font-size:120px;font-weight:500;letter-spacing:-5.4px;fill:#1C3829;}
+    </style>
+  </defs>
+  <!-- Regıs — dotless i (U+0131) so the dot can be positioned as a design element -->
+  <text class="wm" x="12" y="121">Reg&#x131;s</text>
+  <!-- i dot (dark green circle above the ı) -->
+  <circle cx="210" cy="27" r="7" fill="#1C3829"/>
+  <!-- Gold period dot -->
+  <circle cx="289" cy="101" r="11" fill="#C4902A"/>
+</svg>
