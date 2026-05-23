@@ -23,3 +23,71 @@ body {
   color: var(--ink);
   font-family: var(--font-inter), sans-serif;
 }
+
+@media print {
+  @page {
+    margin: 1.5cm;
+    size: portrait;
+  }
+
+  body {
+    background-color: var(--bg) !important;
+    color: var(--ink) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Expand all closed details (findings cards) automatically on print */
+  details > *:not(summary) {
+    display: block !important;
+  }
+
+  /* Hide summary toggle triangle markers and chevron indicators */
+  details summary::-webkit-details-marker {
+    display: none !important;
+  }
+  details summary::marker {
+    content: "" !important;
+  }
+  details summary {
+    cursor: default !important;
+    pointer-events: none !important;
+  }
+
+  /* Prevent elements from being sliced in half across pages */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  details,
+  section,
+  .border-rule,
+  table,
+  tr,
+  img {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Ensure background colors on cards print nicely */
+  .bg-bg-2 {
+    background-color: var(--bg-2) !important;
+  }
+
+  /* Make sure columns and flex layouts don't behave awkwardly when printed */
+  .grid {
+    display: grid !important;
+  }
+
+  /* Force borders to print */
+  .border {
+    border-style: solid !important;
+  }
+}
+

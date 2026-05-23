@@ -332,11 +332,11 @@ Or manually run `supabase/migrations/20260504000000_initial.sql` in the Supabase
 - [x] Demo environment (`/demo/clearview` — no login required)
 - [x] Deployed to Vercel (auto-deploy from `main`)
 
-### Phase 2 — Design partner onboarding (in progress)
+### Phase 2 — Design partner onboarding (complete)
 - [x] Finding status tracking (open / in-progress / resolved toggle on finding cards)
 - [x] Regulatory monitoring feed (FINRA + SEC RSS → `/monitoring`)
-- [ ] PDF export of audit report (browser `window.print()` with print stylesheet)
-- [ ] Weekly email digest of regulatory updates (Resend — already installed)
+- [x] PDF export of audit report (browser `window.print()` with print stylesheet)
+- [x] Weekly email digest of regulatory updates (Resend — already installed)
 
 ### Phase 3 — Pre-YC
 - [ ] Stripe billing integration

@@ -101,7 +101,7 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
 
       <div className="border-t border-rule px-6 py-5 space-y-4 text-sm">
         {!isDemo && (
-          <div>
+          <div className="print:hidden">
             <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-2">Status</p>
             <StatusToggle status={status} onUpdate={updateStatus} disabled={saving} />
           </div>

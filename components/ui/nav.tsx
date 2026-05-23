@@ -8,7 +8,7 @@ interface NavProps {
 
 export function Nav({ email }: NavProps) {
   return (
-    <nav className="border-b border-rule bg-bg-2">
+    <nav className="border-b border-rule bg-bg-2 print:hidden">
       <div className="max-w-content mx-auto px-6 h-14 flex items-center justify-between">
         <Link href="/dashboard" className="hover:opacity-80 transition-opacity">
           <RegisLogo className="text-xl" />
