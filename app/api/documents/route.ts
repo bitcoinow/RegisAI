@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { extractTextFromPdf } from '@/lib/pdf'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import type { DocumentUploadResponse, ApiError } from '@/types'
 
 // GET /api/documents — list documents for the authenticated user
 export async function GET(
   _req: NextRequest
 ): Promise<NextResponse> {
-  const supabase = await createServiceClient()
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -36,7 +36,7 @@ export async function GET(
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<DocumentUploadResponse | ApiError>> {
-  const supabase = await createServiceClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

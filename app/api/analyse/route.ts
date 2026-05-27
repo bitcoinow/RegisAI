@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { runGapAnalysis } from '@/lib/claude'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import type { AnalyseResponse, ApiError, Finding } from '@/types'
 
 export async function POST(
@@ -18,7 +18,7 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const supabase = await createServiceClient()
+  const supabase = await createClient()
 
   // ── 1. Auth check ──────────────────────────────────────────────────────────
   const {
