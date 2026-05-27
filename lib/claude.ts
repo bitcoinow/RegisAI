@@ -1,6 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { REGULATORY_LIBRARY } from '@/lib/regulatory-library'
-import type { AuditResult } from '@/types'
+import { EU_REGULATORY_LIBRARY } from '@/lib/eu-regulatory-library'
+import { UK_REGULATORY_LIBRARY } from '@/lib/uk-regulatory-library'
+import type { AuditResult, Jurisdiction } from '@/types'
 
 // All Claude API calls live here. Do not call the Anthropic SDK from API routes or components.
 
@@ -17,18 +19,31 @@ function getClient(): Anthropic {
   return _client
 }
 
-let _systemPrompt: string | null = null
+const _systemPrompts = new Map<Jurisdiction, string>()
 
-function buildSystemPrompt(): string {
-  if (_systemPrompt) return _systemPrompt
-  const requirementsContext = REGULATORY_LIBRARY.map(
+function buildSystemPrompt(jurisdiction: Jurisdiction): string {
+  if (_systemPrompts.has(jurisdiction)) return _systemPrompts.get(jurisdiction)!
+
+  const library =
+    jurisdiction === 'EU' ? EU_REGULATORY_LIBRARY
+    : jurisdiction === 'UK' ? UK_REGULATORY_LIBRARY
+    : REGULATORY_LIBRARY
+
+  const requirementsContext = library.map(
     (req) =>
       `${req.id} | ${req.rule} | ${req.framework} | ${req.requirement}\n${req.description}`
   ).join('\n\n')
 
-  const prompt = `You are a senior compliance analyst with 15 years of experience in financial services regulation. You specialise in FINRA, SEC, AML/BSA, Regulation Best Interest, and business continuity requirements for mid-market firms.
+  const jurisdictionExpertise =
+    jurisdiction === 'EU'
+      ? 'MiFID II, GDPR, AMLD6, DORA, SFDR, and MAR requirements for EU financial services firms'
+      : jurisdiction === 'UK'
+      ? 'FCA Rules (SYSC, COBS, SM&CR), UK AML (MLR 2017), UK GDPR, FCA Consumer Duty, and FCA Operational Resilience requirements for UK financial services firms'
+      : 'FINRA, SEC, AML/BSA, Regulation Best Interest, and business continuity requirements for mid-market firms'
 
-You are performing a regulatory gap analysis on a compliance manual submitted by a financial services firm. You will evaluate the document against the following 32 regulatory requirements:
+  const prompt = `You are a senior compliance analyst with 15 years of experience in financial services regulation. You specialise in ${jurisdictionExpertise}.
+
+You are performing a regulatory gap analysis on a compliance manual submitted by a financial services firm. You will evaluate the document against the following ${library.length} regulatory requirements:
 
 --- REGULATORY LIBRARY START ---
 ${requirementsContext}
@@ -60,13 +75,14 @@ OUTPUT FORMAT (strict JSON, no markdown fences):
   "strengths": ["array of short strings describing areas of clear compliance"],
   "priority_actions": ["ordered array of the top 3-5 most urgent remediation actions"]
 }`
-  _systemPrompt = prompt
-  return _systemPrompt
+  _systemPrompts.set(jurisdiction, prompt)
+  return prompt
 }
 
 export async function runGapAnalysis(
   documentText: string,
-  firmName?: string
+  firmName?: string,
+  jurisdiction: Jurisdiction = 'US'
 ): Promise<AuditResult> {
   const client = getClient()
 
@@ -86,7 +102,7 @@ export async function runGapAnalysis(
     system: [
       {
         type: 'text',
-        text: buildSystemPrompt(),
+        text: buildSystemPrompt(jurisdiction),
         cache_control: { type: 'ephemeral' },
       },
     ],
