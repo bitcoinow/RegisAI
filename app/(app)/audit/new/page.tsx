@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { UploadForm } from '@/components/audit/upload-form'
+import { NewAuditForm } from '@/components/audit/new-audit-form'
 
 export default function NewAuditPage() {
   return (
@@ -13,35 +13,12 @@ export default function NewAuditPage() {
       <div className="max-w-lg">
         <h1 className="font-serif text-3xl text-ink mb-2">New Gap Analysis</h1>
         <p className="text-ink-3 text-sm mb-8">
-          Upload your compliance manual as a PDF. Regis will analyse it against 32 FINRA, SEC,
-          AML/BSA, and Regulation Best Interest requirements and return a structured findings
-          report.
+          Select your regulatory jurisdiction, then upload your compliance manual as a PDF.
+          Regis will analyse it and return a structured findings report with risk-rated gaps,
+          rule citations, and remediation recommendations.
         </p>
 
-        <UploadForm />
-
-        <div className="mt-6 pt-6 border-t border-rule">
-          <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-3">
-            What we analyse
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              'FINRA Rules 3110–3130',
-              'SEC Regulation S-P',
-              'AML / BSA (FinCEN)',
-              'Regulation Best Interest',
-              'Customer Identification (CIP)',
-              'Customer Due Diligence (CDD)',
-              'OFAC Sanctions',
-              'Business Continuity',
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-2">
-                <span className="text-green text-xs">·</span>
-                <span className="text-ink-3 text-xs">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <NewAuditForm />
       </div>
     </div>
   )

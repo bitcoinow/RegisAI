@@ -2,17 +2,18 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import type { Jurisdiction } from '@/types'
 
 type Stage = 'idle' | 'uploading' | 'analysing' | 'error'
 
-const stageLabel: Record<Stage, string> = {
-  idle: '',
-  uploading: 'Extracting text from PDF…',
-  analysing: 'Analysing against 32 regulatory requirements…',
-  error: '',
-}
-
-export function UploadForm() {
+export function UploadForm({ jurisdiction }: { jurisdiction: Jurisdiction }) {
+  const requirementCount: Record<Jurisdiction, number> = { US: 32, EU: 23, UK: 19 }
+  const stageLabel: Record<Stage, string> = {
+    idle: '',
+    uploading: 'Extracting text from PDF…',
+    analysing: `Analysing against ${requirementCount[jurisdiction]} regulatory requirements…`,
+    error: '',
+  }
   const [stage, setStage] = useState<Stage>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -48,7 +49,7 @@ export function UploadForm() {
     const analyseRes = await fetch('/api/analyse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ document_id }),
+      body: JSON.stringify({ document_id, jurisdiction }),
     })
 
     if (!analyseRes.ok) {
