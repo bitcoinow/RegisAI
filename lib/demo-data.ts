@@ -5,6 +5,7 @@ export const CLEARVIEW_DEMO: Audit = {
   id: 'demo-clearview',
   document_id: 'demo-doc',
   user_id: 'demo-user',
+  jurisdiction: 'US',
   firm_name: 'Clearview Capital Management',
   exec_summary:
     "Clearview Capital Management's compliance manual demonstrates a foundational compliance framework; however, the analysis identifies 18 significant gaps against applicable FINRA, SEC, AML/BSA, and Regulation Best Interest requirements. Seven findings present High risk exposure requiring immediate remediation before the firm's next regulatory examination. The firm demonstrates strength in investment policy documentation and Form ADV disclosures, but critical deficiencies exist in supervisory procedures, AML controls, and Reg BI implementation.",

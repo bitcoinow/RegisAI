@@ -22,7 +22,7 @@ export default async function AuditReportPage({ params }: PageProps) {
     .from('audits')
     .select(
       `id, firm_name, exec_summary, total_gaps, high_risk, medium_risk, low_risk,
-       strengths, priority_actions, created_at, document_id,
+       strengths, priority_actions, created_at, document_id, jurisdiction,
        findings (id, req_id, rule, requirement, policy_says, gap, risk, recommendation, status)`
     )
     .eq('id', id)
@@ -51,6 +51,7 @@ export default async function AuditReportPage({ params }: PageProps) {
     id: row.id as string,
     document_id: row.document_id as string,
     user_id: user.id,
+    jurisdiction: (((row as unknown as Record<string, unknown>)['jurisdiction'] as string) ?? 'US') as import('@/types').Jurisdiction,
     firm_name: row.firm_name as string,
     exec_summary: (row.exec_summary as string) ?? '',
     total_gaps: (row.total_gaps as number) ?? 0,

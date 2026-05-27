@@ -8,7 +8,15 @@ export type DocumentStatus = 'uploaded' | 'analysing' | 'complete' | 'error'
 
 export type FindingStatus = 'open' | 'in_progress' | 'resolved'
 
-export type RegulatoryFramework = 'FINRA' | 'SEC' | 'AML' | 'RegBI' | 'BCP'
+export type RegulatoryFramework =
+  // US
+  | 'FINRA' | 'SEC' | 'AML' | 'RegBI' | 'BCP'
+  // EU
+  | 'MiFID II' | 'GDPR' | 'AMLD' | 'DORA' | 'SFDR' | 'MAR'
+  // UK
+  | 'SM&CR' | 'FCA Conduct' | 'FCA Systems' | 'UK AML' | 'UK GDPR' | 'FCA OpRes'
+
+export type Jurisdiction = 'US' | 'EU' | 'UK'
 
 // ── Regulatory library ────────────────────────────────────────────────────────
 
@@ -69,6 +77,7 @@ export interface Audit {
   id: string
   document_id: string
   user_id: string
+  jurisdiction: Jurisdiction
   firm_name: string
   exec_summary: string
   total_gaps: number
