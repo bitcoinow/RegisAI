@@ -17,7 +17,7 @@ RegisAI is a **Compliance-as-a-Service** platform. Firms upload their compliance
 
 1. A firm uploads their compliance manual (PDF).
 2. Regis extracts the text and runs it through a Claude-powered gap analysis engine.
-3. The engine checks the document against a library of 32 regulatory requirements across FINRA, SEC, AML/BSA, Reg BI, and BCP frameworks.
+3. The engine checks the document against a jurisdiction-specific regulatory library — 32 US requirements (FINRA, SEC, AML/BSA, Reg BI, BCP), 23 EU requirements (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR), or 19 UK requirements (FCA Rules, UK AML, UK GDPR, SM&CR, FCA OpRes).
 4. A structured audit report is returned with:
    - Executive summary
    - Gap findings with risk level (High / Medium / Low), rule citation, and remediation recommendation
@@ -144,6 +144,7 @@ audits (
   strengths jsonb,
   priority_actions jsonb,
   raw_result jsonb,         -- full Claude response
+  jurisdiction text default 'US',  -- 'US' | 'EU' | 'UK'
   created_at timestamptz default now()
 )
 
@@ -221,15 +222,39 @@ Returns all stored `regulatory_updates` ordered by `published_at` descending, li
 
 ## Regulatory Library
 
-Lives in `lib/regulatory-library.ts` as a typed array of 32 requirements across 5 frameworks:
+Three jurisdiction-specific typed arrays, each consumed by `buildSystemPrompt(jurisdiction)` in `lib/claude.ts`.
+
+### United States — `lib/regulatory-library.ts` (32 requirements)
 
 | Framework | Coverage |
 |---|---|
-| FINRA | Rules 3110, 3120, 2111, 4512, 4370, 4511, 3310, 2210, 4530, 4513 |
-| SEC | Rules 17a-3, 17a-4, 206(4)-7, 204A-1, 38a-1, 204-2, 206(4)-5 |
-| AML/BSA | Customer ID, SAR, CTR, Risk Assessment, Training, OFAC |
-| Reg BI | Best Interest, Disclosure, Care, Conflict of Interest |
-| BCP | Business Continuity, Recovery, Testing |
+| FINRA | Rules 3110, 3120, 2010, 2111, 4511, 3310, 3130 |
+| SEC | Rules 17a-3, 17a-4, Reg S-P, 206(4)-7, 204A-1, Reg S-ID, 15c3-3, 206(4)-2 |
+| AML/BSA | Customer ID, SAR, CTR, CDD, Beneficial Ownership, OFAC Sanctions |
+| Reg BI | Best Interest, Form CRS, Conflicts of Interest, Compliance, Fiduciary Duty |
+| BCP | Business Continuity, Annual Review, Internal Inspections, Incident Response |
+
+### European Union — `lib/eu-regulatory-library.ts` (23 requirements)
+
+| Framework | Coverage |
+|---|---|
+| MiFID II | Organisational Requirements, Suitability, Best Execution, Conflicts of Interest, Client Communication, Product Governance |
+| GDPR | Lawfulness of Processing, Controller Accountability, Security, Breach Notification, DPO Designation |
+| AMLD6 | AML Programme, CDD, Enhanced Due Diligence, Beneficial Ownership, Suspicious Transaction Reporting |
+| DORA | ICT Risk Management, Incident Reporting, Resilience Testing |
+| SFDR | Sustainability Risk Policy, Principal Adverse Impact Disclosure |
+| MAR | Market Abuse Prevention, Disclosure of Inside Information |
+
+### United Kingdom — `lib/uk-regulatory-library.ts` (19 requirements)
+
+| Framework | Coverage |
+|---|---|
+| SM&CR | Senior Management Arrangements, Statements of Responsibilities, Certification Regime |
+| FCA Conduct | Consumer Duty, Best Interests Rule, Suitability Assessment, Financial Promotions |
+| FCA Systems | Compliance Function, Risk Assessment & Control, Conflicts of Interest Policy |
+| UK AML | AML Policies & Procedures, CDD, Enhanced Due Diligence (PEPs), Training |
+| UK GDPR | Data Processing Principles, Security of Processing, ICO Registration & DPO |
+| FCA OpRes | Important Business Services & Impact Tolerances, Resilience Testing & Self-Assessment |
 
 Each requirement has: `id`, `rule`, `framework`, `requirement`, `description`, `defaultRisk`.
 
@@ -339,6 +364,7 @@ Or manually run `supabase/migrations/20260504000000_initial.sql` in the Supabase
 - [x] Weekly email digest of regulatory updates (Resend — already installed)
 
 ### Phase 3 — Pre-YC
+- [x] EU & UK regulatory libraries (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR + FCA Rules, SM&CR, UK GDPR)
 - [ ] Stripe billing integration
 - [ ] Multi-document support per firm
 - [ ] Policy update drafting (Claude generates amended policy language)

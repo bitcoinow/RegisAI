@@ -34,7 +34,12 @@ There are no tests configured in this project.
 
 ### AI Integration (`lib/claude.ts`)
 
-Uses `claude-sonnet-4-20250514`. The system prompt embeds all 32 regulatory requirements from `lib/regulatory-library.ts` (FINRA, SEC, AML/BSA, Reg BI). Document text is truncated to 12,000 characters before sending. Returns structured JSON with `gaps[]`, `strengths[]`, and `priorityActions[]`.
+Uses `claude-sonnet-4-20250514`. The system prompt embeds all regulatory requirements for the selected jurisdiction from one of three libraries:
+- `lib/regulatory-library.ts` — 32 US requirements (FINRA, SEC, AML/BSA, Reg BI, BCP)
+- `lib/eu-regulatory-library.ts` — 23 EU requirements (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR)
+- `lib/uk-regulatory-library.ts` — 19 UK requirements (FCA Rules, UK AML, UK GDPR, SM&CR, FCA OpRes)
+
+`buildSystemPrompt(jurisdiction)` is memoised per jurisdiction using a `Map<Jurisdiction, string>`. `runGapAnalysis(text, firmName?, jurisdiction?)` defaults to `'US'`. Document text is truncated to 12,000 characters before sending. Returns structured JSON with `gaps[]`, `strengths[]`, and `priorityActions[]`.
 
 ### Authentication & Authorization
 
@@ -46,7 +51,7 @@ Uses `claude-sonnet-4-20250514`. The system prompt embeds all 32 regulatory requ
 
 Tables: `profiles`, `documents`, `audits`, `findings`, `regulatory_updates`
 
-Migration in `supabase/migrations/20260504000000_initial.sql`. A trigger auto-creates a profile row on new user signup. The `findings` and `regulatory_updates` tables exist for a Phase 2 monitoring feature (not yet implemented beyond the placeholder page).
+Migrations in `supabase/migrations/`. The initial schema is `20260504000000_initial.sql`. `20260527000000_audits_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `audits` table. A trigger auto-creates a profile row on new user signup. The `findings` and `regulatory_updates` tables exist for a Phase 2 monitoring feature (not yet implemented beyond the placeholder page).
 
 ### Environment Variables
 
