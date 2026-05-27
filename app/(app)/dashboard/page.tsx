@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RiskBadge } from '@/components/ui/risk-badge'
-import type { RiskLevel } from '@/types'
+import type { Jurisdiction, RiskLevel } from '@/types'
 
 interface AuditRow {
   id: string
@@ -10,7 +10,25 @@ interface AuditRow {
   high_risk: number
   medium_risk: number
   low_risk: number
+  jurisdiction: string
   created_at: string
+}
+
+function JurisdictionBadge({ jurisdiction }: { jurisdiction: string }) {
+  const colorMap: Record<string, string> = {
+    US: 'var(--ink-3)',
+    EU: 'var(--blue)',
+    UK: 'var(--gold)',
+  }
+  const color = colorMap[jurisdiction] ?? 'var(--ink-3)'
+  return (
+    <span
+      className="font-mono text-[9px] tracking-widest uppercase px-1.5 py-0.5 border"
+      style={{ color, borderColor: color }}
+    >
+      {jurisdiction}
+    </span>
+  )
 }
 
 function dominantRisk(row: AuditRow): RiskLevel {
@@ -24,7 +42,7 @@ export default async function DashboardPage() {
 
   const { data: audits } = await supabase
     .from('audits')
-    .select('id, firm_name, total_gaps, high_risk, medium_risk, low_risk, created_at')
+    .select('id, firm_name, total_gaps, high_risk, medium_risk, low_risk, jurisdiction, created_at')
     .order('created_at', { ascending: false })
 
   const rows = (audits ?? []) as AuditRow[]
@@ -87,7 +105,12 @@ export default async function DashboardPage() {
                     i % 2 === 0 ? 'bg-bg' : 'bg-bg-2'
                   }`}
                 >
-                  <td className="px-5 py-4 text-ink font-medium">{audit.firm_name}</td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-ink font-medium">{audit.firm_name}</span>
+                      <JurisdictionBadge jurisdiction={audit.jurisdiction ?? 'US'} />
+                    </div>
+                  </td>
                   <td className="px-5 py-4 text-ink-3 font-mono text-xs">
                     {new Date(audit.created_at).toLocaleDateString('en-GB', {
                       day: 'numeric',

@@ -6,6 +6,12 @@ import { RiskBadge } from '@/components/ui/risk-badge'
 
 const RISK_ORDER: Record<RiskLevel, number> = { High: 0, Medium: 1, Low: 2 }
 
+const JURISDICTION_FRAMEWORKS: Record<string, string> = {
+  US: 'FINRA · SEC · AML/BSA · Reg BI · BCP',
+  EU: 'MiFID II · GDPR · AMLD6 · DORA · SFDR · MAR',
+  UK: 'FCA Rules · UK AML · UK GDPR · SM&CR · FCA OpRes',
+}
+
 const STATUS_CONFIG: Record<FindingStatus, { label: string; color: string }> = {
   open: { label: 'Open', color: 'text-ink-3' },
   in_progress: { label: 'In Progress', color: 'text-amber' },
@@ -129,6 +135,10 @@ interface AuditReportProps {
 }
 
 export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
+  const jurisdictionColor =
+    audit.jurisdiction === 'EU' ? 'var(--blue)'
+    : audit.jurisdiction === 'UK' ? 'var(--gold)'
+    : 'var(--ink-3)'
   const sortedFindings = [...audit.findings].sort(
     (a, b) => RISK_ORDER[a.risk]! - RISK_ORDER[b.risk]!
   )
@@ -150,9 +160,18 @@ export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
               Demo Report
             </div>
           )}
+          <span
+            className="inline-block font-mono text-xs tracking-widest uppercase px-3 py-1 border mb-4"
+            style={{ color: jurisdictionColor, borderColor: jurisdictionColor }}
+          >
+            {audit.jurisdiction ?? 'US'}
+          </span>
           <h1 className="font-serif text-4xl text-ink mb-2">{audit.firm_name}</h1>
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Regulatory Gap Analysis &nbsp;·&nbsp; {formattedDate}
+          </p>
+          <p className="font-mono text-xs text-ink-3 mt-1">
+            {JURISDICTION_FRAMEWORKS[audit.jurisdiction ?? 'US'] ?? JURISDICTION_FRAMEWORKS.US}
           </p>
         </div>
         <button

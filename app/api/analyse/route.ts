@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { runGapAnalysis } from '@/lib/claude'
 import { createClient } from '@/lib/supabase/server'
-import type { AnalyseResponse, ApiError, Finding } from '@/types'
+import type { AnalyseResponse, ApiError, Finding, Jurisdiction } from '@/types'
 
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<AnalyseResponse | ApiError>> {
   let document_id: string
+  let jurisdiction: Jurisdiction
 
   try {
-    const body = (await req.json()) as { document_id?: unknown }
+    const body = (await req.json()) as { document_id?: unknown; jurisdiction?: unknown }
     if (!body.document_id || typeof body.document_id !== 'string') {
       return NextResponse.json({ error: 'document_id is required' }, { status: 400 })
     }
     document_id = body.document_id
+    jurisdiction = (['US', 'EU', 'UK'] as const).includes(body.jurisdiction as Jurisdiction)
+      ? (body.jurisdiction as Jurisdiction)
+      : 'US'
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
@@ -70,7 +74,7 @@ export async function POST(
   // ── 5. Run gap analysis ────────────────────────────────────────────────────
   let auditResult
   try {
-    auditResult = await runGapAnalysis(document.extracted_text, firmName)
+    auditResult = await runGapAnalysis(document.extracted_text, firmName, jurisdiction)
   } catch (err) {
     console.error('Gap analysis failed:', err)
     await supabase
@@ -99,6 +103,7 @@ export async function POST(
     .insert({
       document_id,
       user_id: user.id,
+      jurisdiction,
       firm_name: auditResult.firm_name,
       exec_summary: auditResult.exec_summary,
       total_gaps: auditResult.gaps.length,
