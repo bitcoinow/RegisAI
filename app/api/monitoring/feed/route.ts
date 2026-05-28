@@ -6,6 +6,7 @@ export interface FeedResponse {
   updates: {
     id: string
     regulator: string
+    jurisdiction: string
     title: string
     summary: string | null
     url: string
@@ -30,7 +31,7 @@ export async function GET(): Promise<NextResponse<FeedResponse | ApiError>> {
 
   const { data, error } = await supabase
     .from('regulatory_updates')
-    .select('id, regulator, title, summary, url, published_at, relevance_score, affected_rules, created_at')
+    .select('id, regulator, jurisdiction, title, summary, url, published_at, relevance_score, affected_rules, created_at')
     .order('published_at', { ascending: false, nullsFirst: false })
     .limit(100)
 

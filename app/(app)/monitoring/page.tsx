@@ -4,14 +4,42 @@ import { useState, useEffect } from 'react'
 import type { FeedResponse } from '@/app/api/monitoring/feed/route'
 
 type Update = FeedResponse['updates'][number]
+type JurisdictionFilter = 'US' | 'EU' | 'UK'
+
+const JURISDICTION_LABELS: Record<JurisdictionFilter, string> = {
+  US: 'United States',
+  EU: 'European Union',
+  UK: 'United Kingdom',
+}
+
+const JURISDICTION_SOURCES: Record<JurisdictionFilter, string> = {
+  US: 'FINRA · SEC',
+  EU: 'ESMA · EBA',
+  UK: 'FCA · PRA',
+}
+
+const REGULATOR_STYLES: Record<string, string> = {
+  FINRA: 'bg-green text-white',
+  SEC: 'text-ink-2 border border-rule bg-bg-2',
+}
 
 function RegulatorBadge({ regulator }: { regulator: string }) {
-  const cls =
-    regulator === 'FINRA'
-      ? 'bg-green text-white'
-      : 'text-ink-2 border border-rule bg-bg-2'
+  const staticCls = REGULATOR_STYLES[regulator]
+  if (staticCls) {
+    return (
+      <span className={`inline-block font-mono text-xs tracking-widest uppercase px-2 py-0.5 ${staticCls}`}>
+        {regulator}
+      </span>
+    )
+  }
+  // EU badges = blue, UK badges = gold
+  const euRegs = new Set(['ESMA', 'EBA'])
+  const color = euRegs.has(regulator) ? 'var(--blue)' : 'var(--gold)'
   return (
-    <span className={`inline-block font-mono text-xs tracking-widest uppercase px-2 py-0.5 ${cls}`}>
+    <span
+      className="inline-block font-mono text-xs tracking-widest uppercase px-2 py-0.5 border"
+      style={{ color, borderColor: color }}
+    >
       {regulator}
     </span>
   )
@@ -86,6 +114,7 @@ function FeedItem({ item }: { item: Update }) {
 export default function MonitoringPage() {
   const [updates, setUpdates] = useState<Update[]>([])
   const [fetching, setFetching] = useState(true)
+  const [jurisdictionFilter, setJurisdictionFilter] = useState<JurisdictionFilter>('US')
   const [refreshState, setRefreshState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [refreshDetail, setRefreshDetail] = useState<string | null>(null)
 
@@ -130,8 +159,14 @@ export default function MonitoringPage() {
           ? 'Error — retry'
           : 'Refresh Feed'
 
-  const finraCount = updates.filter((u) => u.regulator === 'FINRA').length
-  const secCount = updates.filter((u) => u.regulator === 'SEC').length
+  const jurisCount: Record<JurisdictionFilter, number> = {
+    US: updates.filter((u) => u.jurisdiction === 'US').length,
+    EU: updates.filter((u) => u.jurisdiction === 'EU').length,
+    UK: updates.filter((u) => u.jurisdiction === 'UK').length,
+  }
+
+  const filtered = updates.filter((u) => u.jurisdiction === jurisdictionFilter)
+
   const firstUpdate = updates[0]
   const lastUpdated = firstUpdate
     ? new Date(firstUpdate.created_at).toLocaleDateString('en-GB', {
@@ -139,7 +174,7 @@ export default function MonitoringPage() {
         month: 'short',
         year: 'numeric',
       })
-      : null
+    : null
 
   return (
     <div className="max-w-content mx-auto px-6 py-10">
@@ -148,7 +183,7 @@ export default function MonitoringPage() {
         <div>
           <h1 className="font-serif text-3xl text-ink mb-1">Regulatory Updates</h1>
           <p className="text-ink-3 text-sm">
-            FINRA · SEC · live compliance feed
+            {JURISDICTION_SOURCES[jurisdictionFilter]} · live compliance feed
             {lastUpdated && (
               <span className="ml-3 font-mono text-xs">updated {lastUpdated}</span>
             )}
@@ -170,13 +205,32 @@ export default function MonitoringPage() {
         </div>
       </div>
 
+      {/* ── Jurisdiction Tabs ───────────────────────────────────────────────── */}
+      <div className="flex border border-rule mb-6">
+        {(Object.keys(JURISDICTION_LABELS) as JurisdictionFilter[]).map((j) => (
+          <button
+            key={j}
+            onClick={() => setJurisdictionFilter(j)}
+            className={`flex-1 py-2.5 font-mono text-xs tracking-widest uppercase transition-colors
+              ${jurisdictionFilter === j
+                ? 'bg-green text-white'
+                : 'text-ink-3 hover:text-ink hover:bg-bg-2'}`}
+          >
+            {JURISDICTION_LABELS[j]}
+            <span className="ml-2 opacity-70">({jurisCount[j]})</span>
+          </button>
+        ))}
+      </div>
+
       {/* ── Stats ──────────────────────────────────────────────────────────── */}
       {updates.length > 0 && (
         <div className="flex gap-4 mb-6">
           {[
-            { label: 'Total', value: updates.length },
-            { label: 'FINRA', value: finraCount },
-            { label: 'SEC', value: secCount },
+            { label: 'Total', value: filtered.length },
+            ...JURISDICTION_SOURCES[jurisdictionFilter].split(' · ').map((reg) => ({
+              label: reg,
+              value: filtered.filter((u) => u.regulator === reg).length,
+            })),
           ].map(({ label, value }) => (
             <div key={label} className="border border-rule bg-bg-2 px-4 py-3 min-w-[80px]">
               <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-1">{label}</p>
@@ -191,16 +245,17 @@ export default function MonitoringPage() {
         <div className="border border-rule bg-bg-2 p-12 text-center">
           <p className="text-ink-3 text-sm">Loading feed…</p>
         </div>
-      ) : updates.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="border border-rule bg-bg-2 p-16 text-center">
           <p className="font-serif text-2xl text-ink mb-2">No updates yet</p>
           <p className="text-ink-3 text-sm">
-            Click <span className="text-ink">Refresh Feed</span> to pull the latest FINRA and SEC notices.
+            Click <span className="text-ink">Refresh Feed</span> to pull the latest{' '}
+            {JURISDICTION_SOURCES[jurisdictionFilter]} notices.
           </p>
         </div>
       ) : (
         <div className="border border-rule overflow-hidden">
-          {updates.map((item) => (
+          {filtered.map((item) => (
             <FeedItem key={item.id} item={item} />
           ))}
         </div>

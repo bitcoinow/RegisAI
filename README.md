@@ -90,6 +90,11 @@ RegisAI/
 │       ├── client.ts                 # Browser Supabase client
 │       └── server.ts                 # Server Supabase client (SSR cookies)
 ├── middleware.ts                     # Auth session refresh on every request
+├── plans/                            # Strategic plans and architectural design documents
+│   ├── 01-core-mvp-scaffold.md       # Phase 1 Core MVP scaffold & database setup
+│   ├── 02-finding-tracking-and-monitoring.md # Phase 2 status tracking & monitoring feed
+│   ├── 03-eu-uk-regulatory-expansion.md # Phase 3 regulatory library expansion
+│   └── 04-eu-uk-monitoring-expansion.md # Phase 3 monitoring feed expansion
 ├── supabase/
 │   └── migrations/
 │       ├── 20260504000000_initial.sql            # Full schema
@@ -101,6 +106,41 @@ RegisAI/
 ├── .env.example                      # Environment variable template
 └── lessons.md                        # Build session learnings log
 ```
+
+---
+
+## Planning & Strategy
+
+To ensure long-term maintainability, strategic alignment, and the ability to review past decisions, RegisAI enforces a disciplined planning protocol. All architectural changes, major feature implementations, and strategic milestones are documented upfront and preserved historically.
+
+### The Planning Protocol
+1. **Design & Strategy Phase:** Before writing any complex code, a comprehensive planning document is created under the `plans/` directory.
+2. **Phased Structure:** Plans are written in Markdown, structured by clear execution phases (Types/Libraries, AI Prompts, DB Schema, API routes, UI, Verification).
+3. **Permanent Archive:** Documents in the `plans/` folder are committed as source-controlled history, enabling the team to easily go back and study the reasoning behind structural decisions.
+4. **Retrospective Log:** Critical takeaways, structural friction, or paradigm shifts are summarized post-implementation in [lessons.md](lessons.md).
+
+### Saved Strategy & Planning Documents
+Here is the index of all historic and active planning documents:
+
+- **[Plan 01 — Core MVP & Compliance Analysis Engine](plans/01-core-mvp-scaffold.md)**
+  * **Objective:** Establish the foundational RegisAI architecture, database schema, PDF text extraction pipeline, and initial Claude-powered gap analysis engine.
+  * **Scope:** Configured Supabase Auth/RLS, built 32-requirement US regulatory library, integrated `pdf-parse`, drafted robust cached prompts in `lib/claude.ts`, and designed the primary audit dashboard and report pages.
+  * **Status:** Complete.
+
+- **[Plan 02 — Finding Tracking, Monitoring Feed & Exports](plans/02-finding-tracking-and-monitoring.md)**
+  * **Objective:** Enhance platform engagement and interactivity by adding individual finding status toggling, Live RSS/Federal Register updates, and robust PDF exports.
+  * **Scope:** Modeled discrete `findings` table with interactive card statuses, designed regulatory feed RSS/Federal Register parsers, integrated relevance scoring via Claude, and developed custom CSS print stylesheets for browser-native PDF export.
+  * **Status:** Complete.
+
+- **[Plan 03 — EU & UK Regulatory Expansion](plans/03-eu-uk-regulatory-expansion.md)**
+  * **Objective:** Expand the compliance gap analysis engine to handle EU and UK manuals alongside the existing US framework.
+  * **Scope:** Added `Jurisdiction` types, built 23 EU and 19 UK regulatory requirements, configured jurisdiction-aware prompt caching in Claude engine, ran Supabase schema migration, and implemented the multi-tab UI selector.
+  * **Status:** Complete.
+
+- **[Plan 04 — EU & UK Regulatory Monitoring Expansion](plans/04-eu-uk-monitoring-expansion.md)**
+  * **Objective:** Extend the automated regulatory feed parser to ingest live updates from EU and UK watchdogs and implement a dashboard jurisdiction filter.
+  * **Scope:** Ingested ESMA, EBA, FCA, and PRA RSS feeds, updated relevance keyword matching patterns, added `jurisdiction` column to the DB schema, and built a dynamic three-tab filtering UI on the monitoring board.
+  * **Status:** Complete.
 
 ---
 
@@ -163,15 +203,16 @@ findings (
   created_at timestamptz default now()
 )
 
--- Regulatory monitoring feed (Phase 2)
+-- Regulatory monitoring feed
 regulatory_updates (
   id uuid primary key default gen_random_uuid(),
-  regulator text,           -- 'FINRA' | 'SEC' | 'CFPB' | 'FinCEN'
+  regulator text,           -- 'FINRA' | 'SEC' | 'ESMA' | 'EBA' | 'FCA' | 'PRA'
+  jurisdiction text default 'US',  -- 'US' | 'EU' | 'UK'
   title text,
   summary text,
   url text,
   published_at timestamptz,
-  relevance_score int,      -- 1-5, Claude-generated
+  relevance_score int,      -- 1-5, rule-keyword scored
   affected_rules text[],
   raw_content text,
   created_at timestamptz default now()
@@ -209,14 +250,18 @@ Accepts `{ status: 'open' | 'in_progress' | 'resolved' }`.
 
 ### `POST /api/monitoring/refresh`
 No body required.
-1. Fetches RSS feeds from SEC (proposed rules, final rules, enforcement) and FINRA (regulatory notices)
-2. Parses XML with a zero-dependency regex parser in `lib/monitoring.ts`
-3. Scores each item 1–5 for relevance and extracts affected rule citations
-4. Upserts into `regulatory_updates` (deduped on `url`)
-5. Returns `{ inserted: number }`
+1. Fetches regulatory updates from three jurisdiction sources in parallel:
+   - **US**: Federal Register JSON API (SEC + FINRA)
+   - **EU**: ESMA RSS + EBA RSS (falls back to `[]` gracefully if blocked)
+   - **UK**: FCA RSS + PRA/Bank of England RSS (same fallback)
+2. Parses RSS/Atom XML with a zero-dependency regex parser in `lib/monitoring.ts`
+3. Tags each item with its `jurisdiction` (`'US'` | `'EU'` | `'UK'`)
+4. Scores each item 1–5 for relevance and extracts affected rule citations (US, EU, and UK rules)
+5. Upserts into `regulatory_updates` (deduped on `url`)
+6. Returns `{ inserted: number, parsed: number }`
 
 ### `GET /api/monitoring/feed`
-Returns all stored `regulatory_updates` ordered by `published_at` descending, limited to 100 rows.
+Returns all stored `regulatory_updates` ordered by `published_at` descending, limited to 100 rows. Each item includes a `jurisdiction` field for client-side filtering.
 
 ---
 

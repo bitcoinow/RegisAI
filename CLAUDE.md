@@ -51,7 +51,16 @@ Uses `claude-sonnet-4-20250514`. The system prompt embeds all regulatory require
 
 Tables: `profiles`, `documents`, `audits`, `findings`, `regulatory_updates`
 
-Migrations in `supabase/migrations/`. The initial schema is `20260504000000_initial.sql`. `20260527000000_audits_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `audits` table. A trigger auto-creates a profile row on new user signup. The `findings` and `regulatory_updates` tables exist for a Phase 2 monitoring feature (not yet implemented beyond the placeholder page).
+Migrations in `supabase/migrations/`. The initial schema is `20260504000000_initial.sql`. `20260527000000_audits_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `audits` table. `20260528000000_regulatory_updates_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `regulatory_updates` table. A trigger auto-creates a profile row on new user signup.
+
+### Regulatory Monitoring (`lib/monitoring.ts`)
+
+`fetchAndParseFeeds()` fetches from three jurisdiction sources in parallel and returns a combined `ParsedUpdate[]` (each item has a `jurisdiction` field):
+- US: Federal Register JSON API (SEC/FINRA articles)
+- EU: ESMA RSS + EBA RSS — fetched with a zero-dep regex parser; returns `[]` gracefully if blocked
+- UK: FCA RSS + PRA/Bank of England RSS — same fallback behaviour
+
+Each `ParsedUpdate` includes: `regulator`, `jurisdiction`, `title`, `summary`, `url`, `published_at`, `relevance_score` (1–5), `affected_rules[]`, `raw_content`. Items are upserted to `regulatory_updates` on `url` conflict. The monitoring page (`app/(app)/monitoring/page.tsx`) filters the feed by a US/EU/UK tab selector.
 
 ### Environment Variables
 
