@@ -1,4 +1,4 @@
-# Plan 01 — EU & UK Regulatory Expansion
+# Plan 03 — EU & UK Regulatory Expansion
 
 **Goal:** Extend RegisAI to support EU and UK jurisdictions alongside the existing US framework. A jurisdiction selector (tab UI) on the new audit page lets a firm pick their regulatory environment before uploading. The same upload → Claude gap analysis → report pipeline runs unchanged — only the regulatory library fed into the prompt changes.
 
@@ -280,33 +280,12 @@ Update the **AI Integration** section:
 
 ## Final Phase: Verification Checklist
 
-- [ ] `npm run type-check` — zero errors
-- [ ] `npm run lint` — zero warnings
-- [ ] `npm run build` — clean build
-- [ ] US flow unchanged: upload a PDF, select "United States", get a US audit with FINRA/SEC citations
-- [ ] EU flow: select "European Union", upload a PDF, get audit with MiFID II/GDPR citations
-- [ ] UK flow: select "United Kingdom", upload a PDF, get audit with FCA/MLR citations
-- [ ] Dashboard shows correct jurisdiction badge on each card
-- [ ] Existing US audits still load correctly (backward compat — `jurisdiction` defaults to `'US'`)
-- [ ] Commit and push to main
-
----
-
-## File Change Summary
-
-| File | Change |
-|---|---|
-| `types/index.ts` | Add `Jurisdiction`, extend `RegulatoryFramework`, add `jurisdiction` to `Audit` |
-| `lib/eu-regulatory-library.ts` | **New** — 23 EU requirements |
-| `lib/uk-regulatory-library.ts` | **New** — 19 UK requirements |
-| `lib/claude.ts` | Jurisdiction-aware prompt builder and `runGapAnalysis` signature |
-| `supabase/migrations/20260527000000_audits_add_jurisdiction.sql` | **New** — adds `jurisdiction` column |
-| `app/api/analyse/route.ts` | Accept and store `jurisdiction` |
-| `app/(app)/audit/new/page.tsx` | Three-tab jurisdiction selector |
-| `components/audit/upload-form.tsx` | Accept `jurisdiction` prop, pass to API |
-| `app/(app)/dashboard/page.tsx` | Fetch and display jurisdiction badge |
-| `components/audit/audit-report.tsx` | Show jurisdiction badge + framework list |
-| `CLAUDE.md` | Update architecture notes |
-| `README.md` | Update regulatory library docs |
-
-**Total: 10 modified files, 2 new library files, 1 new migration.**
+- [x] `npm run type-check` — zero errors
+- [x] `npm run lint` — zero warnings
+- [x] `npm run build` — clean build
+- [x] US flow unchanged: upload a PDF, select "United States", get a US audit with FINRA/SEC citations
+- [x] EU flow: select "European Union", upload a PDF, get audit with MiFID II/GDPR citations
+- [x] UK flow: select "United Kingdom", upload a PDF, get audit with FCA/MLR citations
+- [x] Dashboard shows correct jurisdiction badge on each card
+- [x] Existing US audits still load correctly (backward compat — `jurisdiction` defaults to `'US'`)
+- [x] Commit and push to main
