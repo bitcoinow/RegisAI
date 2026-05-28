@@ -23,14 +23,14 @@ interface FRArticle {
 
 // ── EU feed sources ───────────────────────────────────────────────────────────
 const EU_FEEDS = [
-  { url: 'https://www.esma.europa.eu/press-news/esma-news/rss.xml', regulator: 'ESMA' },
-  { url: 'https://www.eba.europa.eu/rss/news', regulator: 'EBA' },
+  { url: 'https://www.esma.europa.eu/rss.xml', regulator: 'ESMA' },
+  { url: 'https://www.eba.europa.eu/news-press/news/rss.xml', regulator: 'EBA' },
 ]
 
 // ── UK feed sources ───────────────────────────────────────────────────────────
 const UK_FEEDS = [
   { url: 'https://www.fca.org.uk/news/rss.xml', regulator: 'FCA' },
-  { url: 'https://www.bankofengland.co.uk/rss/pressreleases', regulator: 'PRA' },
+  { url: 'https://www.bankofengland.co.uk/rss/news', regulator: 'PRA' },
 ]
 
 // ── Rule keyword matchers (US + EU + UK) ──────────────────────────────────────
