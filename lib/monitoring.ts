@@ -105,6 +105,12 @@ function cleanTitle(title: string): string {
   return title.replace(/^Self-Regulatory\s+Organizations;\s+[^;]+;\s*/i, '').trim()
 }
 
+function safeISODate(dateStr: string | null): string | null {
+  if (!dateStr) return null
+  const d = new Date(dateStr)
+  return isNaN(d.getTime()) ? null : d.toISOString()
+}
+
 // ── Lightweight RSS/Atom parser (zero deps) ───────────────────────────────────
 interface RssItem {
   title: string
@@ -177,9 +183,7 @@ async function fetchUSFeeds(): Promise<ParsedUpdate[]> {
         title: title.slice(0, 500),
         summary: summary.slice(0, 1000),
         url: article.html_url,
-        published_at: article.publication_date
-          ? new Date(article.publication_date).toISOString()
-          : null,
+        published_at: safeISODate(article.publication_date),
         relevance_score: scoreRelevance(text),
         affected_rules: extractAffectedRules(text),
         raw_content: summary.slice(0, 5000),
@@ -209,7 +213,15 @@ async function fetchRssFeed(
       return []
     }
     const xml = await res.text()
+    const trimmed = xml.trim()
+    if (!trimmed.startsWith('<')) {
+      console.error(`${regulator} feed returned non-XML (bot challenge?): ${trimmed.slice(0, 200)}`)
+      return []
+    }
     const items = parseRssItems(xml)
+    if (items.length === 0) {
+      console.error(`${regulator} feed parsed 0 items — first 300 chars: ${trimmed.slice(0, 300)}`)
+    }
     return items.map((item) => {
       const text = `${item.title} ${item.description}`
       return {
@@ -218,7 +230,7 @@ async function fetchRssFeed(
         title: item.title.slice(0, 500),
         summary: item.description.slice(0, 1000),
         url: item.link,
-        published_at: item.pubDate ? new Date(item.pubDate).toISOString() : null,
+        published_at: safeISODate(item.pubDate),
         relevance_score: scoreRelevance(text),
         affected_rules: extractAffectedRules(text),
         raw_content: item.description.slice(0, 5000),
