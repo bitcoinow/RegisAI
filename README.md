@@ -55,7 +55,7 @@ RegisAI/
 │   │   ├── audit/
 │   │   │   ├── new/page.tsx          # Upload + trigger analysis
 │   │   │   └── [id]/page.tsx         # Audit report view
-│   │   └── monitoring/page.tsx       # Regulatory feed — live FINRA + SEC feed
+│   │   └── monitoring/page.tsx       # Regulatory feed — US / EU / UK live feed with jurisdiction tabs
 │   ├── (auth)/
 │   │   ├── layout.tsx
 │   │   └── login/page.tsx            # Magic link OTP login
@@ -100,7 +100,9 @@ RegisAI/
 │       ├── 20260504000000_initial.sql            # Full schema
 │       ├── 20260509000001_findings_update_policy.sql  # RLS update policy for findings
 │       ├── 20260511000000_regulatory_updates_rls.sql  # RLS + read policy for regulatory_updates
-│       └── 20260511000001_regulatory_updates_unique_url.sql  # Unique constraint on url
+│       ├── 20260511000001_regulatory_updates_unique_url.sql  # Unique constraint on url
+│       ├── 20260527000000_audits_add_jurisdiction.sql  # jurisdiction column on audits (default 'US')
+│       └── 20260528000000_regulatory_updates_add_jurisdiction.sql  # jurisdiction column on regulatory_updates (default 'US')
 ├── types/
 │   └── index.ts                      # Shared domain types
 ├── .env.example                      # Environment variable template
@@ -404,12 +406,13 @@ Or manually run `supabase/migrations/20260504000000_initial.sql` in the Supabase
 
 ### Phase 2 — Design partner onboarding (complete)
 - [x] Finding status tracking (open / in-progress / resolved toggle on finding cards)
-- [x] Regulatory monitoring feed (FINRA + SEC RSS → `/monitoring`)
+- [x] Regulatory monitoring feed (Federal Register / ESMA / EBA / FCA / PRA → `/monitoring`)
 - [x] PDF export of audit report (browser `window.print()` with print stylesheet)
 - [x] Weekly email digest of regulatory updates (Resend — already installed)
 
 ### Phase 3 — Pre-YC
 - [x] EU & UK regulatory libraries (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR + FCA Rules, SM&CR, UK GDPR)
+- [x] EU & UK regulatory monitoring feed (ESMA, EBA, FCA, PRA — jurisdiction tab selector on monitoring page)
 - [ ] Stripe billing integration
 - [ ] Multi-document support per firm
 - [ ] Policy update drafting (Claude generates amended policy language)

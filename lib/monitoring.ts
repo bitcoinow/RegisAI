@@ -197,9 +197,15 @@ async function fetchRssFeed(
   jurisdiction: 'EU' | 'UK'
 ): Promise<ParsedUpdate[]> {
   try {
-    const res = await fetch(feedUrl, { next: { revalidate: 0 } })
+    const res = await fetch(feedUrl, {
+      next: { revalidate: 0 },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; RegisAI/1.0; regulatory-compliance-monitor)',
+        'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*',
+      },
+    })
     if (!res.ok) {
-      console.error(`${regulator} feed fetch failed: ${res.status}`)
+      console.error(`${regulator} feed fetch failed: ${res.status} ${res.statusText} — ${feedUrl}`)
       return []
     }
     const xml = await res.text()
