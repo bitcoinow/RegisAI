@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { LandingPage } from '@/components/marketing/landing-page'
 
-// Root route — redirect to dashboard if authenticated, otherwise to login.
 export default async function RootPage() {
   const supabase = await createClient()
   const {
@@ -10,7 +10,7 @@ export default async function RootPage() {
 
   if (user) {
     redirect('/dashboard')
-  } else {
-    redirect('/login')
   }
+
+  return <LandingPage />
 }

@@ -1,13 +1,13 @@
 interface Props {
   className?: string
+  light?: boolean
 }
 
-export function RegisLogo({ className }: Props) {
+export function RegisLogo({ className, light }: Props) {
   return (
     <span className={`relative inline-flex items-baseline font-serif font-black ${className ?? ''}`}>
-      {/* Floating accent dot — proportional to font size via em units */}
       <span
-        className="absolute bg-green"
+        className={`absolute ${light ? 'bg-bg' : 'bg-green'}`}
         style={{
           width: '0.22em',
           height: '0.22em',
@@ -17,7 +17,7 @@ export function RegisLogo({ className }: Props) {
           transform: 'translateX(-50%)',
         }}
       />
-      <span className="text-green tracking-tight">Regis</span>
+      <span className={`tracking-tight ${light ? 'text-bg' : 'text-green'}`}>Regis</span>
       <span className="text-gold">.</span>
     </span>
   )
