@@ -824,10 +824,14 @@ function SiteFooter() {
       <div className="max-w-content mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <RegisLogo className="text-sm" light />
         <div className="flex items-center gap-6">
-          {['Privacy Policy', 'Terms of Service', 'Security'].map((label) => (
-            <a key={label} href="#" className="text-xs text-green-tint transition-colors hover:text-bg" style={{ opacity: 0.5 }}>
+          {[
+            { label: 'Privacy Policy', href: '/privacy' },
+            { label: 'Terms of Service', href: '/terms' },
+            { label: 'Security', href: '/security' },
+          ].map(({ label, href }) => (
+            <Link key={href} href={href} className="text-xs text-green-tint transition-colors hover:text-bg" style={{ opacity: 0.5 }}>
               {label}
-            </a>
+            </Link>
           ))}
         </div>
         <p className="text-xs text-green-tint" style={{ opacity: 0.35 }}>
