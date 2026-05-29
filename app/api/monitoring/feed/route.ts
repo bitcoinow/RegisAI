@@ -33,7 +33,7 @@ export async function GET(): Promise<NextResponse<FeedResponse | ApiError>> {
     .from('regulatory_updates')
     .select('id, regulator, jurisdiction, title, summary, url, published_at, relevance_score, affected_rules, created_at')
     .order('published_at', { ascending: false, nullsFirst: false })
-    .limit(100)
+    .limit(500)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
