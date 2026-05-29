@@ -4,9 +4,10 @@ import { SignOutButton } from '@/components/ui/sign-out-button'
 
 interface NavProps {
   email: string
+  firmName?: string
 }
 
-export function Nav({ email }: NavProps) {
+export function Nav({ email, firmName }: NavProps) {
   return (
     <nav className="border-b border-rule bg-bg-2 print:hidden">
       <div className="max-w-content mx-auto px-6 h-14 flex items-center justify-between">
@@ -27,7 +28,7 @@ export function Nav({ email }: NavProps) {
           >
             New Audit
           </Link>
-          <span className="text-ink-3 text-sm hidden sm:block">{email}</span>
+          <span className="text-ink-3 text-sm hidden sm:block">{firmName ?? email}</span>
           <SignOutButton />
         </div>
       </div>

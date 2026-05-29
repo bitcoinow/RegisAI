@@ -32,7 +32,8 @@ export async function middleware(request: NextRequest) {
 
   const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') ||
                            request.nextUrl.pathname.startsWith('/audit') ||
-                           request.nextUrl.pathname.startsWith('/monitoring')
+                           request.nextUrl.pathname.startsWith('/monitoring') ||
+                           request.nextUrl.pathname.startsWith('/onboarding')
 
   // Redirect to login if accessing a protected route without a user
   if (isProtectedRoute && !user) {
