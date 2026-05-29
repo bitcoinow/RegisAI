@@ -13,19 +13,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/login')
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('firm_name')
     .eq('id', user.id)
     .single<Pick<Profile, 'firm_name'>>()
 
-  if (!profile?.firm_name) {
+  // Only redirect to onboarding when the query succeeded but firm_name is absent.
+  // If the query errored (e.g. mobile network failure) we fall through so the
+  // user reaches their dashboard rather than cascading into /onboarding → /login.
+  if (!profileError && !profile?.firm_name) {
     redirect('/onboarding')
   }
 
   return (
     <>
-      <Nav email={user.email ?? ''} firmName={profile.firm_name} />
+      <Nav email={user.email ?? ''} firmName={profile?.firm_name ?? undefined} />
       <main>{children}</main>
     </>
   )

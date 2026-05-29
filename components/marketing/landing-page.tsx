@@ -410,7 +410,7 @@ function LandingNav() {
 
 function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col justify-center bg-green pt-16 overflow-hidden">
+    <section className="relative min-h-[100dvh] flex flex-col justify-center bg-green pt-16 overflow-hidden">
       <div
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
