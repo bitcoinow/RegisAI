@@ -5,12 +5,17 @@ import Link from 'next/link'
 import { RegisLogo } from '@/components/ui/logo'
 
 // ─── Scroll-triggered fade-in ─────────────────────────────────────────────────
+// Starts visible (SSR-safe: crawlers and prerenderers see full content).
+// After hydration, JS hides elements and animates them in on scroll.
+// Reduced-motion users never see any animation.
 
 function useFadeIn(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(true) // SSR default: visible
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    setVisible(false)
     const el = ref.current
     if (!el) return
     const obs = new IntersectionObserver(
@@ -26,7 +31,8 @@ function useFadeIn(delay = 0) {
     style: {
       opacity: visible ? 1 : 0,
       transform: visible ? 'translateY(0)' : 'translateY(18px)',
-      transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
+      transition: `opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+      willChange: visible ? 'auto' : 'transform, opacity',
     } as React.CSSProperties,
   }
 }
@@ -40,7 +46,7 @@ function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; 
 
 function GapIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
       <polyline points="14 2 14 8 20 8" />
       <line x1="9" y1="12" x2="15" y2="12" />
@@ -53,7 +59,7 @@ function GapIcon() {
 
 function BellIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
       <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
       <path d="M13.73 21a2 2 0 01-3.46 0" />
     </svg>
@@ -62,7 +68,7 @@ function BellIcon() {
 
 function GlobeIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
       <circle cx="12" cy="12" r="9" />
       <path d="M12 3c-4.97 5.5-4.97 12.5 0 18M12 3c4.97 5.5 4.97 12.5 0 18M3 12h18" />
     </svg>
@@ -71,7 +77,7 @@ function GlobeIcon() {
 
 function BuildingIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
       <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
@@ -80,7 +86,7 @@ function BuildingIcon() {
 
 function DocIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
       <polyline points="14 2 14 8 20 8" />
       <line x1="8" y1="13" x2="16" y2="13" />
@@ -311,18 +317,18 @@ const FAQS = [
 
 function AuditMockup() {
   const findings = [
-    { level: 'HIGH', color: '#8b2020', label: 'Form ADV Disclosures', desc: 'Reg BI conflict disclosure language absent from Part 2A' },
-    { level: 'HIGH', color: '#8b2020', label: 'Code of Ethics', desc: 'Personal trading pre-clearance window undefined per SEC Rule 17j-1' },
-    { level: 'MED', color: '#8b5a10', label: 'Business Continuity Plan', desc: 'Annual BCP testing documentation not on file' },
-    { level: 'LOW', color: '#1a3060', label: 'Cybersecurity Policy', desc: 'Third-party vendor assessment cadence undefined' },
+    { level: 'HIGH', colorVar: '--red',   label: 'Form ADV Disclosures',  desc: 'Reg BI conflict disclosure language absent from Part 2A' },
+    { level: 'HIGH', colorVar: '--red',   label: 'Code of Ethics',         desc: 'Personal trading pre-clearance window undefined per SEC Rule 17j-1' },
+    { level: 'MED',  colorVar: '--amber', label: 'Business Continuity Plan', desc: 'Annual BCP testing documentation not on file' },
+    { level: 'LOW',  colorVar: '--blue',  label: 'Cybersecurity Policy',   desc: 'Third-party vendor assessment cadence undefined' },
   ]
 
   return (
-    <div className="rounded border shadow-2xl overflow-hidden" style={{ backgroundColor: 'var(--bg-2)', borderColor: 'rgba(255,255,255,0.12)' }}>
+    <div className="border shadow-2xl overflow-hidden" style={{ backgroundColor: 'var(--bg-2)', borderColor: 'rgba(255,255,255,0.12)' }}>
       <div className="px-4 py-3 flex items-center gap-2" style={{ backgroundColor: 'var(--bg)', borderBottom: '1px solid var(--rule)' }}>
-        <span className="w-3 h-3 rounded-full bg-rule" />
-        <span className="w-3 h-3 rounded-full bg-rule" />
-        <span className="w-3 h-3 rounded-full bg-rule" />
+        <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
+        <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
+        <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
         <div className="flex-1 mx-3 px-3 py-1 font-mono text-xs" style={{ backgroundColor: 'var(--bg-2)', color: 'var(--ink-3)', border: '1px solid var(--rule)', borderRadius: 2 }}>
           regis.ai/audit/meridian-q2-2026
         </div>
@@ -342,7 +348,11 @@ function AuditMockup() {
             <div key={i} className="flex gap-3 p-3" style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--rule)' }}>
               <span
                 className="mt-0.5 font-mono text-xs font-bold shrink-0 px-1.5 py-0.5"
-                style={{ backgroundColor: f.color + '18', color: f.color, border: `1px solid ${f.color}30` }}
+                style={{
+                  color: `var(${f.colorVar})`,
+                  backgroundColor: `color-mix(in srgb, var(${f.colorVar}) 9%, transparent)`,
+                  border: `1px solid color-mix(in srgb, var(${f.colorVar}) 19%, transparent)`,
+                }}
               >
                 {f.level}
               </span>
@@ -368,6 +378,7 @@ function AuditMockup() {
 
 function LandingNav() {
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40)
@@ -376,29 +387,83 @@ function LandingNav() {
     return () => window.removeEventListener('scroll', h)
   }, [])
 
+  const navLinks = [
+    { href: '#features', label: 'Features' },
+    { href: '#how-it-works', label: 'How It Works' },
+    { href: '#pricing', label: 'Pricing' },
+  ]
+
   return (
     <nav
+      aria-label="Site navigation"
       className="fixed top-0 inset-x-0 z-50 transition-all duration-300"
       style={{
-        backgroundColor: scrolled ? 'var(--green)' : 'transparent',
-        borderBottom: scrolled ? '1px solid var(--green-2)' : '1px solid transparent',
+        backgroundColor: scrolled || menuOpen ? 'var(--green)' : 'transparent',
+        borderBottom: scrolled || menuOpen ? '1px solid var(--green-2)' : '1px solid transparent',
       }}
     >
       <div className="max-w-content mx-auto px-6 h-16 flex items-center justify-between">
         <RegisLogo className="text-xl" light />
         <div className="flex items-center gap-7">
-          <a href="#features" className="text-sm hidden md:block text-green-tint hover:text-bg transition-colors">
-            Features
-          </a>
-          <a href="#how-it-works" className="text-sm hidden md:block text-green-tint hover:text-bg transition-colors">
-            How It Works
-          </a>
-          <a href="#pricing" className="text-sm hidden md:block text-green-tint hover:text-bg transition-colors">
-            Pricing
-          </a>
+          {navLinks.map(({ href, label }) => (
+            <a key={href} href={href} className="text-sm hidden md:block text-green-tint hover:text-bg transition-colors">
+              {label}
+            </a>
+          ))}
           <Link
             href="/login"
-            className="text-sm px-4 py-2 font-medium bg-bg text-green hover:bg-green-tint transition-colors"
+            className="text-sm px-4 py-3 font-medium bg-bg text-green hover:bg-green-tint transition-colors hidden md:inline-block"
+          >
+            Request Access
+          </Link>
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden flex flex-col justify-center items-center w-11 h-11 gap-[5px]"
+            onClick={() => setMenuOpen(m => !m)}
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav-menu"
+          >
+            <span
+              className="block w-5 h-px bg-green-tint transition-all duration-200 origin-center"
+              style={{ transform: menuOpen ? 'rotate(45deg) translateY(6px)' : 'none' }}
+            />
+            <span
+              className="block w-5 h-px bg-green-tint transition-all duration-200"
+              style={{ opacity: menuOpen ? 0 : 1 }}
+            />
+            <span
+              className="block w-5 h-px bg-green-tint transition-all duration-200 origin-center"
+              style={{ transform: menuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none' }}
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      <div
+        id="mobile-nav-menu"
+        className="md:hidden overflow-hidden transition-all duration-300"
+        style={{
+          maxHeight: menuOpen ? '360px' : '0',
+          borderTop: menuOpen ? '1px solid var(--green-2)' : 'none',
+        }}
+      >
+        <div className="px-6 py-4 flex flex-col">
+          {navLinks.map(({ href, label }) => (
+            <a
+              key={href}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              className="text-sm py-3.5 text-green-tint hover:text-bg transition-colors border-b border-green-2 last:border-0"
+            >
+              {label}
+            </a>
+          ))}
+          <Link
+            href="/login"
+            onClick={() => setMenuOpen(false)}
+            className="mt-4 text-sm px-4 py-3 font-medium bg-bg text-green hover:bg-green-tint transition-colors text-center"
           >
             Request Access
           </Link>
@@ -412,6 +477,7 @@ function Hero() {
   return (
     <section className="relative min-h-[100dvh] flex flex-col justify-center bg-green pt-16 overflow-hidden">
       <div
+        aria-hidden="true"
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
           backgroundImage: 'radial-gradient(circle at 1px 1px, var(--bg) 1px, transparent 0)',
@@ -434,30 +500,31 @@ function Hero() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/login"
-              className="px-6 py-3 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
+              className="px-6 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
             >
               Request Early Access
             </Link>
             <Link
               href="/demo/clearview"
-              className="px-6 py-3 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
+              className="px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
             >
               View Sample Audit →
             </Link>
           </div>
-          <p className="mt-6 text-xs text-green-tint opacity-40">
+          <p className="mt-6 text-xs text-green-tint">
             No credit card required · Design partner access only
           </p>
         </div>
         <div className="relative hidden md:block">
           <AuditMockup />
           <div
+            aria-hidden="true"
             className="absolute -inset-12 blur-3xl opacity-15 pointer-events-none rounded-full"
             style={{ backgroundColor: 'var(--bg)' }}
           />
         </div>
       </div>
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
+      <div aria-hidden="true" className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
         <span className="font-mono text-xs text-green-tint tracking-widest uppercase">Scroll</span>
         <span className="text-green-tint text-lg">↓</span>
       </div>
@@ -470,7 +537,6 @@ function Problem() {
     <section className="py-24 border-t border-rule bg-bg">
       <div className="max-w-content mx-auto px-6">
         <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">The Problem</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
             Compliance is still a manual, expensive, error-prone process.
           </h2>
@@ -478,19 +544,29 @@ function Problem() {
             Even well-resourced teams miss gaps because the regulatory surface area is too large to review manually—and it grows every year.
           </p>
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {PAINS.map((p, i) => (
-            <Reveal key={i} delay={i * 90}>
-              <div className="p-8 border border-rule bg-bg-2 h-full">
-                <p className="font-serif text-4xl font-bold text-green mb-2">{p.stat}</p>
-                <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-3">{p.label}</p>
+
+        {/* Asymmetric stat layout: one dominant figure + two supporting */}
+        <div className="grid md:grid-cols-[3fr_2fr] gap-0 border border-rule mb-12">
+          <Reveal className="p-10 border-b border-rule md:border-b-0 md:border-r">
+            <p className="font-serif font-bold text-green leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 8vw, 5rem)' }}>
+              {PAINS[0]?.stat}
+            </p>
+            <p className="text-xl font-medium text-ink mb-3">{PAINS[0]?.label}</p>
+            <p className="text-base leading-relaxed text-ink-2 max-w-md">{PAINS[0]?.desc}</p>
+          </Reveal>
+          <div className="flex flex-col">
+            {PAINS.slice(1).map((p, i) => (
+              <Reveal key={i} delay={i * 80} className={`p-8 flex-1 ${i === 0 ? 'border-b border-rule' : ''}`}>
+                <p className="font-serif text-4xl font-bold text-green leading-none mb-3">{p.stat}</p>
+                <p className="font-medium text-ink text-sm mb-1">{p.label}</p>
                 <p className="text-sm leading-relaxed text-ink-2">{p.desc}</p>
-              </div>
-            </Reveal>
-          ))}
+              </Reveal>
+            ))}
+          </div>
         </div>
-        <Reveal delay={300}>
-          <div className="p-8 border-l-4 border-green bg-green-tint">
+
+        <Reveal delay={200}>
+          <div className="p-8 border border-green bg-green-tint">
             <p className="font-serif text-xl italic text-green">
               "Regis doesn't replace your compliance team. It gives them a 10× productivity multiplier
               and eliminates the risk of human oversight failure on a 74-requirement regulatory framework."
@@ -516,18 +592,57 @@ function Features() {
           </p>
         </Reveal>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {FEATURES.map(({ Icon, title, benefit, desc }, i) => (
-            <Reveal key={i} delay={i * 70}>
-              <div className="p-7 border border-rule bg-bg h-full transition-transform duration-200 hover:-translate-y-0.5">
-                <div className="w-10 h-10 flex items-center justify-center bg-green-tint text-green mb-5">
-                  <Icon />
+          {FEATURES.map(({ Icon, title, benefit, desc }, i) => {
+            const featured = i === 0
+            return (
+              <Reveal key={i} delay={i * 70} className={featured ? 'lg:col-span-2' : ''}>
+                <div
+                  className={`border h-full transition-transform duration-200 hover:-translate-y-0.5 ${
+                    featured ? 'p-9 lg:flex lg:gap-10 items-start' : 'p-7'
+                  }`}
+                  style={{
+                    borderColor: featured ? 'var(--green-2)' : 'var(--rule)',
+                    backgroundColor: featured ? 'var(--green)' : 'var(--bg)',
+                  }}
+                >
+                  <div className={featured ? 'lg:shrink-0 mb-5 lg:mb-0 lg:pt-1' : ''}>
+                    <div
+                      className="w-10 h-10 flex items-center justify-center mb-5"
+                      style={{
+                        backgroundColor: featured ? 'var(--green-2)' : 'var(--green-tint)',
+                        color: featured ? 'var(--green-tint)' : 'var(--green)',
+                      }}
+                    >
+                      <Icon />
+                    </div>
+                  </div>
+                  <div>
+                    <p
+                      className="font-mono text-xs tracking-widest uppercase mb-2"
+                      style={{ color: featured ? 'var(--green-tint)' : 'var(--green)' }}
+                    >
+                      {benefit}
+                    </p>
+                    <h3
+                      className={`font-serif mb-3 ${featured ? 'text-2xl lg:text-3xl' : 'text-xl'}`}
+                      style={{ color: featured ? 'var(--bg)' : 'var(--ink)' }}
+                    >
+                      {title}
+                    </h3>
+                    <p
+                      className={`leading-relaxed ${featured ? 'text-base' : 'text-sm'}`}
+                      style={{
+                        color: featured ? 'var(--green-tint)' : 'var(--ink-2)',
+                        opacity: featured ? 0.85 : 1,
+                      }}
+                    >
+                      {desc}
+                    </p>
+                  </div>
                 </div>
-                <p className="font-mono text-xs tracking-widest uppercase text-green mb-2">{benefit}</p>
-                <h3 className="font-serif text-xl text-ink mb-3">{title}</h3>
-                <p className="text-sm leading-relaxed text-ink-2">{desc}</p>
-              </div>
-            </Reveal>
-          ))}
+              </Reveal>
+            )
+          })}
         </div>
       </div>
     </section>
@@ -539,7 +654,6 @@ function HowItWorks() {
     <section id="how-it-works" className="py-24 border-t border-green-2 bg-green">
       <div className="max-w-content mx-auto px-6">
         <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-green-tint opacity-60">Process</p>
           <h2 className="font-serif text-4xl text-bg mb-4">
             From signup to your first audit in under 10 minutes.
           </h2>
@@ -552,7 +666,7 @@ function HowItWorks() {
             <Reveal key={i} delay={i * 90}>
               <div className="relative border border-green-2 p-7 h-full" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}>
                 {i < STEPS.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-5 h-px bg-green-2" style={{ zIndex: 1 }} />
+                  <div aria-hidden="true" className="hidden lg:block absolute top-8 left-full w-5 h-px bg-green-2" style={{ zIndex: 1 }} />
                 )}
                 <p className="font-mono text-3xl font-bold text-gold mb-5">{s.n}</p>
                 <h3 className="font-serif text-lg text-bg mb-3">{s.title}</h3>
@@ -564,7 +678,7 @@ function HowItWorks() {
         <Reveal delay={400} className="mt-12 text-center">
           <Link
             href="/demo/clearview"
-            className="inline-block px-7 py-3 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
+            className="inline-block px-7 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
           >
             See a real audit output →
           </Link>
@@ -579,7 +693,6 @@ function UseCases() {
     <section className="py-24 border-t border-rule bg-bg">
       <div className="max-w-content mx-auto px-6">
         <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Who It's For</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
             Built for every regulated financial firm.
           </h2>
@@ -599,7 +712,7 @@ function UseCases() {
                   <ul className="space-y-2.5 mb-auto">
                     {u.items.map((item, j) => (
                       <li key={j} className="flex gap-2 text-sm text-ink-2">
-                        <span className="text-green shrink-0 mt-px">→</span>
+                        <span aria-hidden="true" className="text-green shrink-0 mt-px">→</span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -652,7 +765,6 @@ function Pricing() {
     <section id="pricing" className="py-24 border-t border-rule bg-bg">
       <div className="max-w-content mx-auto px-6">
         <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Pricing</p>
           <h2 className="font-serif text-4xl text-ink mb-4">Straightforward pricing. No surprises.</h2>
           <p className="text-base text-ink-2 max-w-xl mb-16">
             All plans include a 14-day trial. Cancel anytime. Annual plans available at 20% off.
@@ -709,14 +821,14 @@ function Pricing() {
                         className="flex gap-2 text-sm"
                         style={{ color: p.highlight ? 'var(--green-tint)' : 'var(--ink-2)' }}
                       >
-                        <span style={{ color: p.highlight ? 'var(--gold)' : 'var(--green)' }}>✓</span>
+                        <span aria-hidden="true" style={{ color: p.highlight ? 'var(--gold)' : 'var(--green)' }}>✓</span>
                         {f}
                       </li>
                     ))}
                   </ul>
                   <Link
                     href="/login"
-                    className="block text-center py-2.5 px-4 text-sm font-medium transition-colors"
+                    className="block text-center py-3 px-4 text-sm font-medium transition-colors"
                     style={{
                       backgroundColor: p.highlight ? 'var(--bg)' : 'var(--green)',
                       color: p.highlight ? 'var(--green)' : 'var(--bg)',
@@ -749,7 +861,6 @@ function FAQ() {
     <section id="faq" className="py-24 border-t border-rule bg-bg-2">
       <div className="max-w-content mx-auto px-6">
         <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">FAQ</p>
           <h2 className="font-serif text-4xl text-ink mb-16">Common questions.</h2>
         </Reveal>
         <div className="max-w-3xl space-y-2">
@@ -758,11 +869,14 @@ function FAQ() {
               <div className="border border-rule overflow-hidden">
                 <button
                   onClick={() => setOpen(open === i ? null : i)}
+                  aria-expanded={open === i}
+                  aria-controls={`faq-answer-${i}`}
                   className="w-full flex justify-between items-center px-6 py-5 text-left transition-colors"
                   style={{ backgroundColor: open === i ? 'var(--bg)' : 'var(--bg-2)', color: 'var(--ink)' }}
                 >
                   <span className="text-sm font-medium pr-4">{faq.q}</span>
                   <span
+                    aria-hidden="true"
                     className="shrink-0 font-mono text-lg text-green transition-transform duration-200"
                     style={{ transform: open === i ? 'rotate(45deg)' : 'rotate(0deg)', display: 'inline-block' }}
                   >
@@ -770,7 +884,7 @@ function FAQ() {
                   </span>
                 </button>
                 {open === i && (
-                  <div className="px-6 py-5 border-t border-rule bg-bg">
+                  <div id={`faq-answer-${i}`} role="region" className="px-6 py-5 border-t border-rule bg-bg">
                     <p className="text-sm leading-relaxed text-ink-2">{faq.a}</p>
                   </div>
                 )}
@@ -829,12 +943,12 @@ function SiteFooter() {
             { label: 'Terms of Service', href: '/terms' },
             { label: 'Security', href: '/security' },
           ].map(({ label, href }) => (
-            <Link key={href} href={href} className="text-xs text-green-tint transition-colors hover:text-bg" style={{ opacity: 0.5 }}>
+            <Link key={href} href={href} className="text-xs py-1.5 text-green-tint transition-colors hover:text-bg">
               {label}
             </Link>
           ))}
         </div>
-        <p className="text-xs text-green-tint" style={{ opacity: 0.35 }}>
+        <p className="text-xs text-green-tint">
           © 2026 Regis AI. All rights reserved.
         </p>
       </div>
@@ -847,16 +961,25 @@ function SiteFooter() {
 export function LandingPage() {
   return (
     <div className="min-h-screen">
+      {/* Skip to main content for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:text-sm focus:bg-bg focus:text-green focus:font-medium focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       <LandingNav />
-      <Hero />
-      <Problem />
-      <Features />
-      <HowItWorks />
-      <UseCases />
-      <Testimonials />
-      <Pricing />
-      <FAQ />
-      <CTAFooter />
+      <main id="main-content">
+        <Hero />
+        <Problem />
+        <Features />
+        <HowItWorks />
+        <UseCases />
+        <Testimonials />
+        <Pricing />
+        <FAQ />
+        <CTAFooter />
+      </main>
       <SiteFooter />
     </div>
   )
