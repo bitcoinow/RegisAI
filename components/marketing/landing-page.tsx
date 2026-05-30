@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react'
 import Link from 'next/link'
 import { RegisLogo } from '@/components/ui/logo'
+import { CURRENCIES, CURRENCY_SYMBOL, type Currency } from '@/lib/currency'
 
 // ─── Scroll-triggered fade-in ─────────────────────────────────────────────────
 // Starts visible (SSR-safe: crawlers and prerenderers see full content).
@@ -237,7 +238,7 @@ const TESTIMONIALS = [
 const PLANS = [
   {
     name: 'Starter',
-    price: '$299',
+    prices: { USD: 299, EUR: 279, GBP: 249 } as Record<Currency, number>,
     cadence: '/month',
     tag: null,
     desc: 'For solo CCOs and small registered advisers.',
@@ -254,7 +255,7 @@ const PLANS = [
   },
   {
     name: 'Professional',
-    price: '$799',
+    prices: { USD: 799, EUR: 749, GBP: 699 } as Record<Currency, number>,
     cadence: '/month',
     tag: 'Most popular',
     desc: 'For compliance teams and cross-border firms.',
@@ -272,7 +273,7 @@ const PLANS = [
   },
   {
     name: 'Enterprise',
-    price: 'Custom',
+    prices: null,
     cadence: '',
     tag: null,
     desc: 'For banks, large asset managers, and multi-entity firms.',
@@ -760,15 +761,43 @@ function Testimonials() {
   )
 }
 
-function Pricing() {
+function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
+  const [currency, setCurrency] = useState<Currency>(defaultCurrency)
+
   return (
     <section id="pricing" className="py-24 border-t border-rule bg-bg">
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-ink mb-4">Straightforward pricing. No surprises.</h2>
-          <p className="text-base text-ink-2 max-w-xl mb-16">
-            All plans include a 14-day trial. Cancel anytime. Annual plans available at 20% off.
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-16">
+            <p className="text-base text-ink-2 max-w-xl">
+              All plans include a 14-day trial. Cancel anytime. Annual plans available at 20% off.
+            </p>
+            <div
+              role="group"
+              aria-label="Display currency"
+              className="inline-flex shrink-0 border border-rule bg-bg-2 p-0.5 self-start"
+            >
+              {CURRENCIES.map((c) => {
+                const active = c === currency
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCurrency(c)}
+                    aria-pressed={active}
+                    className="font-mono text-xs tracking-widest uppercase px-3 py-1.5 transition-colors"
+                    style={{
+                      backgroundColor: active ? 'var(--green)' : 'transparent',
+                      color: active ? 'var(--bg)' : 'var(--ink-2)',
+                    }}
+                  >
+                    {c}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
         </Reveal>
         <div className="grid md:grid-cols-3 gap-6 items-start">
           {PLANS.map((p, i) => (
@@ -797,7 +826,9 @@ function Pricing() {
                       className="font-serif text-4xl font-bold"
                       style={{ color: p.highlight ? 'var(--bg)' : 'var(--ink)' }}
                     >
-                      {p.price}
+                      {p.prices
+                        ? `${CURRENCY_SYMBOL[currency]}${p.prices[currency].toLocaleString()}`
+                        : 'Custom'}
                     </span>
                     {p.cadence && (
                       <span
@@ -958,7 +989,7 @@ function SiteFooter() {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
-export function LandingPage() {
+export function LandingPage({ defaultCurrency = 'USD' }: { defaultCurrency?: Currency }) {
   return (
     <div className="min-h-screen">
       {/* Skip to main content for keyboard users */}
@@ -976,7 +1007,7 @@ export function LandingPage() {
         <HowItWorks />
         <UseCases />
         <Testimonials />
-        <Pricing />
+        <Pricing defaultCurrency={defaultCurrency} />
         <FAQ />
         <CTAFooter />
       </main>
