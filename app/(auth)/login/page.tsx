@@ -35,7 +35,7 @@ export default function LoginPage() {
     return (
       <div className="w-full max-w-md text-center">
         <div className="mb-10">
-          <RegisLogo className="text-4xl" />
+          <RegisLogo className="text-4xl" href="/" />
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Compliance Operations
           </p>

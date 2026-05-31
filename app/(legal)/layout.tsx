@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { RegisLogo } from '@/components/ui/logo'
 
 const LEGAL_LINKS = [
+  { label: 'About', href: '/about' },
   { label: 'Privacy Policy', href: '/privacy' },
   { label: 'Terms of Service', href: '/terms' },
   { label: 'Security', href: '/security' },
@@ -12,9 +13,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen bg-bg">
       <header className="border-b border-rule bg-bg-2">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="hover:opacity-80 transition-opacity">
-            <RegisLogo className="text-xl" />
-          </Link>
+          <RegisLogo className="text-lg sm:text-xl" href="/" />
           <nav className="flex items-center gap-6">
             {LEGAL_LINKS.map((l) => (
               <Link
@@ -33,7 +32,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
 
       <footer className="border-t border-rule mt-16 py-8">
         <div className="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <RegisLogo className="text-sm" />
+          <RegisLogo className="text-sm" href="/" />
           <div className="flex items-center gap-6">
             {LEGAL_LINKS.map((l) => (
               <Link key={l.href} href={l.href} className="text-xs text-ink-3 hover:text-ink transition-colors">

@@ -404,7 +404,7 @@ function LandingNav() {
       }}
     >
       <div className="max-w-content mx-auto px-6 h-16 flex items-center justify-between">
-        <RegisLogo className="text-xl" light />
+        <RegisLogo className="text-lg md:text-xl" light href="/" />
         <div className="flex items-center gap-7">
           {navLinks.map(({ href, label }) => (
             <a key={href} href={href} className="text-sm hidden md:block text-green-tint hover:text-bg transition-colors">
@@ -967,9 +967,10 @@ function SiteFooter() {
   return (
     <footer className="py-8 border-t border-green-2 bg-green">
       <div className="max-w-content mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <RegisLogo className="text-sm" light />
+        <RegisLogo className="text-sm" light href="/" />
         <div className="flex items-center gap-6">
           {[
+            { label: 'About', href: '/about' },
             { label: 'Privacy Policy', href: '/privacy' },
             { label: 'Terms of Service', href: '/terms' },
             { label: 'Security', href: '/security' },

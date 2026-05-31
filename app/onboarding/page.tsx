@@ -74,7 +74,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-xl">
 
         <div className="mb-10 text-center">
-          <RegisLogo className="text-4xl" />
+          <RegisLogo className="text-4xl" href="/" />
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mt-1">
             Compliance Operations
           </p>
