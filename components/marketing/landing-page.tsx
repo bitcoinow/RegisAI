@@ -96,6 +96,15 @@ function DocIcon() {
   )
 }
 
+function DraftIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4z" />
+    </svg>
+  )
+}
+
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const PAINS = [
@@ -122,6 +131,12 @@ const FEATURES = [
     title: 'AI-Powered Gap Analysis',
     benefit: 'Surface every gap in minutes, not weeks',
     desc: 'Upload your compliance document. Regis maps it against every applicable requirement for your jurisdiction and returns a prioritized gap list with regulatory citations and remediation guidance.',
+  },
+  {
+    Icon: DraftIcon,
+    title: 'Automated Policy Drafting',
+    benefit: 'Close the gap, not just flag it',
+    desc: 'For any finding, Regis drafts ready-to-paste compliance-manual language that remediates the gap—written in your firm\'s voice, scoped to your jurisdiction, and citing the governing rule. Copy it straight into your manual.',
   },
   {
     Icon: BellIcon,
@@ -167,8 +182,8 @@ const STEPS = [
   },
   {
     n: '04',
-    title: 'Review findings & take action',
-    desc: 'Your prioritized findings list is ready in minutes. Download a print-ready report, mark gaps resolved, or monitor for new regulatory guidance.',
+    title: 'Review findings & draft the fix',
+    desc: 'Your prioritized findings list is ready in minutes. Draft ready-to-paste policy language for any gap, download a print-ready report, mark gaps resolved, or monitor for new regulatory guidance.',
   },
 ]
 
@@ -301,6 +316,10 @@ const FAQS = [
     a: 'Regis uses Claude, Anthropic\'s frontier AI, with a regulatory library encoding 74 specific requirements across three jurisdictions. Each finding cites the exact regulatory rule. We recommend treating the output as a first-pass review to be validated by a qualified professional—not a substitute for legal advice.',
   },
   {
+    q: 'Does Regis only find gaps, or does it help fix them?',
+    a: 'Both. For any finding, Regis can draft ready-to-paste compliance-manual language that closes the gap—written in the formal voice of your manual, scoped to your jurisdiction, and citing the governing rule. The draft is saved with the finding and exports with your report. Like all AI output, drafted language is a starting point to be reviewed and approved by a qualified compliance professional before it goes into your manual.',
+  },
+  {
     q: 'Is my document data secure and private?',
     a: 'Your documents are stored in encrypted cloud storage with strict row-level security: only your account can access your data. No cross-user data access is possible by design. Documents are never used to train AI models. Each firm account is fully isolated—a true multi-tenant architecture.',
   },
@@ -366,9 +385,14 @@ function AuditMockup() {
         </div>
         <div className="mt-4 pt-4 border-t flex items-center justify-between" style={{ borderColor: 'var(--rule)' }}>
           <span className="font-mono text-xs" style={{ color: 'var(--ink-3)' }}>4 findings · 2 priority actions</span>
-          <span className="text-xs px-3 py-1 font-medium" style={{ backgroundColor: 'var(--green)', color: 'var(--bg)' }}>
-            Export Report
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs px-3 py-1 font-medium" style={{ border: '1px solid var(--rule)', color: 'var(--ink-2)' }}>
+              Draft Policy
+            </span>
+            <span className="text-xs px-3 py-1 font-medium" style={{ backgroundColor: 'var(--green)', color: 'var(--bg)' }}>
+              Export Report
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -496,7 +520,8 @@ function Hero() {
           </h1>
           <p className="text-lg leading-relaxed mb-10 text-green-tint" style={{ opacity: 0.82 }}>
             Regis reads your compliance documents, applies the exact regulatory
-            framework for your firm, and surfaces every gap—before the examiner does.
+            framework for your firm, surfaces every gap—before the examiner does—and
+            drafts the policy language to fix it.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link

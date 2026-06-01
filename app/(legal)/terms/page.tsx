@@ -41,7 +41,7 @@ export default function TermsPage() {
       <header className="mb-12 pb-10 border-b border-rule">
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-4">Legal</p>
         <h1 className="font-serif text-4xl text-ink mb-4">Terms of Service</h1>
-        <p className="text-sm text-ink-3">Effective May 29, 2026 · Last updated May 29, 2026</p>
+        <p className="text-sm text-ink-3">Effective May 29, 2026 · Last updated June 1, 2026</p>
         <p className="text-base text-ink-2 mt-4 max-w-xl leading-relaxed">
           These Terms of Service ("<strong className="text-ink">Terms</strong>") govern your access to and use of Regis AI, Inc.'s ("<strong className="text-ink">Regis</strong>") compliance operations platform. By using Regis, you agree to these Terms.
         </p>
@@ -56,6 +56,7 @@ export default function TermsPage() {
         <p>Regis is a compliance operations platform for regulated financial firms that provides:</p>
         <List items={[
           'AI-powered gap analysis of compliance documents against regulatory requirements.',
+          'AI-generated draft policy language intended to remediate identified findings.',
           'Real-time monitoring of regulatory publications across US, EU, and UK jurisdictions.',
           'Audit report generation and findings management.',
           'Firm-specific regulatory context based on your firm type, AUM, and primary regulator.',
@@ -92,12 +93,13 @@ export default function TermsPage() {
 
       <Section title="6. AI-Generated Content and Disclaimer">
         <Warning>
-          Regis uses artificial intelligence to generate compliance gap analyses. AI-generated output may be incomplete, inaccurate, or out of date. The presence of a gap in a Regis analysis does not mean your firm is legally non-compliant; the absence of a gap does not mean your firm is compliant. Always review findings with a qualified compliance professional before taking action.
+          Regis uses artificial intelligence to generate compliance gap analyses and draft remediation policy language. AI-generated output may be incomplete, inaccurate, or out of date. The presence of a gap in a Regis analysis does not mean your firm is legally non-compliant; the absence of a gap does not mean your firm is compliant. Drafted policy language is a suggested starting point only — it is not legal drafting and may not fit your firm&rsquo;s facts, structure, or obligations. Always review findings and any drafted language with a qualified compliance professional before adopting or acting on them.
         </Warning>
         <p>Regis makes no warranty that:</p>
         <List items={[
           'The regulatory library is current, complete, or applicable to every firm within a stated jurisdiction.',
           'The AI will identify every gap present in a submitted document.',
+          'Drafted policy language will be accurate, complete, or suitable for adoption without review by a qualified professional.',
           'Acting on Regis output will satisfy any regulatory requirement or prevent regulatory action.',
         ]} />
         <p>Regulatory requirements change frequently. You are responsible for verifying that guidance cited by Regis reflects current rules as of the date of your review.</p>

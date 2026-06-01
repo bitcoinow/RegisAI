@@ -76,6 +76,12 @@ export default function AboutPage() {
           <PrincipleCard title="United Kingdom" body="FCA rules, UK AML, UK GDPR, SM&CR, and FCA operational resilience." />
         </div>
         <p>
+          Regis does not stop at finding the gap. For any finding, it drafts ready-to-paste
+          compliance-manual language that closes it — written in the formal voice of a manual,
+          scoped to the firm&rsquo;s jurisdiction, and citing the governing rule — so remediation
+          starts with a draft in hand rather than a blank page.
+        </p>
+        <p>
           Beyond point-in-time audits, Regis monitors regulatory sources across all three
           jurisdictions, so teams can see relevant updates as the rules they are measured against
           change.

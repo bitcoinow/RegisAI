@@ -50,7 +50,7 @@ export default function SecurityPage() {
       <header className="mb-12 pb-10 border-b border-rule">
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-4">Legal</p>
         <h1 className="font-serif text-4xl text-ink mb-4">Security</h1>
-        <p className="text-sm text-ink-3">Last updated May 29, 2026</p>
+        <p className="text-sm text-ink-3">Last updated June 1, 2026</p>
         <p className="text-base text-ink-2 mt-4 max-w-xl leading-relaxed">
           Compliance professionals trust Regis with sensitive firm documents. This page describes the specific technical and operational controls we use to protect your data.
         </p>
@@ -93,7 +93,8 @@ export default function SecurityPage() {
           'Extracted text is truncated to 12,000 characters before being sent to the Anthropic API. This minimises the amount of firm data transmitted per request.',
           'Anthropic\'s API operates under a zero-data-retention policy for API-submitted content. Content submitted via the API is not used to train models.',
           'All API calls to Anthropic are made over TLS from Regis\'s server environment. The Anthropic API key is stored as a server-side environment variable and is never exposed to the browser.',
-          'Analysis results (the gap findings, not the original document text) are stored in your account\'s audit history.',
+          'When drafting remediation policy language, only the relevant finding\'s details are sent to the API — never the full source document.',
+          'Analysis results and any AI-drafted policy language (the findings, not the original document text) are stored in your account\'s audit history under the same row-level security guarantees as all other data.',
         ]} />
       </Section>
 

@@ -41,7 +41,7 @@ export default function PrivacyPage() {
       <header className="mb-12 pb-10 border-b border-rule">
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-4">Legal</p>
         <h1 className="font-serif text-4xl text-ink mb-4">Privacy Policy</h1>
-        <p className="text-sm text-ink-3">Effective May 29, 2026 · Last updated May 29, 2026</p>
+        <p className="text-sm text-ink-3">Effective May 29, 2026 · Last updated June 1, 2026</p>
         <p className="text-base text-ink-2 mt-4 max-w-xl leading-relaxed">
           Regis AI, Inc. ("<strong className="text-ink">Regis</strong>", "we", "us") takes data privacy seriously — especially given that our customers trust us with sensitive compliance documents. This policy explains exactly what we collect, why, and how we protect it.
         </p>
@@ -50,6 +50,7 @@ export default function PrivacyPage() {
       <Section title="1. Information We Collect">
         <p><strong className="text-ink">Account information.</strong> When you create an account, we collect your email address and, during onboarding, your firm name, firm type, AUM range, and primary regulator. This information is used to personalise every analysis to your regulatory context.</p>
         <p><strong className="text-ink">Documents you upload.</strong> Compliance documents (PDFs) you upload for gap analysis are stored in encrypted cloud storage. The extracted text is sent to our AI provider for analysis and then stored alongside your audit results.</p>
+        <p><strong className="text-ink">Analysis and drafted content.</strong> The findings produced by an analysis, and any AI-drafted policy language you generate to remediate a finding, are stored with your account&rsquo;s audit history so you can return to them. Drafted content is associated only with your account and is never shared across accounts.</p>
         <p><strong className="text-ink">Usage data.</strong> We collect information about how you use Regis — pages visited, features used, audit frequency — to improve the product and diagnose issues.</p>
         <p><strong className="text-ink">Log data.</strong> Standard server logs including IP address, browser type, and request timestamps. These are retained for 30 days for security monitoring purposes.</p>
       </Section>
@@ -105,6 +106,7 @@ export default function PrivacyPage() {
           'Your documents are never used to train AI models — by Regis or Anthropic. Anthropic\'s API operates under a zero-data-retention policy for API requests.',
           'Document text is extracted server-side by Regis and transmitted to Anthropic\'s API over an encrypted connection (TLS 1.3).',
           'The extracted text is scoped to 12,000 characters per analysis to minimise data exposure.',
+          'When you generate draft policy language for a finding, only that finding\'s details (the rule, the gap, and the suggested remediation) are sent to Anthropic\'s API — not your full document.',
           'If you are concerned about uploading particularly sensitive documents, we recommend reviewing the specific document before upload and redacting client-identifying information where it is not relevant to the compliance analysis.',
         ]} />
       </Section>
