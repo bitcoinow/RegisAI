@@ -4,8 +4,18 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { env } from '@/lib/env'
 import { Resend } from 'resend'
 
+// Shape of a regulatory update as consumed by the digest email template.
+interface DigestUpdate {
+  regulator: string
+  title: string
+  summary: string
+  url: string
+  relevance_score: number
+  affected_rules: string[]
+}
+
 // Mock updates to fallback to for developers/testing if no live updates occurred in past 7 days
-const MOCK_UPDATES = [
+const MOCK_UPDATES: DigestUpdate[] = [
   {
     regulator: 'FINRA',
     title: 'Regulatory Notice 26-05: Supervisory Requirements for Generative AI',
@@ -24,7 +34,7 @@ const MOCK_UPDATES = [
   }
 ]
 
-function generateEmailHtml(updates: any[], firmName: string): string {
+function generateEmailHtml(updates: DigestUpdate[], firmName: string): string {
   const updatesListHtml = updates.map(update => {
     const scoreColor = update.relevance_score >= 4 ? '#8b2020' : update.relevance_score >= 3 ? '#8b5a10' : '#1a3060'
     const regulatorBg = update.regulator === 'FINRA' ? '#1a3a2a' : '#1a3060'
@@ -244,8 +254,9 @@ async function handleDigest(request: Request) {
       } else {
         results.push({ email: recipient.email, success: true, id: data?.id })
       }
-    } catch (err: any) {
-      results.push({ email: recipient.email, success: false, error: err.message })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      results.push({ email: recipient.email, success: false, error: message })
     }
   }
 

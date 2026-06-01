@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RiskBadge } from '@/components/ui/risk-badge'
-import type { Jurisdiction, RiskLevel } from '@/types'
+import type { RiskLevel } from '@/types'
 
 interface AuditRow {
   id: string
