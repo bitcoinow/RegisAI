@@ -111,7 +111,7 @@ const PAINS = [
   {
     stat: '$40K+',
     label: 'Avg. annual advisory spend',
-    desc: 'What a mid-sized RIA pays outside compliance counsel for a single annual review—before exam prep.',
+    desc: 'What a mid-sized RIA pays outside compliance counsel for a single annual review, before exam prep.',
   },
   {
     stat: '3–6 wks',
@@ -142,7 +142,7 @@ const FEATURES = [
     Icon: BellIcon,
     title: 'Real-Time Regulatory Monitoring',
     benefit: 'Stay current without reading the Federal Register',
-    desc: 'Regis continuously monitors SEC, FINRA, FCA, ESMA, and EBA publications. The moment something relevant to your firm type drops, it surfaces in your feed—scored by relevance.',
+    desc: 'Regis continuously monitors SEC, FINRA, FCA, ESMA, and EBA publications. The moment something relevant to your firm type drops, it surfaces in your feed, scored by relevance.',
   },
   {
     Icon: GlobeIcon,
@@ -154,7 +154,7 @@ const FEATURES = [
     Icon: BuildingIcon,
     title: 'Firm-Specific Context',
     benefit: 'Every audit calibrated to your firm',
-    desc: 'Regis knows your firm type (RIA, Fintech, Bank, Insurance), AUM range, and primary regulator. Every analysis is scoped to what actually applies—never a generic checklist.',
+    desc: 'Regis knows your firm type (RIA, Fintech, Bank, Insurance), AUM range, and primary regulator. Every analysis is scoped to what actually applies, never a generic checklist.',
   },
   {
     Icon: DocIcon,
@@ -173,12 +173,12 @@ const STEPS = [
   {
     n: '02',
     title: 'Upload your compliance document',
-    desc: 'Drop in any PDF—Form ADV, compliance manual, code of ethics, BCP. Regis extracts the full text and prepares it for analysis.',
+    desc: 'Drop in any PDF: Form ADV, compliance manual, code of ethics, or BCP. Regis extracts the full text and prepares it for analysis.',
   },
   {
     n: '03',
     title: 'Regis runs the gap analysis',
-    desc: 'Our AI applies your jurisdiction\'s exact regulatory requirements, cites the specific rules, and scores each finding by risk level.',
+    desc: 'Regis applies your jurisdiction\'s exact regulatory requirements, cites the specific rules, and scores each finding by risk level.',
   },
   {
     n: '04',
@@ -313,7 +313,7 @@ const FAQS = [
   },
   {
     q: 'How accurate is the gap analysis?',
-    a: 'Regis uses Claude, Anthropic\'s frontier AI, with a regulatory library encoding 74 specific requirements across three jurisdictions. Each finding cites the exact regulatory rule. We recommend treating the output as a first-pass review to be validated by a qualified professional—not a substitute for legal advice.',
+    a: 'Regis uses Claude, Anthropic\'s frontier AI, with a regulatory library encoding 74 specific requirements across three jurisdictions. Each finding cites the exact regulatory rule. We recommend treating the output as a first-pass review to be validated by a qualified professional, not a substitute for legal advice.',
   },
   {
     q: 'Does Regis only find gaps, or does it help fix them?',
@@ -321,7 +321,7 @@ const FAQS = [
   },
   {
     q: 'Is my document data secure and private?',
-    a: 'Your documents are stored in encrypted cloud storage with strict row-level security: only your account can access your data. No cross-user data access is possible by design. Documents are never used to train AI models. Each firm account is fully isolated—a true multi-tenant architecture.',
+    a: 'Your documents are stored in encrypted cloud storage with strict row-level security: only your account can access your data. No cross-user data access is possible by design. Documents are never used to train AI models. Each firm account is fully isolated in a true multi-tenant architecture.',
   },
   {
     q: 'Can multiple team members share an account?',
@@ -519,9 +519,9 @@ function Hero() {
             <em className="not-italic text-gold">actually work.</em>
           </h1>
           <p className="text-lg leading-relaxed mb-10 text-green-tint" style={{ opacity: 0.82 }}>
-            Regis reads your compliance documents, applies the exact regulatory
-            framework for your firm, surfaces every gap—before the examiner does—and
-            drafts the policy language to fix it.
+            Regis reads your compliance documents, applies your jurisdiction's exact
+            regulatory requirements, surfaces every gap before the examiner does,
+            and drafts the policy language to fix it.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -534,7 +534,7 @@ function Hero() {
               href="/demo/clearview"
               className="px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
             >
-              View Sample Audit →
+              View Sample Audit
             </Link>
           </div>
           <p className="mt-6 text-xs text-green-tint">
@@ -560,14 +560,17 @@ function Hero() {
 
 function Problem() {
   return (
-    <section className="py-24 border-t border-rule bg-bg">
+    <section
+      className="py-24 border-t border-rule bg-bg"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-ink mb-4">
             Compliance is still a manual, expensive, error-prone process.
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Even well-resourced teams miss gaps because the regulatory surface area is too large to review manually—and it grows every year.
+            Even well-resourced teams miss gaps. The regulatory surface area is too large to review manually, and it expands every year.
           </p>
         </Reveal>
 
@@ -606,7 +609,11 @@ function Problem() {
 
 function Features() {
   return (
-    <section id="features" className="py-24 border-t border-rule bg-bg-2">
+    <section
+      id="features"
+      className="py-24 border-t border-rule bg-bg-2"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 700px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Capabilities</p>
@@ -614,7 +621,7 @@ function Features() {
             Everything your CCO needs in one platform.
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Built specifically for regulated financial firms—not a generic compliance checklist repackaged as SaaS.
+            Built specifically for regulated financial firms, not a generic compliance checklist repurposed as software.
           </p>
         </Reveal>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -677,14 +684,18 @@ function Features() {
 
 function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 border-t border-green-2 bg-green">
+    <section
+      id="how-it-works"
+      className="py-24 border-t border-green-2 bg-green"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-bg mb-4">
             From signup to your first audit in under 10 minutes.
           </h2>
           <p className="text-base text-green-tint max-w-2xl mb-16" style={{ opacity: 0.75 }}>
-            No onboarding call required. No implementation project. No six-month setup.
+            Sign up, upload your first document, and get your audit in minutes. No sales call, no implementation project, no lengthy setup.
           </p>
         </Reveal>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -706,7 +717,7 @@ function HowItWorks() {
             href="/demo/clearview"
             className="inline-block px-7 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
           >
-            See a real audit output →
+            See a real audit
           </Link>
         </Reveal>
       </div>
@@ -716,7 +727,10 @@ function HowItWorks() {
 
 function UseCases() {
   return (
-    <section className="py-24 border-t border-rule bg-bg">
+    <section
+      className="py-24 border-t border-rule bg-bg"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 640px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-ink mb-4">
@@ -738,14 +752,14 @@ function UseCases() {
                   <ul className="space-y-2.5 mb-auto">
                     {u.items.map((item, j) => (
                       <li key={j} className="flex gap-2 text-sm text-ink-2">
-                        <span aria-hidden="true" className="text-green shrink-0 mt-px">→</span>
+                        <span aria-hidden="true" className="text-green shrink-0 mt-px">·</span>
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-8 pt-6 border-t border-rule">
                     <p className="text-sm italic text-ink mb-2">"{u.quote}"</p>
-                    <p className="font-mono text-xs text-ink-3">— {u.who}</p>
+                    <p className="font-mono text-xs text-ink-3">{u.who}</p>
                   </div>
                 </div>
               </div>
@@ -759,7 +773,10 @@ function UseCases() {
 
 function Testimonials() {
   return (
-    <section className="py-24 border-t border-rule bg-bg-2">
+    <section
+      className="py-24 border-t border-rule bg-bg-2"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">From the Field</p>
@@ -790,10 +807,14 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
   const [currency, setCurrency] = useState<Currency>(defaultCurrency)
 
   return (
-    <section id="pricing" className="py-24 border-t border-rule bg-bg">
+    <section
+      id="pricing"
+      className="py-24 border-t border-rule bg-bg"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 720px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif text-4xl text-ink mb-4">Straightforward pricing. No surprises.</h2>
+          <h2 className="font-serif text-4xl text-ink mb-4">Simple, transparent pricing.</h2>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-16">
             <p className="text-base text-ink-2 max-w-xl">
               All plans include a 14-day trial. Cancel anytime. Annual plans available at 20% off.
@@ -901,7 +922,7 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
           <p className="text-sm text-ink-3">
             All plans include end-to-end encryption, multi-tenant data isolation, and a 99.9% uptime SLA.{' '}
             <a href="#faq" className="text-green underline underline-offset-2 hover:text-green-2 transition-colors">
-              See security FAQ →
+              See security FAQ
             </a>
           </p>
         </Reveal>
@@ -914,7 +935,11 @@ function FAQ() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section id="faq" className="py-24 border-t border-rule bg-bg-2">
+    <section
+      id="faq"
+      className="py-24 border-t border-rule bg-bg-2"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 540px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-ink mb-16">Common questions.</h2>
@@ -955,7 +980,10 @@ function FAQ() {
 
 function CTAFooter() {
   return (
-    <section className="py-28 border-t border-green-2 bg-green">
+    <section
+      className="py-28 border-t border-green-2 bg-green"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 440px' } as React.CSSProperties}
+    >
       <div className="max-w-content mx-auto px-6 text-center">
         <Reveal>
           <RegisLogo className="text-3xl" light />
@@ -979,7 +1007,7 @@ function CTAFooter() {
               href="/demo/clearview"
               className="px-8 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
             >
-              View Sample Audit →
+              View Sample Audit
             </Link>
           </div>
         </Reveal>
