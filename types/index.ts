@@ -40,6 +40,7 @@ export interface Finding {
   risk: RiskLevel
   recommendation: string
   status?: FindingStatus
+  drafted_policy?: string | null
 }
 
 export interface AuditResult {
@@ -94,6 +95,10 @@ export interface Audit {
 
 export interface AnalyseResponse {
   audit_id: string
+}
+
+export interface DraftPolicyResponse {
+  drafted_policy: string
 }
 
 export interface DocumentUploadResponse {

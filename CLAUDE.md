@@ -41,6 +41,8 @@ Uses `claude-sonnet-4-20250514`. The system prompt embeds all regulatory require
 
 `buildSystemPrompt(jurisdiction)` is memoised per jurisdiction using a `Map<Jurisdiction, string>`. `runGapAnalysis(text, firmName?, jurisdiction?)` defaults to `'US'`. Document text is truncated to 12,000 characters before sending. Returns structured JSON with `gaps[]`, `strengths[]`, and `priorityActions[]`.
 
+`draftPolicyLanguage(finding, jurisdiction?, firmName?)` generates ready-to-paste compliance-manual language that closes a single finding's gap. It returns formal policy prose (parsed from a `{ "policy_language": "..." }` JSON response). Invoked from `POST /api/findings/[id]/draft`, which verifies ownership via the owning audit, persists the result to `findings.drafted_policy`, and returns it. The audit report renders the draft inline per finding with a copy-to-clipboard and regenerate action.
+
 ### Authentication & Authorization
 
 - **Middleware** (`middleware.ts`): Refreshes Supabase sessions on every request; protects `/dashboard`, `/audit`, `/monitoring`; redirects unauthenticated users to `/login`
@@ -51,7 +53,7 @@ Uses `claude-sonnet-4-20250514`. The system prompt embeds all regulatory require
 
 Tables: `profiles`, `documents`, `audits`, `findings`, `regulatory_updates`
 
-Migrations in `supabase/migrations/`. The initial schema is `20260504000000_initial.sql`. `20260527000000_audits_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `audits` table. `20260528000000_regulatory_updates_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `regulatory_updates` table. A trigger auto-creates a profile row on new user signup.
+Migrations in `supabase/migrations/`. The initial schema is `20260504000000_initial.sql`. `20260527000000_audits_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `audits` table. `20260528000000_regulatory_updates_add_jurisdiction.sql` adds the `jurisdiction` column (default `'US'`) to the `regulatory_updates` table. `20260601000000_findings_add_drafted_policy.sql` adds the nullable `drafted_policy` column to the `findings` table. A trigger auto-creates a profile row on new user signup.
 
 ### Regulatory Monitoring (`lib/monitoring.ts`)
 

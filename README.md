@@ -413,9 +413,9 @@ Or manually run `supabase/migrations/20260504000000_initial.sql` in the Supabase
 ### Phase 3 — Pre-YC
 - [x] EU & UK regulatory libraries (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR + FCA Rules, SM&CR, UK GDPR)
 - [x] EU & UK regulatory monitoring feed (ESMA, EBA, FCA, PRA — jurisdiction tab selector on monitoring page)
+- [x] Policy update drafting (Claude generates amended policy language per finding, persisted + copy-to-clipboard)
 - [ ] Stripe billing integration
 - [ ] Multi-document support per firm
-- [ ] Policy update drafting (Claude generates amended policy language)
 - [ ] Audit prep package export (ZIP of all evidence)
 
 ---

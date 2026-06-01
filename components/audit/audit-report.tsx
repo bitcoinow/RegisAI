@@ -69,6 +69,10 @@ function StatBox({ value, label, color }: { value: number; label: string; color:
 function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean }) {
   const [status, setStatus] = useState<FindingStatus>(finding.status ?? 'open')
   const [saving, setSaving] = useState(false)
+  const [draft, setDraft] = useState<string | null>(finding.drafted_policy ?? null)
+  const [drafting, setDrafting] = useState(false)
+  const [draftError, setDraftError] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   async function updateStatus(next: FindingStatus) {
     if (next === status || saving || !finding.id) return
@@ -86,6 +90,37 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
       setStatus(prev)
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function generateDraft() {
+    if (drafting || !finding.id) return
+    setDrafting(true)
+    setDraftError(false)
+    try {
+      const res = await fetch(`/api/findings/${finding.id}/draft`, { method: 'POST' })
+      if (!res.ok) {
+        setDraftError(true)
+        return
+      }
+      const data = (await res.json()) as { drafted_policy?: string }
+      if (data.drafted_policy) setDraft(data.drafted_policy)
+      else setDraftError(true)
+    } catch {
+      setDraftError(true)
+    } finally {
+      setDrafting(false)
+    }
+  }
+
+  async function copyDraft() {
+    if (!draft) return
+    try {
+      await navigator.clipboard.writeText(draft)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Clipboard unavailable — no-op; the text remains selectable on screen.
     }
   }
 
@@ -115,6 +150,52 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
         <Section label="Policy says" content={finding.policy_says} />
         <Section label="Gap" content={finding.gap} />
         <Section label="Recommendation" content={finding.recommendation} />
+
+        {/* ── Drafted policy language ─────────────────────────────────────── */}
+        {(draft || !isDemo) && (
+          <div className="pt-2 border-t border-rule">
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
+                Suggested policy language
+              </p>
+              {draft && (
+                <button
+                  onClick={copyDraft}
+                  className="print:hidden font-mono text-[10px] tracking-widest uppercase text-ink-3 hover:text-ink transition-colors"
+                >
+                  {copied ? 'Copied ✓' : 'Copy'}
+                </button>
+              )}
+            </div>
+
+            {draft ? (
+              <div className="border border-rule bg-bg p-4 whitespace-pre-wrap text-ink-2 leading-relaxed font-mono text-xs">
+                {draft}
+              </div>
+            ) : (
+              <p className="text-ink-3 text-sm leading-relaxed">
+                Generate ready-to-paste compliance-manual language that closes this gap.
+              </p>
+            )}
+
+            {!isDemo && (
+              <div className="print:hidden mt-3 flex items-center gap-3">
+                <button
+                  onClick={generateDraft}
+                  disabled={drafting}
+                  className="border border-rule px-3 py-1.5 font-mono text-[10px] tracking-widest uppercase text-ink hover:bg-bg transition-colors disabled:opacity-50"
+                >
+                  {drafting ? 'Drafting…' : draft ? 'Regenerate' : 'Draft policy language'}
+                </button>
+                {draftError && (
+                  <span className="font-mono text-[10px] tracking-widest uppercase text-risk-high">
+                    Failed — try again
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </details>
   )

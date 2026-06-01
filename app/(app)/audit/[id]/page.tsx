@@ -23,7 +23,7 @@ export default async function AuditReportPage({ params }: PageProps) {
     .select(
       `id, firm_name, exec_summary, total_gaps, high_risk, medium_risk, low_risk,
        strengths, priority_actions, created_at, document_id, jurisdiction,
-       findings (id, req_id, rule, requirement, policy_says, gap, risk, recommendation, status)`
+       findings (id, req_id, rule, requirement, policy_says, gap, risk, recommendation, status, drafted_policy)`
     )
     .eq('id', id)
     .eq('user_id', user.id)
@@ -43,6 +43,7 @@ export default async function AuditReportPage({ params }: PageProps) {
         risk: (f['risk'] as RiskLevel) ?? 'Low',
         recommendation: (f['recommendation'] as string) ?? '',
         status: (f['status'] as FindingStatus) ?? 'open',
+        drafted_policy: (f['drafted_policy'] as string | null) ?? null,
       }
     }
   )

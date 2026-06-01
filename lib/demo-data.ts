@@ -38,6 +38,13 @@ export const CLEARVIEW_DEMO: Audit = {
       risk: 'High',
       recommendation:
         'Develop a comprehensive supervisory structure document naming all supervisory principals, defining their specific responsibilities, and establishing the reporting hierarchy. Review FINRA Notice 19-18 for guidance on supervisory system elements.',
+      drafted_policy:
+        'Supervisory System (FINRA Rule 3110(a))\n\n' +
+        'The Firm shall establish and maintain a system to supervise the activities of each associated person that is reasonably designed to achieve compliance with applicable securities laws and regulations and with FINRA rules.\n\n' +
+        '1. Designation of Principals. The Firm shall designate, by name and title, one or more appropriately registered principals with authority to carry out supervisory responsibilities for each type of business in which the Firm engages. The Chief Compliance Officer shall maintain a current Supervisory Responsibility Matrix identifying each supervisor, the activities and associated persons they supervise, and their reporting line.\n\n' +
+        '2. Supervisory Procedures. Each designated principal shall supervise in accordance with the Firm’s Written Supervisory Procedures, including the review and evidencing of transactions, correspondence, and outside business activities within their assigned area.\n\n' +
+        '3. Annual Review. The Firm shall review and update the supervisory system and the Supervisory Responsibility Matrix no less than annually, and promptly upon any material change in business or personnel. The CCO shall retain records of each review for not less than the period required under FINRA Rule 4511.\n\n' +
+        '4. Reporting. Supervisory principals shall escalate material compliance exceptions to the CCO promptly, and the CCO shall report to senior management on the operation of the supervisory system at least annually.',
     },
     {
       id: 'REQ-002',
