@@ -23,7 +23,8 @@ RegisAI is a **Compliance-as-a-Service** platform. Firms upload their compliance
    - Gap findings with risk level (High / Medium / Low), rule citation, and remediation recommendation
    - Strengths identified in the manual
    - Priority action list
-5. Findings are stored per-user with Supabase RLS so data is fully isolated.
+5. Per-finding **policy drafting** — Claude generates ready-to-paste compliance manual language that closes each gap. Persisted to the database, copy-to-clipboard inline in the report.
+6. Findings are stored per-user with Supabase RLS so data is fully isolated.
 
 ---
 
@@ -31,14 +32,14 @@ RegisAI is a **Compliance-as-a-Service** platform. Firms upload their compliance
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Framework | Next.js 14 (App Router) | TypeScript strict mode throughout |
+| Framework | Next.js 16 (App Router) | TypeScript strict mode throughout |
 | Database & Auth | Supabase | Postgres + Storage + Magic Link auth |
-| AI | Anthropic Claude API | `claude-sonnet-4-20250514` for gap analysis |
+| AI | Anthropic Claude API | `claude-sonnet-4-20250514` for gap analysis and policy drafting |
 | PDF Parsing | `pdf-parse` | Server-side only — do not use pdf.js server-side |
 | Styling | Tailwind CSS | Custom design system (editorial compliance aesthetic) |
-| Email | Resend | Transactional email (installed, wired for Phase 2 digests) |
-| Deployment | Vercel | Auto-deploy from `main` branch |
-| Payments | Stripe | Phase 3 — not yet integrated |
+| Email | Resend | Transactional email — weekly regulatory digest |
+| Deployment | Vercel | Auto-deploy from `main` branch; geo headers used for currency detection |
+| Payments | Stripe | Phase 4 — not yet integrated |
 
 **Full dependency list:** see [package.json](package.json)
 
@@ -50,61 +51,80 @@ RegisAI is a **Compliance-as-a-Service** platform. Firms upload their compliance
 RegisAI/
 ├── app/
 │   ├── (app)/                        # Authenticated app shell
-│   │   ├── layout.tsx                # App layout with Nav
-│   │   ├── dashboard/page.tsx        # Audit history list
+│   │   ├── layout.tsx                # App layout with Nav + onboarding gate
+│   │   ├── dashboard/page.tsx        # Audit history list with jurisdiction badges
 │   │   ├── audit/
-│   │   │   ├── new/page.tsx          # Upload + trigger analysis
-│   │   │   └── [id]/page.tsx         # Audit report view
-│   │   └── monitoring/page.tsx       # Regulatory feed — US / EU / UK live feed with jurisdiction tabs
+│   │   │   ├── new/page.tsx          # Upload + jurisdiction selector + trigger analysis
+│   │   │   └── [id]/page.tsx         # Audit report view with policy drafting
+│   │   └── monitoring/page.tsx       # Regulatory feed — US / EU / UK tabs
 │   ├── (auth)/
 │   │   ├── layout.tsx
 │   │   └── login/page.tsx            # Magic link OTP login
+│   ├── (legal)/
+│   │   ├── layout.tsx                # Shared legal page wrapper
+│   │   ├── about/page.tsx            # About page
+│   │   ├── privacy/page.tsx          # Privacy Policy
+│   │   ├── security/page.tsx         # Security page
+│   │   └── terms/page.tsx            # Terms of Service
 │   ├── api/
-│   │   ├── analyse/route.ts          # POST — runs gap analysis pipeline
+│   │   ├── analyse/route.ts          # POST — jurisdiction-aware gap analysis pipeline
 │   │   ├── documents/route.ts        # POST — PDF upload + text extraction
-│   │   ├── findings/[id]/status/route.ts  # PATCH — update finding status
+│   │   ├── findings/[id]/
+│   │   │   ├── status/route.ts       # PATCH — update finding status
+│   │   │   └── draft/route.ts        # POST — generate + persist policy language
+│   │   ├── profile/route.ts          # PATCH — upsert firm profile (onboarding)
 │   │   └── monitoring/
 │   │       ├── feed/route.ts         # GET — returns stored regulatory updates
-│   │       └── refresh/route.ts      # POST — fetches RSS feeds + upserts to DB
+│   │       ├── refresh/route.ts      # POST — fetches RSS feeds + upserts to DB
+│   │       └── digest/route.ts       # POST — sends weekly email digest via Resend
 │   ├── auth/callback/route.ts        # Supabase PKCE callback handler
 │   ├── demo/clearview/page.tsx       # Public demo — no login required
-│   ├── globals.css                   # Design tokens + global styles
+│   ├── onboarding/page.tsx           # Post-signup onboarding (firm name, type, size)
+│   ├── globals.css                   # Design tokens + global styles + print stylesheet
 │   ├── layout.tsx                    # Root layout
-│   └── page.tsx                      # Root redirect (auth-gated)
+│   └── page.tsx                      # Marketing landing page (geo-based currency)
 ├── components/
 │   ├── audit/
-│   │   ├── audit-report.tsx          # Full report renderer with findings
+│   │   ├── audit-report.tsx          # Full report renderer with findings + policy drafting
+│   │   ├── new-audit-form.tsx        # Jurisdiction selector component
 │   │   └── upload-form.tsx           # Two-stage upload + analysis form
+│   ├── marketing/
+│   │   └── landing-page.tsx          # B2B landing page (hero, pricing, testimonials)
 │   └── ui/
+│       ├── logo.tsx                  # Pure-CSS RegisLogo component
 │       ├── nav.tsx                   # Navigation bar with branding + auth
 │       ├── risk-badge.tsx            # High/Medium/Low badge component
 │       └── sign-out-button.tsx       # Sign out client component
 ├── lib/
-│   ├── claude.ts                     # Anthropic client + gap analysis prompt
+│   ├── claude.ts                     # Anthropic client + gap analysis + policy drafting
+│   ├── currency.ts                   # Country-to-currency mapping (USD / EUR / GBP)
 │   ├── demo-data.ts                  # Pre-seeded Clearview Capital demo audit
 │   ├── env.ts                        # Runtime env validation
+│   ├── eu-regulatory-library.ts      # 23 EU requirements (typed)
 │   ├── monitoring.ts                 # RSS parser + relevance scoring (no new deps)
 │   ├── pdf.ts                        # PDF text extraction wrapper
-│   ├── regulatory-library.ts         # 32 regulatory requirements (typed)
+│   ├── regulatory-library.ts         # 32 US regulatory requirements (typed)
+│   ├── uk-regulatory-library.ts      # 19 UK requirements (typed)
 │   └── supabase/
 │       ├── client.ts                 # Browser Supabase client
 │       └── server.ts                 # Server Supabase client (SSR cookies)
-├── middleware.ts                     # Auth session refresh on every request
+├── middleware.ts                     # Auth session refresh + onboarding redirect gate
 ├── plans/                            # Strategic plans and architectural design documents
 │   ├── 01-core-mvp-scaffold.md       # Phase 1 Core MVP scaffold & database setup
-│   ├── 02-finding-tracking-and-monitoring.md # Phase 2 status tracking & monitoring feed
-│   ├── 03-eu-uk-regulatory-expansion.md # Phase 3 regulatory library expansion
-│   └── 04-eu-uk-monitoring-expansion.md # Phase 3 monitoring feed expansion
+│   ├── 02-finding-tracking-and-monitoring.md  # Phase 2 status tracking & monitoring feed
+│   ├── 03-eu-uk-regulatory-expansion.md       # Phase 3 regulatory library expansion
+│   └── 04-eu-uk-monitoring-expansion.md       # Phase 3 monitoring feed expansion
 ├── supabase/
 │   └── migrations/
-│       ├── 20260504000000_initial.sql            # Full schema
-│       ├── 20260509000001_findings_update_policy.sql  # RLS update policy for findings
-│       ├── 20260511000000_regulatory_updates_rls.sql  # RLS + read policy for regulatory_updates
-│       ├── 20260511000001_regulatory_updates_unique_url.sql  # Unique constraint on url
-│       ├── 20260527000000_audits_add_jurisdiction.sql  # jurisdiction column on audits (default 'US')
-│       └── 20260528000000_regulatory_updates_add_jurisdiction.sql  # jurisdiction column on regulatory_updates (default 'US')
+│       ├── 20260504000000_initial.sql                          # Full schema
+│       ├── 20260509000001_findings_update_policy.sql           # RLS update policy for findings
+│       ├── 20260511000000_regulatory_updates_rls.sql           # RLS + read policy for regulatory_updates
+│       ├── 20260511000001_regulatory_updates_unique_url.sql    # Unique constraint on url
+│       ├── 20260527000000_audits_add_jurisdiction.sql          # jurisdiction column on audits (default 'US')
+│       ├── 20260528000000_regulatory_updates_add_jurisdiction.sql  # jurisdiction column on regulatory_updates (default 'US')
+│       └── 20260601000000_findings_add_drafted_policy.sql      # drafted_policy column on findings
 ├── types/
-│   └── index.ts                      # Shared domain types
+│   └── index.ts                      # Shared domain types (incl. Jurisdiction)
 ├── .env.example                      # Environment variable template
 └── lessons.md                        # Build session learnings log
 ```
@@ -202,6 +222,7 @@ findings (
   risk text,                -- 'High' | 'Medium' | 'Low'
   recommendation text,
   status text default 'open',  -- 'open' | 'in_progress' | 'resolved'
+  drafted_policy text,      -- Claude-generated policy language (nullable)
   created_at timestamptz default now()
 )
 
@@ -234,10 +255,10 @@ Accepts `multipart/form-data` with a `file` field (PDF).
 3. Returns `{ document_id, page_count }`
 
 ### `POST /api/analyse`
-Accepts `{ document_id: string }`.
+Accepts `{ document_id: string, jurisdiction?: 'US' | 'EU' | 'UK' }`.
 1. Fetches extracted text from Supabase
-2. Builds prompt from 32-requirement regulatory library
-3. Calls Claude API (`claude-sonnet-4-20250514`)
+2. Builds jurisdiction-specific prompt from the matching regulatory library (32 US / 23 EU / 19 UK requirements)
+3. Calls Claude API (`claude-sonnet-4-20250514`) with prompt caching
 4. Parses structured JSON response
 5. Persists audit + individual findings to Supabase
 6. Returns `{ audit_id }`
@@ -249,6 +270,19 @@ Accepts `{ status: 'open' | 'in_progress' | 'resolved' }`.
 1. Verifies auth and that the finding belongs to the authenticated user (via audit ownership)
 2. Updates `findings.status` in Supabase
 3. Returns `{ status }`
+
+### `POST /api/findings/[id]/draft`
+No body required.
+1. Verifies auth and finding ownership via the owning audit
+2. Calls `draftPolicyLanguage(finding, jurisdiction, firmName)` in `lib/claude.ts`
+3. Persists the result to `findings.drafted_policy`
+4. Returns `{ drafted_policy: string }`
+
+### `PATCH /api/profile`
+Accepts `{ firm_name, firm_type, aum_range, regulator }`.
+1. Verifies auth
+2. Upserts the authenticated user's profile row
+3. Returns `{ profile }`
 
 ### `POST /api/monitoring/refresh`
 No body required.
@@ -263,13 +297,16 @@ No body required.
 6. Returns `{ inserted: number, parsed: number }`
 
 ### `GET /api/monitoring/feed`
-Returns all stored `regulatory_updates` ordered by `published_at` descending, limited to 100 rows. Each item includes a `jurisdiction` field for client-side filtering.
+Returns all stored `regulatory_updates` ordered by `published_at` descending, limited to 500 rows. Each item includes a `jurisdiction` field for client-side tab filtering.
+
+### `POST /api/monitoring/digest`
+Sends the weekly regulatory updates email digest via Resend to the authenticated user's email address.
 
 ---
 
 ## Regulatory Library
 
-Three jurisdiction-specific typed arrays, each consumed by `buildSystemPrompt(jurisdiction)` in `lib/claude.ts`.
+Three jurisdiction-specific typed arrays, each consumed by `buildSystemPrompt(jurisdiction)` in `lib/claude.ts`. The prompt builder is memoised per jurisdiction using a `Map<Jurisdiction, string>`.
 
 ### United States — `lib/regulatory-library.ts` (32 requirements)
 
@@ -363,7 +400,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ### Prerequisites
 
 - Node.js 18+
-- A Supabase project (with the migration in `supabase/migrations/` applied)
+- A Supabase project (with the migrations in `supabase/migrations/` applied)
 - An Anthropic API key
 
 ### Installation
@@ -381,21 +418,21 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Database Setup
 
-Apply the migration to your Supabase project via the Supabase dashboard SQL editor or CLI:
+Apply all migrations to your Supabase project via the CLI:
 
 ```bash
 supabase db push
 ```
 
-Or manually run `supabase/migrations/20260504000000_initial.sql` in the Supabase SQL editor.
+Or run each file in `supabase/migrations/` in chronological order via the Supabase SQL editor.
 
 ---
 
 ## Build Status
 
 ### Phase 1 — Demo-ready (complete)
-- [x] Gap analysis engine (Claude prompt + 32-requirement regulatory library)
-- [x] Next.js 14 App Router scaffold
+- [x] Gap analysis engine (Claude prompt + 32-requirement US regulatory library)
+- [x] Next.js 16 App Router scaffold
 - [x] PDF upload + server-side text extraction
 - [x] Gap analysis API route (`/api/analyse`)
 - [x] Audit report page with expandable findings
@@ -408,12 +445,19 @@ Or manually run `supabase/migrations/20260504000000_initial.sql` in the Supabase
 - [x] Finding status tracking (open / in-progress / resolved toggle on finding cards)
 - [x] Regulatory monitoring feed (Federal Register / ESMA / EBA / FCA / PRA → `/monitoring`)
 - [x] PDF export of audit report (browser `window.print()` with print stylesheet)
-- [x] Weekly email digest of regulatory updates (Resend — already installed)
+- [x] Weekly email digest of regulatory updates (Resend)
 
-### Phase 3 — Pre-YC
+### Phase 3 — Pre-YC (complete)
 - [x] EU & UK regulatory libraries (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR + FCA Rules, SM&CR, UK GDPR)
 - [x] EU & UK regulatory monitoring feed (ESMA, EBA, FCA, PRA — jurisdiction tab selector on monitoring page)
-- [x] Policy update drafting (Claude generates amended policy language per finding, persisted + copy-to-clipboard)
+- [x] Policy drafting per finding (Claude generates ready-to-paste compliance manual language, persisted + copy-to-clipboard)
+- [x] Design partner onboarding flow (firm profile collection post-signup)
+- [x] B2B marketing landing page (hero, pricing, testimonials, CTA)
+- [x] Geo-based default pricing currency (USD / EUR / GBP from Vercel geo headers)
+- [x] Legal pages (Privacy Policy, Terms of Service, Security, About)
+- [x] Mobile auth stability (stale session and network timeout handling)
+
+### Phase 4 — Revenue
 - [ ] Stripe billing integration
 - [ ] Multi-document support per firm
 - [ ] Audit prep package export (ZIP of all evidence)
@@ -438,7 +482,8 @@ When running a CCO demo:
 2. Walk through High-risk findings first
 3. Point to rule citations — every finding maps to a specific FINRA or SEC requirement
 4. Show risk breakdown (High / Medium / Low counts)
-5. Close: "We're onboarding 3 design partners at no cost. Is your firm a fit?"
+5. Click "Draft Policy Language" on a finding — Claude generates ready-to-paste remediation text in seconds
+6. Close: "We're onboarding 3 design partners at no cost. Is your firm a fit?"
 
 ---
 
