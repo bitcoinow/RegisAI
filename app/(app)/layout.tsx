@@ -13,6 +13,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/login')
   }
 
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+  if (aal?.nextLevel === 'aal2' && aal?.currentLevel !== 'aal2') {
+    redirect('/auth/mfa')
+  }
+
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('firm_name')

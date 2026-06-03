@@ -23,6 +23,12 @@ export function Nav({ email, firmName }: NavProps) {
             Monitoring
           </Link>
           <Link
+            href="/settings"
+            className="text-sm text-ink-2 hover:text-ink transition-colors"
+          >
+            Settings
+          </Link>
+          <Link
             href="/audit/new"
             className="text-sm text-green hover:text-green-2 transition-colors"
           >
