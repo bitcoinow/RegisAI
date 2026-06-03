@@ -1,8 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { REGULATORY_LIBRARY } from '@/lib/regulatory-library'
-import { EU_REGULATORY_LIBRARY } from '@/lib/eu-regulatory-library'
-import { UK_REGULATORY_LIBRARY } from '@/lib/uk-regulatory-library'
-import type { AuditResult, Finding, Jurisdiction } from '@/types'
+import { getScopedRequirements } from '@/lib/coverage'
+import type { AuditResult, Finding, Jurisdiction, RegulatoryFramework } from '@/types'
 
 // All Claude API calls live here. Do not call the Anthropic SDK from API routes or components.
 
@@ -27,15 +25,16 @@ function jurisdictionExpertise(jurisdiction: Jurisdiction): string {
     : 'FINRA, SEC, AML/BSA, Regulation Best Interest, and business continuity requirements for mid-market firms'
 }
 
-const _systemPrompts = new Map<Jurisdiction, string>()
+const _systemPrompts = new Map<string, string>()
 
-function buildSystemPrompt(jurisdiction: Jurisdiction): string {
-  if (_systemPrompts.has(jurisdiction)) return _systemPrompts.get(jurisdiction)!
+function buildSystemPrompt(
+  jurisdiction: Jurisdiction,
+  framework?: RegulatoryFramework | null
+): string {
+  const cacheKey = `${jurisdiction}:${framework ?? 'ALL'}`
+  if (_systemPrompts.has(cacheKey)) return _systemPrompts.get(cacheKey)!
 
-  const library =
-    jurisdiction === 'EU' ? EU_REGULATORY_LIBRARY
-    : jurisdiction === 'UK' ? UK_REGULATORY_LIBRARY
-    : REGULATORY_LIBRARY
+  const library = getScopedRequirements(jurisdiction, framework)
 
   const requirementsContext = library.map(
     (req) =>
@@ -76,14 +75,15 @@ OUTPUT FORMAT (strict JSON, no markdown fences):
   "strengths": ["array of short strings describing areas of clear compliance"],
   "priority_actions": ["ordered array of the top 3-5 most urgent remediation actions"]
 }`
-  _systemPrompts.set(jurisdiction, prompt)
+  _systemPrompts.set(cacheKey, prompt)
   return prompt
 }
 
 export async function runGapAnalysis(
   documentText: string,
   firmName?: string,
-  jurisdiction: Jurisdiction = 'US'
+  jurisdiction: Jurisdiction = 'US',
+  framework?: RegulatoryFramework | null
 ): Promise<AuditResult> {
   const client = getClient()
 
@@ -103,7 +103,7 @@ export async function runGapAnalysis(
     system: [
       {
         type: 'text',
-        text: buildSystemPrompt(jurisdiction),
+        text: buildSystemPrompt(jurisdiction, framework),
         cache_control: { type: 'ephemeral' },
       },
     ],

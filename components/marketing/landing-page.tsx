@@ -536,6 +536,12 @@ function Hero() {
             >
               View Sample Audit
             </Link>
+            <Link
+              href="/demo/gdpr"
+              className="px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
+            >
+              GDPR Re-scan Demo
+            </Link>
           </div>
           <p className="mt-6 text-xs text-green-tint">
             No credit card required · Design partner access only

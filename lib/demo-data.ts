@@ -234,3 +234,297 @@ export const CLEARVIEW_DEMO: Audit = {
   ],
   created_at: '2026-04-28T09:00:00.000Z',
 }
+
+// ── GDPR end-to-end proof point (Northwind Payments) ──────────────────────────
+// Two linked audits demonstrating the full lifecycle for a single framework:
+//   V1 — initial scan: 13 gaps, posture 40%
+//   V2 — re-scan of the remediated manual: 10 gaps closed, posture 90%
+// Shown at /demo/gdpr without login. req ids match lib/eu-regulatory-library.ts so
+// the coverage matrix and re-scan delta line up against the real GDPR library.
+
+export const GDPR_DEMO_V1: Audit = {
+  id: 'demo-gdpr-v1',
+  document_id: 'demo-gdpr-doc-v1',
+  user_id: 'demo-user',
+  jurisdiction: 'EU',
+  framework: 'GDPR',
+  firm_name: 'Northwind Payments Ltd',
+  exec_summary:
+    'Northwind Payments Ltd, an EU-authorised electronic money institution, submitted its Data Protection Policy for a focused GDPR gap analysis against all 16 in-scope GDPR requirements. The manual establishes a baseline — encryption is in place, a consent mechanism exists, and a customer privacy notice is published — but 13 gaps remain, 5 of them High risk. The most serious deficiencies concern the lawful basis for processing, breach notification timelines, processor contracts, and international transfer safeguards. Overall compliance posture is assessed at 40%.',
+  total_gaps: 13,
+  high_risk: 5,
+  medium_risk: 6,
+  low_risk: 2,
+  scan_number: 1,
+  parent_audit_id: null,
+  compliance_score: 40,
+  requirements_total: 16,
+  requirements_met: 3,
+  strengths: [
+    'Personal data is encrypted in transit (TLS 1.2+) and at rest (AES-256), satisfying the core technical measures of Article 32',
+    'A consent capture mechanism with a granular opt-in is implemented for marketing communications, broadly consistent with Article 7',
+    'A customer-facing privacy notice is published on the website and at account opening, addressing Articles 12–14',
+  ],
+  priority_actions: [
+    'Document the Article 6 lawful basis for every processing activity, with a legitimate interests assessment where relied upon — no lawful basis is currently recorded',
+    'Establish a personal data breach procedure with a 72-hour supervisory authority notification workflow under Articles 33–34',
+    'Put Article 28-compliant Data Processing Agreements in place with all processors, including the firm’s cloud and KYC vendors',
+    'Implement an international transfers framework (adequacy / SCCs + transfer impact assessment) for data sent outside the EEA',
+    'Appoint and formally document a Data Protection Officer with defined responsibilities and reporting line under Article 37',
+  ],
+  findings: [
+    {
+      id: 'REQ-EU-007',
+      req_id: 'REQ-EU-007',
+      rule: 'GDPR Article 5',
+      requirement: 'Lawfulness of Processing — Principles',
+      policy_says:
+        'The policy states that "Northwind respects customer privacy and handles data responsibly," but does not articulate the data protection principles or how they are applied.',
+      gap: 'The Article 5 principles (purpose limitation, data minimisation, accuracy, storage limitation, integrity and confidentiality, and accountability) are not reflected in the policy. There is no evidence the principles govern processing decisions.',
+      risk: 'High',
+      recommendation:
+        'Restate the six data protection principles in the policy and map each to a concrete control (e.g. data minimisation enforced at the collection form; accuracy via periodic data reviews).',
+    },
+    {
+      id: 'REQ-EU-024',
+      req_id: 'REQ-EU-024',
+      rule: 'GDPR Article 6',
+      requirement: 'Lawful Basis for Processing',
+      policy_says: 'Not addressed. The policy does not identify a lawful basis for any processing activity.',
+      gap: 'No Article 6 lawful basis is documented for any processing activity. Where legitimate interests would be relied upon, no legitimate interests assessment (LIA) exists. This is a foundational GDPR deficiency.',
+      risk: 'High',
+      recommendation:
+        'Build a processing inventory and assign one of the six Article 6 lawful bases to each activity. Complete and retain an LIA wherever legitimate interests is the basis.',
+    },
+    {
+      id: 'REQ-EU-010',
+      req_id: 'REQ-EU-010',
+      rule: 'GDPR Article 33 and 34',
+      requirement: 'Personal Data Breach Notification',
+      policy_says:
+        'The policy notes that "security incidents are taken seriously and investigated," with no timelines, roles, or notification triggers.',
+      gap: 'There is no breach notification procedure. The 72-hour supervisory authority notification obligation and the high-risk data subject communication requirement are absent, as is any breach register.',
+      risk: 'High',
+      recommendation:
+        'Implement a documented breach response procedure with detection, assessment, a 72-hour notification workflow to the lead supervisory authority, data subject communication criteria, and a breach register.',
+      drafted_policy:
+        'Personal Data Breach Management (GDPR Articles 33 and 34)\n\n' +
+        'The Firm shall maintain a documented procedure for the identification, assessment, containment, and notification of personal data breaches.\n\n' +
+        '1. Detection and Escalation. Any employee or processor who becomes aware of a suspected personal data breach shall report it to the Data Protection Officer without undue delay and in any event within 24 hours of becoming aware. The DPO shall record the report in the Firm’s Breach Register.\n\n' +
+        '2. Assessment. The DPO shall assess, without undue delay, whether a personal data breach has occurred and the likelihood and severity of the risk to the rights and freedoms of affected data subjects.\n\n' +
+        '3. Supervisory Authority Notification. Where the breach is likely to result in a risk to data subjects, the DPO shall notify the lead supervisory authority not later than 72 hours after the Firm became aware of the breach. Where notification is made after 72 hours, the reasons for the delay shall be documented.\n\n' +
+        '4. Data Subject Communication. Where the breach is likely to result in a high risk to data subjects, the Firm shall communicate the breach to affected data subjects without undue delay, in clear and plain language.\n\n' +
+        '5. Record-Keeping. The Firm shall document all personal data breaches, including the facts, effects, and remedial action taken, in the Breach Register, irrespective of whether notification was required.',
+    },
+    {
+      id: 'REQ-EU-030',
+      req_id: 'REQ-EU-030',
+      rule: 'GDPR Article 28',
+      requirement: 'Processors and Data Processing Agreements',
+      policy_says: 'The policy lists third-party vendors but references no data processing terms.',
+      gap: 'No Article 28-compliant Data Processing Agreements are in place with processors (including the cloud hosting and KYC/identity-verification vendors). The mandatory Article 28(3) clauses are absent.',
+      risk: 'High',
+      recommendation:
+        'Execute DPAs containing the Article 28(3) clauses with all processors; maintain a processor register and obtain documented sub-processor authorisations.',
+    },
+    {
+      id: 'REQ-EU-033',
+      req_id: 'REQ-EU-033',
+      rule: 'GDPR Chapter V, Articles 44 to 49',
+      requirement: 'International Transfers of Personal Data',
+      policy_says: 'Not addressed, though the firm uses a US-based KYC provider.',
+      gap: 'Personal data is transferred outside the EEA (US KYC provider) with no transfer mechanism — no adequacy reliance, Standard Contractual Clauses, or transfer impact assessment is documented.',
+      risk: 'High',
+      recommendation:
+        'Map all cross-border transfers and put an appropriate Chapter V mechanism in place (SCCs plus a transfer impact assessment and supplementary measures where required).',
+    },
+    {
+      id: 'REQ-EU-008',
+      req_id: 'REQ-EU-008',
+      rule: 'GDPR Article 24',
+      requirement: 'Controller Accountability',
+      policy_says: 'The policy asserts compliance but provides no governance or documentation framework.',
+      gap: 'The accountability principle is not operationalised: there are no data protection policies maintained as a set, no evidence of management oversight, and no demonstrable compliance documentation.',
+      risk: 'Medium',
+      recommendation:
+        'Establish a data protection governance framework: a policy suite, defined ownership, periodic management review, and a documentation set that demonstrates compliance.',
+    },
+    {
+      id: 'REQ-EU-011',
+      req_id: 'REQ-EU-011',
+      rule: 'GDPR Article 37',
+      requirement: 'Data Protection Officer Designation',
+      policy_says: 'The policy names a "Compliance Manager" but does not designate a DPO or describe DPO tasks.',
+      gap: 'Given large-scale, systematic monitoring of customers, a DPO is likely required. No DPO is formally designated, and the Article 39 tasks and independence/reporting line are not described.',
+      risk: 'Medium',
+      recommendation:
+        'Assess the Article 37 trigger; formally designate a DPO with documented tasks, resources, independence, and a direct reporting line to senior management.',
+      status: 'in_progress',
+      reviewed_by: 'demo-user',
+      reviewed_at: '2026-05-02T10:15:00.000Z',
+      reviewer_label: 'dpo@northwindpay.eu',
+      review_note:
+        'DPO appointment approved by the board on 1 May; candidate identified, formal designation and job description in progress.',
+    },
+    {
+      id: 'REQ-EU-026',
+      req_id: 'REQ-EU-026',
+      rule: 'GDPR Article 9',
+      requirement: 'Special Categories of Personal Data',
+      policy_says: 'Not addressed.',
+      gap: 'The firm collects identity documents that may reveal special-category data; the policy does not identify an Article 9(2) condition or additional safeguards for such processing.',
+      risk: 'Medium',
+      recommendation:
+        'Determine whether special-category data is processed; if so, identify the Article 9(2) condition and apply additional safeguards, or implement controls to avoid collecting it.',
+    },
+    {
+      id: 'REQ-EU-028',
+      req_id: 'REQ-EU-028',
+      rule: 'GDPR Articles 15 to 22',
+      requirement: 'Data Subject Rights',
+      policy_says: 'The privacy notice mentions customers "may contact us about their data," with no procedure.',
+      gap: 'There is no procedure to handle data subject rights requests (access, rectification, erasure, portability, objection) within the one-month statutory timeframe, and no identity verification or logging process.',
+      risk: 'Medium',
+      recommendation:
+        'Implement a data subject rights procedure with intake, identity verification, a one-month response SLA, and a request log.',
+    },
+    {
+      id: 'REQ-EU-031',
+      req_id: 'REQ-EU-031',
+      rule: 'GDPR Article 30',
+      requirement: 'Records of Processing Activities (ROPA)',
+      policy_says: 'Not addressed.',
+      gap: 'No Record of Processing Activities is maintained. The Article 30 record (purposes, categories, recipients, transfers, retention, security measures) does not exist.',
+      risk: 'Medium',
+      recommendation:
+        'Create and maintain a ROPA covering all processing activities and make it available to the supervisory authority on request.',
+    },
+    {
+      id: 'REQ-EU-032',
+      req_id: 'REQ-EU-032',
+      rule: 'GDPR Article 35',
+      requirement: 'Data Protection Impact Assessment (DPIA)',
+      policy_says: 'Not addressed.',
+      gap: 'The firm performs automated transaction monitoring and profiling likely to be high risk, but no DPIA process exists and no DPIA has been conducted.',
+      risk: 'Medium',
+      recommendation:
+        'Adopt a DPIA methodology and complete DPIAs for high-risk processing (e.g. profiling/monitoring), consulting the supervisory authority where residual high risk remains.',
+    },
+    {
+      id: 'REQ-EU-029',
+      req_id: 'REQ-EU-029',
+      rule: 'GDPR Article 25',
+      requirement: 'Data Protection by Design and by Default',
+      policy_says: 'Not addressed.',
+      gap: 'Data protection by design and by default is not embedded into product or system development; default settings are not assessed for data minimisation.',
+      risk: 'Low',
+      recommendation:
+        'Introduce a privacy-by-design checkpoint into the product development lifecycle and review default settings to ensure only necessary data is processed.',
+    },
+    {
+      id: 'REQ-EU-034',
+      req_id: 'REQ-EU-034',
+      rule: 'GDPR Article 5(1)(e)',
+      requirement: 'Storage Limitation and Retention',
+      policy_says: 'The policy states data is "kept only as long as necessary" without a schedule.',
+      gap: 'No data retention schedule defines retention periods per data category, and there is no documented secure deletion/anonymisation process.',
+      risk: 'Low',
+      recommendation:
+        'Publish a retention schedule mapping each data category to a retention period and a secure deletion or anonymisation procedure, balanced against AML record-keeping obligations.',
+    },
+  ],
+  created_at: '2026-04-30T09:00:00.000Z',
+}
+
+export const GDPR_DEMO_V2: Audit = {
+  id: 'demo-gdpr-v2',
+  document_id: 'demo-gdpr-doc-v2',
+  user_id: 'demo-user',
+  jurisdiction: 'EU',
+  framework: 'GDPR',
+  firm_name: 'Northwind Payments Ltd',
+  exec_summary:
+    'Following remediation, Northwind Payments resubmitted its updated Data Protection Policy for a GDPR re-scan. Of the 13 gaps identified in the initial audit, 10 have been fully closed — including the lawful basis register, breach procedure, processor DPAs, ROPA, DPIA methodology, and DPO designation. Two High-risk findings (international transfers and processor terms) have been materially improved but are not yet fully closed, one Low-risk retention gap has been formally risk-accepted, and one new Low-risk gap was identified in the revised privacy notice. Overall compliance posture has risen from 40% to 90%.',
+  total_gaps: 4,
+  high_risk: 0,
+  medium_risk: 1,
+  low_risk: 3,
+  scan_number: 2,
+  parent_audit_id: 'demo-gdpr-v1',
+  compliance_score: 90,
+  requirements_total: 16,
+  requirements_met: 12,
+  gaps_closed: 10,
+  gaps_new: 1,
+  gaps_persisting: 3,
+  strengths: [
+    'Article 6 lawful basis register completed for all processing activities, with legitimate interests assessments retained',
+    'Breach response procedure implemented with a 72-hour notification workflow and breach register (Articles 33–34)',
+    'Record of Processing Activities (ROPA) created and maintained (Article 30)',
+    'DPIA methodology adopted and a DPIA completed for transaction-monitoring profiling (Article 35)',
+    'Data Protection Officer formally designated with defined tasks and a direct reporting line (Article 37)',
+    'Data subject rights procedure implemented with a one-month response SLA and request log (Articles 15–22)',
+  ],
+  priority_actions: [
+    'Finalise Standard Contractual Clauses and the transfer impact assessment for the US KYC provider to fully close the international transfers gap',
+    'Execute the remaining sub-processor authorisations to complete the Article 28 processor framework',
+    'Update the customer privacy notice to include the new retention periods and lawful basis details',
+  ],
+  findings: [
+    {
+      id: 'REQ-EU-033',
+      req_id: 'REQ-EU-033',
+      rule: 'GDPR Chapter V, Articles 44 to 49',
+      requirement: 'International Transfers of Personal Data',
+      policy_says:
+        'The updated policy commits to Standard Contractual Clauses for non-EEA transfers and references an in-progress transfer impact assessment for the US KYC provider.',
+      gap: 'SCCs are drafted but not yet executed with the US KYC provider, and the transfer impact assessment is not finalised. The transfer mechanism is materially improved but not yet complete.',
+      risk: 'Medium',
+      recommendation:
+        'Execute the SCCs and finalise the transfer impact assessment, documenting any supplementary measures, to fully close this gap.',
+    },
+    {
+      id: 'REQ-EU-030',
+      req_id: 'REQ-EU-030',
+      rule: 'GDPR Article 28',
+      requirement: 'Processors and Data Processing Agreements',
+      policy_says:
+        'DPAs containing the Article 28(3) clauses are now executed with the cloud host and KYC vendor; a processor register is maintained.',
+      gap: 'Primary processor DPAs are in place. A small number of sub-processor authorisations remain outstanding, leaving a minor residual gap.',
+      risk: 'Low',
+      recommendation:
+        'Obtain and document the outstanding sub-processor authorisations to complete the processor framework.',
+    },
+    {
+      id: 'REQ-EU-034',
+      req_id: 'REQ-EU-034',
+      rule: 'GDPR Article 5(1)(e)',
+      requirement: 'Storage Limitation and Retention',
+      policy_says:
+        'A retention schedule is published; transaction records are retained for 5 years to satisfy AMLD record-keeping obligations.',
+      gap: 'The 5-year retention of transaction data exceeds the minimum needed for the original processing purpose, but is required under AML legislation. Residual tension between storage limitation and AML retention.',
+      risk: 'Low',
+      recommendation:
+        'Retain the AML-driven retention period and document the legal obligation as justification; review periodically.',
+      status: 'risk_accepted',
+      reviewed_by: 'demo-user',
+      reviewed_at: '2026-05-28T14:20:00.000Z',
+      reviewer_label: 'dpo@northwindpay.eu',
+      review_note:
+        'Risk accepted: the 5-year retention is mandated by the EU AML Directive (Art. 40). The legal obligation overrides storage-limitation minimisation; documented and approved by the DPO and Head of Compliance.',
+    },
+    {
+      id: 'REQ-EU-027',
+      req_id: 'REQ-EU-027',
+      rule: 'GDPR Articles 12, 13 and 14',
+      requirement: 'Transparency and Privacy Notices',
+      policy_says:
+        'The privacy notice was revised during remediation but the new retention periods and updated lawful basis details were not carried through.',
+      gap: 'Newly identified: the revised privacy notice is now inconsistent with the updated retention schedule and lawful basis register, so the Article 13/14 information is incomplete.',
+      risk: 'Low',
+      recommendation:
+        'Update the privacy notice to reflect the finalised retention periods and lawful basis register so the transparency information is accurate.',
+    },
+  ],
+  created_at: '2026-05-29T09:00:00.000Z',
+}

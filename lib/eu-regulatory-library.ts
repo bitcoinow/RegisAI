@@ -1,6 +1,6 @@
 import type { RegulatoryRequirement } from '@/types'
 
-// 23 EU requirements evaluated in every EU-jurisdiction gap analysis.
+// 34 EU requirements evaluated in every EU-jurisdiction gap analysis (16 of them GDPR).
 // Add new requirements here; they are automatically included in the next analysis run.
 export const EU_REGULATORY_LIBRARY: RegulatoryRequirement[] = [
   // ── MiFID II ──────────────────────────────────────────────────────────────
@@ -215,6 +215,106 @@ export const EU_REGULATORY_LIBRARY: RegulatoryRequirement[] = [
     description:
       'Issuers must inform the public as soon as possible of inside information which directly concerns them. Issuers must post and maintain on their websites all inside information they are required to publicly disclose. They must ensure that any disclosure is done in a manner which enables fast access and a complete, correct and timely assessment of the information.',
     defaultRisk: 'High',
+  },
+  // ── GDPR (extended coverage) ────────────────────────────────────────────────
+  {
+    id: 'REQ-EU-024',
+    rule: 'GDPR Article 6',
+    framework: 'GDPR',
+    requirement: 'Lawful Basis for Processing',
+    description:
+      'Processing is lawful only if and to the extent that at least one of the six legal bases in Article 6(1) applies: consent, performance of a contract, compliance with a legal obligation, protection of vital interests, performance of a task in the public interest, or legitimate interests. The controller must identify and document the appropriate lawful basis for each processing activity before processing begins, and where relying on legitimate interests must carry out and record a legitimate interests assessment (LIA).',
+    defaultRisk: 'High',
+  },
+  {
+    id: 'REQ-EU-025',
+    rule: 'GDPR Article 7',
+    framework: 'GDPR',
+    requirement: 'Conditions for Consent',
+    description:
+      'Where processing is based on consent, the controller must be able to demonstrate that the data subject consented. Requests for consent must be presented in a manner clearly distinguishable from other matters, in an intelligible and easily accessible form, using clear and plain language. Consent must be freely given, specific, informed and unambiguous, and the data subject must be able to withdraw consent at any time as easily as it was given.',
+    defaultRisk: 'Medium',
+  },
+  {
+    id: 'REQ-EU-026',
+    rule: 'GDPR Article 9',
+    framework: 'GDPR',
+    requirement: 'Special Categories of Personal Data',
+    description:
+      'Processing of special categories of personal data — revealing racial or ethnic origin, political opinions, religious or philosophical beliefs, trade union membership, genetic data, biometric data for unique identification, health data, or data concerning a person’s sex life or sexual orientation — is prohibited unless one of the specific conditions in Article 9(2) applies (e.g. explicit consent, substantial public interest with a basis in law). Controllers must identify the Article 9 condition and any required additional safeguards.',
+    defaultRisk: 'High',
+  },
+  {
+    id: 'REQ-EU-027',
+    rule: 'GDPR Articles 12, 13 and 14',
+    framework: 'GDPR',
+    requirement: 'Transparency and Privacy Notices',
+    description:
+      'The controller must provide data subjects with concise, transparent, intelligible and easily accessible information about the processing of their personal data, in clear and plain language. This includes the identity and contact details of the controller and DPO, the purposes and lawful basis of processing, recipients, retention periods, data subject rights, and (where data is not obtained from the data subject) the source of the data. This information is typically delivered through a privacy notice provided at or before the point of collection.',
+    defaultRisk: 'Medium',
+  },
+  {
+    id: 'REQ-EU-028',
+    rule: 'GDPR Articles 15 to 22',
+    framework: 'GDPR',
+    requirement: 'Data Subject Rights',
+    description:
+      'The controller must establish procedures to facilitate the exercise of data subject rights: the right of access, rectification, erasure (right to be forgotten), restriction of processing, data portability, objection, and rights related to automated decision-making and profiling. Requests must generally be responded to without undue delay and within one month, free of charge, and the controller must verify the identity of the requester and document each request and its outcome.',
+    defaultRisk: 'High',
+  },
+  {
+    id: 'REQ-EU-029',
+    rule: 'GDPR Article 25',
+    framework: 'GDPR',
+    requirement: 'Data Protection by Design and by Default',
+    description:
+      'The controller must implement appropriate technical and organisational measures — such as pseudonymisation and data minimisation — designed to implement the data protection principles in an effective manner and to integrate the necessary safeguards into the processing, both at the time of determining the means of processing and at the time of the processing itself. By default, only personal data necessary for each specific purpose may be processed, and personal data must not be made accessible to an indefinite number of persons without intervention.',
+    defaultRisk: 'Medium',
+  },
+  {
+    id: 'REQ-EU-030',
+    rule: 'GDPR Article 28',
+    framework: 'GDPR',
+    requirement: 'Processors and Data Processing Agreements',
+    description:
+      'Where processing is carried out on behalf of a controller, the controller must use only processors providing sufficient guarantees to implement appropriate technical and organisational measures. Processing by a processor must be governed by a written contract (Data Processing Agreement) that sets out the subject matter, duration, nature and purpose of processing, the obligations and rights of the controller, and the Article 28(3) mandatory clauses including confidentiality, security, sub-processor authorisation, assistance, and deletion or return of data.',
+    defaultRisk: 'High',
+  },
+  {
+    id: 'REQ-EU-031',
+    rule: 'GDPR Article 30',
+    framework: 'GDPR',
+    requirement: 'Records of Processing Activities (ROPA)',
+    description:
+      'Each controller and, where applicable, its representative must maintain a written record of processing activities under its responsibility, containing the name and contact details of the controller and DPO, the purposes of processing, a description of the categories of data subjects and personal data, the categories of recipients, transfers to third countries, the envisaged time limits for erasure, and a general description of the technical and organisational security measures. The record must be made available to the supervisory authority on request.',
+    defaultRisk: 'Medium',
+  },
+  {
+    id: 'REQ-EU-032',
+    rule: 'GDPR Article 35',
+    framework: 'GDPR',
+    requirement: 'Data Protection Impact Assessment (DPIA)',
+    description:
+      'Where a type of processing, in particular using new technologies, is likely to result in a high risk to the rights and freedoms of natural persons, the controller must, prior to the processing, carry out a Data Protection Impact Assessment. The DPIA must contain a systematic description of the processing and purposes, an assessment of necessity and proportionality, an assessment of the risks to data subjects, and the measures envisaged to address those risks. Where residual high risk remains, prior consultation with the supervisory authority under Article 36 is required.',
+    defaultRisk: 'High',
+  },
+  {
+    id: 'REQ-EU-033',
+    rule: 'GDPR Chapter V, Articles 44 to 49',
+    framework: 'GDPR',
+    requirement: 'International Transfers of Personal Data',
+    description:
+      'Any transfer of personal data to a third country or international organisation may take place only if the controller and processor comply with Chapter V. Transfers must be based on an adequacy decision, or, in its absence, on appropriate safeguards such as Standard Contractual Clauses or Binding Corporate Rules, accompanied where necessary by a transfer impact assessment and supplementary measures. In the absence of these, transfers may rely only on the specific derogations in Article 49.',
+    defaultRisk: 'High',
+  },
+  {
+    id: 'REQ-EU-034',
+    rule: 'GDPR Article 5(1)(e)',
+    framework: 'GDPR',
+    requirement: 'Storage Limitation and Retention',
+    description:
+      'Personal data must be kept in a form which permits identification of data subjects for no longer than is necessary for the purposes for which it is processed. The controller must establish and apply a data retention schedule that defines retention periods for each category of personal data, together with secure deletion or anonymisation procedures at the end of the retention period, and must periodically review stored data to ensure it is not retained beyond its lawful purpose.',
+    defaultRisk: 'Medium',
   },
 ]
 

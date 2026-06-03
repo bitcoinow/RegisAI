@@ -6,7 +6,7 @@ export type Regulator = 'FINRA' | 'SEC' | 'State' | 'Multiple'
 
 export type DocumentStatus = 'uploaded' | 'analysing' | 'complete' | 'error'
 
-export type FindingStatus = 'open' | 'in_progress' | 'resolved'
+export type FindingStatus = 'open' | 'in_progress' | 'resolved' | 'risk_accepted'
 
 export type RegulatoryFramework =
   // US
@@ -33,6 +33,10 @@ export interface RegulatoryRequirement {
 
 export interface Finding {
   id: string
+  // Stable requirement id from the library (e.g. 'REQ-EU-007'); used for coverage
+  // and re-scan delta matching. On Claude output this equals `id`; on DB rows it is
+  // the separate `req_id` column.
+  req_id?: string
   rule: string
   requirement: string
   policy_says: string
@@ -41,6 +45,11 @@ export interface Finding {
   recommendation: string
   status?: FindingStatus
   drafted_policy?: string | null
+  reviewed_by?: string | null
+  reviewed_at?: string | null
+  review_note?: string | null
+  // Display-only label for who reviewed the finding (e.g. email), joined at read time.
+  reviewer_label?: string | null
 }
 
 export interface AuditResult {
@@ -79,6 +88,7 @@ export interface Audit {
   document_id: string
   user_id: string
   jurisdiction: Jurisdiction
+  framework?: RegulatoryFramework | null
   firm_name: string
   exec_summary: string
   total_gaps: number
@@ -89,6 +99,15 @@ export interface Audit {
   priority_actions: string[]
   findings: Finding[]
   created_at: string
+  // Re-scan / posture fields (see migration 20260603000000)
+  parent_audit_id?: string | null
+  scan_number?: number
+  compliance_score?: number | null
+  requirements_total?: number | null
+  requirements_met?: number | null
+  gaps_closed?: number | null
+  gaps_new?: number | null
+  gaps_persisting?: number | null
 }
 
 // ── API response types ────────────────────────────────────────────────────────

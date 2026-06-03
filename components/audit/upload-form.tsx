@@ -2,16 +2,25 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Jurisdiction } from '@/types'
+import type { Jurisdiction, RegulatoryFramework } from '@/types'
 
 type Stage = 'idle' | 'uploading' | 'analysing' | 'error'
 
-export function UploadForm({ jurisdiction }: { jurisdiction: Jurisdiction }) {
-  const requirementCount: Record<Jurisdiction, number> = { US: 32, EU: 23, UK: 19 }
+export function UploadForm({
+  jurisdiction,
+  framework = null,
+  parentAuditId = null,
+}: {
+  jurisdiction: Jurisdiction
+  framework?: RegulatoryFramework | null
+  parentAuditId?: string | null
+}) {
   const stageLabel: Record<Stage, string> = {
     idle: '',
     uploading: 'Extracting text from PDF…',
-    analysing: `Analysing against ${requirementCount[jurisdiction]} regulatory requirements…`,
+    analysing: framework
+      ? `Analysing against the ${framework} framework…`
+      : 'Analysing against the regulatory library…',
     error: '',
   }
   const [stage, setStage] = useState<Stage>('idle')
@@ -49,7 +58,7 @@ export function UploadForm({ jurisdiction }: { jurisdiction: Jurisdiction }) {
     const analyseRes = await fetch('/api/analyse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ document_id, jurisdiction }),
+      body: JSON.stringify({ document_id, jurisdiction, framework, parent_audit_id: parentAuditId }),
     })
 
     if (!analyseRes.ok) {

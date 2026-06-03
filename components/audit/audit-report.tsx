@@ -1,8 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import type { Audit, Finding, FindingStatus, RiskLevel } from '@/types'
 import { RiskBadge } from '@/components/ui/risk-badge'
+import { CoverageMatrix } from '@/components/audit/coverage-matrix'
+import { AuditComparison, type ComparisonData } from '@/components/audit/audit-comparison'
+import type { CoverageItem } from '@/lib/coverage'
 
 const RISK_ORDER: Record<RiskLevel, number> = { High: 0, Medium: 1, Low: 2 }
 
@@ -14,8 +18,17 @@ const JURISDICTION_FRAMEWORKS: Record<string, string> = {
 
 const STATUS_CONFIG: Record<FindingStatus, { label: string; color: string }> = {
   open: { label: 'Open', color: 'text-ink-3' },
-  in_progress: { label: 'In Progress', color: 'text-amber' },
+  in_progress: { label: 'In Progress', color: 'text-risk-medium' },
   resolved: { label: 'Resolved', color: 'text-green' },
+  risk_accepted: { label: 'Risk Accepted', color: 'text-risk-low' },
+}
+
+function formatReviewDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 function StatusBadge({ status }: { status: FindingStatus }) {
@@ -66,13 +79,45 @@ function StatBox({ value, label, color }: { value: number; label: string; color:
   )
 }
 
+interface ReviewInfo {
+  reviewer_label: string | null
+  reviewed_at: string | null
+  review_note: string | null
+}
+
 function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean }) {
   const [status, setStatus] = useState<FindingStatus>(finding.status ?? 'open')
   const [saving, setSaving] = useState(false)
+  const [note, setNote] = useState<string>(finding.review_note ?? '')
+  const [review, setReview] = useState<ReviewInfo>({
+    reviewer_label: finding.reviewer_label ?? null,
+    reviewed_at: finding.reviewed_at ?? null,
+    review_note: finding.review_note ?? null,
+  })
+  const [noteSaved, setNoteSaved] = useState(false)
   const [draft, setDraft] = useState<string | null>(finding.drafted_policy ?? null)
   const [drafting, setDrafting] = useState(false)
   const [draftError, setDraftError] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  // Persist a status change (and the current rationale note) and capture the
+  // returned reviewer attribution.
+  async function persist(next: FindingStatus, noteToSend: string) {
+    if (!finding.id) return false
+    const res = await fetch(`/api/findings/${finding.id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: next, review_note: noteToSend }),
+    })
+    if (!res.ok) return false
+    const data = (await res.json()) as ReviewInfo
+    setReview({
+      reviewer_label: data.reviewer_label,
+      reviewed_at: data.reviewed_at,
+      review_note: data.review_note,
+    })
+    return true
+  }
 
   async function updateStatus(next: FindingStatus) {
     if (next === status || saving || !finding.id) return
@@ -80,14 +125,25 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
     setStatus(next)
     setSaving(true)
     try {
-      const res = await fetch(`/api/findings/${finding.id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: next }),
-      })
-      if (!res.ok) setStatus(prev)
+      const ok = await persist(next, note)
+      if (!ok) setStatus(prev)
     } catch {
       setStatus(prev)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function saveNote() {
+    if (saving || status === 'open') return
+    setSaving(true)
+    setNoteSaved(false)
+    try {
+      const ok = await persist(status, note)
+      if (ok) {
+        setNoteSaved(true)
+        setTimeout(() => setNoteSaved(false), 2000)
+      }
     } finally {
       setSaving(false)
     }
@@ -142,11 +198,55 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
 
       <div className="border-t border-rule px-6 py-5 space-y-4 text-sm">
         {!isDemo && (
-          <div className="print:hidden">
-            <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-2">Status</p>
-            <StatusToggle status={status} onUpdate={updateStatus} disabled={saving} />
+          <div className="print:hidden space-y-3">
+            <div>
+              <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-2">Status</p>
+              <StatusToggle status={status} onUpdate={updateStatus} disabled={saving} />
+            </div>
+            {status !== 'open' && (
+              <div>
+                <label className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-2 block">
+                  Review rationale
+                  {status === 'risk_accepted' && (
+                    <span className="text-risk-low"> — required to accept residual risk</span>
+                  )}
+                </label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={2}
+                  placeholder="Document who reviewed this and why (e.g. remediated in v2; or risk accepted because…)"
+                  className="w-full border border-rule bg-bg text-ink-2 text-sm p-3 focus:outline-none focus:border-green"
+                />
+                <button
+                  onClick={saveNote}
+                  disabled={saving}
+                  className="mt-2 border border-rule px-3 py-1.5 font-mono text-[10px] tracking-widest uppercase text-ink hover:bg-bg transition-colors disabled:opacity-50"
+                >
+                  {noteSaved ? 'Saved ✓' : 'Save rationale'}
+                </button>
+              </div>
+            )}
           </div>
         )}
+
+        {/* ── Review attribution (audit trail) ─────────────────────────────── */}
+        {review.reviewed_at && (
+          <div className="border-l-2 border-green pl-4 py-1">
+            <p className="font-mono text-[11px] text-ink-3">
+              {STATUS_CONFIG[status].label} by{' '}
+              <span className="text-ink-2">{review.reviewer_label ?? 'reviewer'}</span>
+              {' · '}
+              {formatReviewDate(review.reviewed_at)}
+            </p>
+            {review.review_note && (
+              <p className="text-ink-2 text-sm leading-relaxed mt-1 italic">
+                “{review.review_note}”
+              </p>
+            )}
+          </div>
+        )}
+
         <Section label="Policy says" content={finding.policy_says} />
         <Section label="Gap" content={finding.gap} />
         <Section label="Recommendation" content={finding.recommendation} />
@@ -213,9 +313,20 @@ function Section({ label, content }: { label: string; content: string }) {
 interface AuditReportProps {
   audit: Audit
   isDemo?: boolean
+  coverage?: CoverageItem[]
+  comparison?: ComparisonData
+  rescanHref?: string
+  frameworkLabel?: string
 }
 
-export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
+export function AuditReport({
+  audit,
+  isDemo = false,
+  coverage,
+  comparison,
+  rescanHref,
+  frameworkLabel,
+}: AuditReportProps) {
   const jurisdictionColor =
     audit.jurisdiction === 'EU' ? 'var(--blue)'
     : audit.jurisdiction === 'UK' ? 'var(--gold)'
@@ -223,6 +334,8 @@ export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
   const sortedFindings = [...audit.findings].sort(
     (a, b) => RISK_ORDER[a.risk]! - RISK_ORDER[b.risk]!
   )
+
+  const scopeLabel = frameworkLabel ?? audit.framework ?? null
 
   const formattedDate = new Date(audit.created_at).toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -241,27 +354,58 @@ export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
               Demo Report
             </div>
           )}
-          <span
-            className="inline-block font-mono text-xs tracking-widest uppercase px-3 py-1 border mb-4"
-            style={{ color: jurisdictionColor, borderColor: jurisdictionColor }}
-          >
-            {audit.jurisdiction ?? 'US'}
-          </span>
+          <div className="flex items-center gap-2 mb-4">
+            <span
+              className="inline-block font-mono text-xs tracking-widest uppercase px-3 py-1 border"
+              style={{ color: jurisdictionColor, borderColor: jurisdictionColor }}
+            >
+              {audit.jurisdiction ?? 'US'}
+            </span>
+            {scopeLabel && (
+              <span className="inline-block font-mono text-xs tracking-widest uppercase px-3 py-1 border border-green text-green">
+                {scopeLabel}
+              </span>
+            )}
+          </div>
           <h1 className="font-serif text-4xl text-ink mb-2">{audit.firm_name}</h1>
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Regulatory Gap Analysis &nbsp;·&nbsp; {formattedDate}
+            {audit.scan_number && audit.scan_number > 1 ? ` · Re-scan #${audit.scan_number}` : ''}
           </p>
           <p className="font-mono text-xs text-ink-3 mt-1">
-            {JURISDICTION_FRAMEWORKS[audit.jurisdiction ?? 'US'] ?? JURISDICTION_FRAMEWORKS.US}
+            {scopeLabel ?? JURISDICTION_FRAMEWORKS[audit.jurisdiction ?? 'US'] ?? JURISDICTION_FRAMEWORKS.US}
           </p>
         </div>
-        <button
-          onClick={() => window.print()}
-          className="print:hidden border border-rule px-4 py-2 font-mono text-xs tracking-widest uppercase text-ink hover:bg-bg-2 transition-colors"
-        >
-          Download PDF
-        </button>
+        <div className="flex items-center gap-3">
+          {audit.compliance_score != null && (
+            <div className="text-center border border-rule px-4 py-2 bg-bg-2">
+              <div className="font-serif text-3xl text-green leading-none">
+                {audit.compliance_score}%
+              </div>
+              <div className="font-mono text-[10px] tracking-widest uppercase text-ink-3 mt-1">
+                Posture
+              </div>
+            </div>
+          )}
+          {!isDemo && rescanHref && (
+            <Link
+              href={rescanHref}
+              className="print:hidden border border-green bg-green text-white px-4 py-2 font-mono text-xs tracking-widest uppercase hover:bg-green-2 transition-colors"
+            >
+              Re-scan
+            </Link>
+          )}
+          <button
+            onClick={() => window.print()}
+            className="print:hidden border border-rule px-4 py-2 font-mono text-xs tracking-widest uppercase text-ink hover:bg-bg-2 transition-colors"
+          >
+            Download PDF
+          </button>
+        </div>
       </div>
+
+      {/* ── Re-scan comparison (when this audit supersedes a prior one) ───────── */}
+      {comparison && <AuditComparison data={comparison} />}
 
       {/* ── Executive Summary ──────────────────────────────────────────────── */}
       <section className="mb-10">
@@ -281,6 +425,11 @@ export function AuditReport({ audit, isDemo = false }: AuditReportProps) {
           <StatBox value={audit.low_risk} label="Low Risk" color="var(--blue)" />
         </div>
       </section>
+
+      {/* ── Coverage Matrix ────────────────────────────────────────────────── */}
+      {coverage && coverage.length > 0 && (
+        <CoverageMatrix items={coverage} frameworkLabel={scopeLabel ?? (audit.jurisdiction ?? 'US')} />
+      )}
 
       {/* ── Priority Actions ───────────────────────────────────────────────── */}
       {audit.priority_actions.length > 0 && (
