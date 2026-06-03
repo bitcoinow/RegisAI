@@ -26,7 +26,8 @@ There are no tests configured in this project.
 ### Key Directories
 
 - `app/(app)/` — Protected routes (dashboard, audit, monitoring); auth checked in layout
-- `app/(auth)/` — Public auth routes (login, magic link callback)
+- `app/(auth)/` — Public auth routes (login, signup, forgot-password)
+- `app/auth/` — Auth flow handlers (callback, reset-password, mfa challenge)
 - `app/api/` — Two API routes: `documents` and `analyse`
 - `lib/` — Server-side utilities: Claude integration, Supabase clients, PDF parsing, regulatory library
 - `components/audit/` — Upload form and audit report display
@@ -45,8 +46,10 @@ Uses `claude-sonnet-4-20250514`. The system prompt embeds all regulatory require
 
 ### Authentication & Authorization
 
-- **Middleware** (`middleware.ts`): Refreshes Supabase sessions on every request; protects `/dashboard`, `/audit`, `/monitoring`; redirects unauthenticated users to `/login`
-- **Magic link only** — No password auth; handled via `app/auth/callback/route.ts`
+- **Middleware** (`proxy.ts`): Refreshes Supabase sessions on every request; protects `/dashboard`, `/audit`, `/monitoring`, `/onboarding`; redirects unauthenticated users to `/login` and authenticated users away from `/login`
+- **Sign-in methods** — Email + password (`signInWithPassword`) and Google OAuth (`signInWithOAuth`). Signup at `app/(auth)/signup`. No magic link.
+- **MFA (optional TOTP)** — Enrolled/managed in `app/(app)/settings` via the `MfaSettings` component. The app layout enforces an AAL2 challenge at `app/auth/mfa` before dashboard access when a verified factor exists.
+- **Password recovery** — `app/(auth)/forgot-password` calls `resetPasswordForEmail`; the recovery email link must point at `/auth/callback?token_hash=...&type=recovery` (configured in the Supabase email template). The callback (`app/auth/callback/route.ts`) verifies via `verifyOtp` for the `token_hash` flow (and `exchangeCodeForSession` for the OAuth `code` flow), then redirects recovery sessions to `app/auth/reset-password` to set a new password.
 - **Row-Level Security**: Supabase RLS policies enforce user isolation at the database level for all tables
 
 ### Database (Supabase)
