@@ -4,7 +4,7 @@ import type { AuditResult, Finding, Jurisdiction, RegulatoryFramework } from '@/
 
 // All Claude API calls live here. Do not call the Anthropic SDK from API routes or components.
 
-const MODEL = 'claude-sonnet-4-20250514'
+const MODEL = 'claude-sonnet-4-6'
 const MAX_DOCUMENT_CHARS = 12_000
 
 let _client: Anthropic | null = null

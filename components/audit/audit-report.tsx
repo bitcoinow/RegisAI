@@ -86,6 +86,7 @@ interface ReviewInfo {
 }
 
 function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean }) {
+  const [isOpen, setIsOpen] = useState(false)
   const [status, setStatus] = useState<FindingStatus>(finding.status ?? 'open')
   const [saving, setSaving] = useState(false)
   const [note, setNote] = useState<string>(finding.review_note ?? '')
@@ -181,8 +182,14 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
   }
 
   return (
-    <details className="border border-rule bg-bg-2 group">
-      <summary className="flex items-start justify-between gap-4 px-6 py-4 cursor-pointer list-none">
+    <div className="border border-rule bg-bg-2">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsOpen((o) => !o)}
+        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen((o) => !o)}
+        className="flex items-start justify-between gap-4 px-6 py-4 cursor-pointer select-none"
+      >
         <div className="min-w-0">
           <p className="font-mono text-xs text-ink-3 mb-1">{finding.rule}</p>
           <p className="text-ink text-sm font-medium">{finding.requirement}</p>
@@ -190,12 +197,15 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
         <div className="flex items-center gap-3 flex-shrink-0 pt-0.5">
           <StatusBadge status={status} />
           <RiskBadge risk={finding.risk} />
-          <span className="text-ink-3 text-xs group-open:rotate-180 transition-transform select-none">
+          <span
+            className={`text-ink-3 text-xs transition-transform select-none ${isOpen ? 'rotate-180' : ''}`}
+          >
             ▾
           </span>
         </div>
-      </summary>
+      </div>
 
+      {isOpen && (
       <div className="border-t border-rule px-6 py-5 space-y-4 text-sm">
         {!isDemo && (
           <div className="print:hidden space-y-3">
@@ -297,7 +307,8 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
           </div>
         )}
       </div>
-    </details>
+      )}
+    </div>
   )
 }
 

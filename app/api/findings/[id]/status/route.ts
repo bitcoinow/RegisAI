@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { ApiError, FindingStatus } from '@/types'
 
 const VALID_STATUSES: FindingStatus[] = ['open', 'in_progress', 'resolved', 'risk_accepted']
@@ -17,16 +17,20 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<StatusResponse | ApiError>> {
   const { id } = await params
-  const supabase = await createServiceClient()
 
+  // Use cookie-based client for auth (service client has no session cookie access)
+  const authClient = await createClient()
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser()
+  } = await authClient.auth.getUser()
 
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // Use service client for DB operations (bypasses RLS; ownership verified manually below)
+  const supabase = createServiceClient()
 
   let status: FindingStatus
   let reviewNote: string | null = null
