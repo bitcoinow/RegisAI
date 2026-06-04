@@ -17,6 +17,12 @@ export function Nav({ email, firmName }: NavProps) {
 
         <div className="flex items-center gap-6">
           <Link
+            href="/documents"
+            className="text-sm text-ink-2 hover:text-ink transition-colors"
+          >
+            Documents
+          </Link>
+          <Link
             href="/monitoring"
             className="text-sm text-ink-2 hover:text-ink transition-colors"
           >
