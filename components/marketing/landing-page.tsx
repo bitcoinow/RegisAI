@@ -540,10 +540,6 @@ function Hero() {
             >
               GDPR Re-scan Demo
             </Link>
-            <span className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium bg-bg text-green opacity-60 cursor-not-allowed select-none">
-              Request Early Access
-              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green text-bg px-1.5 py-0.5 leading-none">Soon</span>
-            </span>
           </div>
           <p className="mt-6 text-xs text-green-tint">
             No credit card required · Design partner access only
