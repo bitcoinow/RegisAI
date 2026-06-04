@@ -116,9 +116,10 @@ export async function runGapAnalysis(
   }
 
   const rawText = rawContent.text.trim()
+  const cleanText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
 
   try {
-    const result = JSON.parse(rawText) as AuditResult
+    const result = JSON.parse(cleanText) as AuditResult
     return result
   } catch (err) {
     console.error('Failed to parse Claude response as JSON:', err)
@@ -185,9 +186,10 @@ Draft the compliance-manual language that closes this gap.`
   }
 
   const rawText = rawContent.text.trim()
+  const cleanText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
 
   try {
-    const parsed = JSON.parse(rawText) as { policy_language?: unknown }
+    const parsed = JSON.parse(cleanText) as { policy_language?: unknown }
     if (typeof parsed.policy_language !== 'string' || !parsed.policy_language.trim()) {
       throw new Error('Missing policy_language in response')
     }
