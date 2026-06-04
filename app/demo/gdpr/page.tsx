@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { AuditReport } from '@/components/audit/audit-report'
 import type { ComparisonData } from '@/components/audit/audit-comparison'
 import { GDPR_DEMO_V1, GDPR_DEMO_V2 } from '@/lib/demo-data'
@@ -43,29 +44,49 @@ export default function GdprDemoPage() {
 
   return (
     <>
-      {/* Scan selector */}
+      {/* Demo nav bar */}
       <div className="border-b border-rule bg-bg print:hidden">
-        <div className="max-w-content mx-auto px-6 py-3 flex items-center gap-3">
-          <span className="font-mono text-xs tracking-widest uppercase text-ink-3 mr-2">
-            GDPR demo · Northwind Payments
-          </span>
-          <div className="flex border border-rule divide-x divide-rule">
-            <button
-              onClick={() => setView('initial')}
-              className={`px-4 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-colors ${
-                view === 'initial' ? 'bg-green text-white' : 'text-ink-3 hover:bg-bg-2'
-              }`}
+        <div className="max-w-content mx-auto px-6 py-3 flex items-center justify-between gap-4">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="font-mono text-xs tracking-widest uppercase text-ink-3 hover:text-ink transition-colors"
             >
-              Initial scan · 40%
-            </button>
-            <button
-              onClick={() => setView('rescan')}
-              className={`px-4 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-colors ${
-                view === 'rescan' ? 'bg-green text-white' : 'text-ink-3 hover:bg-bg-2'
-              }`}
+              ← Regis
+            </Link>
+            <span className="text-ink-3 text-xs">/</span>
+            <span className="font-mono text-xs tracking-widest uppercase text-ink-3">
+              GDPR Demo · Northwind Payments
+            </span>
+          </div>
+
+          {/* Scan toggle + cross-demo link */}
+          <div className="flex items-center gap-4">
+            <Link
+              href="/demo/clearview"
+              className="font-mono text-[10px] tracking-widest uppercase text-ink-3 hover:text-ink transition-colors"
             >
-              Re-scan · 90% ▲
-            </button>
+              ← US Sample Audit
+            </Link>
+            <div className="flex border border-rule divide-x divide-rule">
+              <button
+                onClick={() => setView('initial')}
+                className={`px-4 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-colors ${
+                  view === 'initial' ? 'bg-green text-white' : 'text-ink-3 hover:bg-bg-2'
+                }`}
+              >
+                Initial scan · 40%
+              </button>
+              <button
+                onClick={() => setView('rescan')}
+                className={`px-4 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-colors ${
+                  view === 'rescan' ? 'bg-green text-white' : 'text-ink-3 hover:bg-bg-2'
+                }`}
+              >
+                Re-scan · 90% ▲
+              </button>
+            </div>
           </div>
         </div>
       </div>

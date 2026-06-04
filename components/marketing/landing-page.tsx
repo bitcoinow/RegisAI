@@ -148,7 +148,7 @@ const FEATURES = [
     Icon: GlobeIcon,
     title: 'US, EU & UK Coverage',
     benefit: 'One platform for every jurisdiction you operate in',
-    desc: '74 requirements across three jurisdictions: 32 US (FINRA, SEC, Reg BI, AML/BSA), 23 EU (MiFID II, GDPR, DORA, SFDR), and 19 UK (FCA Rules, SM&CR, FCA OpRes).',
+    desc: '85 requirements across three jurisdictions: 32 US (FINRA, SEC, Reg BI, AML/BSA), 34 EU (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR), and 19 UK (FCA Rules, SM&CR, FCA OpRes).',
   },
   {
     Icon: BuildingIcon,
@@ -307,6 +307,10 @@ const PLANS = [
 ]
 
 const FAQS = [
+  {
+    q: 'Can I see the product before signing up?',
+    a: 'Yes — two live demos are available right now, no account required. The Clearview Capital demo shows a full 18-gap US audit across FINRA, SEC, and AML/BSA requirements. The Northwind Payments GDPR demo shows the complete re-scan lifecycle: an initial 13-gap scan at 40% posture, then a re-scan with 10 gaps resolved and posture at 90%, including the coverage matrix, delta comparison, and the human review audit trail.',
+  },
   {
     q: 'Which document types does Regis support?',
     a: 'Regis currently supports PDF documents. This covers Form ADV (Parts 1, 2A, 2B), compliance manuals, codes of ethics, business continuity plans, cybersecurity policies, and any other compliance document in PDF format. DOCX support is on the roadmap.',
@@ -1014,6 +1018,12 @@ function CTAFooter() {
               className="px-8 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
             >
               View Sample Audit
+            </Link>
+            <Link
+              href="/demo/gdpr"
+              className="px-8 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
+            >
+              GDPR Re-scan Demo
             </Link>
           </div>
         </Reveal>
