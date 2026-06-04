@@ -528,10 +528,6 @@ function Hero() {
             and drafts the policy language to fix it.
           </p>
           <div className="flex flex-wrap gap-3">
-            <span className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium bg-bg text-green opacity-60 cursor-not-allowed select-none">
-              Request Early Access
-              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green text-bg px-1.5 py-0.5 leading-none">Soon</span>
-            </span>
             <Link
               href="/demo/clearview"
               className="px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
@@ -544,6 +540,10 @@ function Hero() {
             >
               GDPR Re-scan Demo
             </Link>
+            <span className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium bg-bg text-green opacity-60 cursor-not-allowed select-none">
+              Request Early Access
+              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green text-bg px-1.5 py-0.5 leading-none">Soon</span>
+            </span>
           </div>
           <p className="mt-6 text-xs text-green-tint">
             No credit card required · Design partner access only
@@ -1005,10 +1005,6 @@ function CTAFooter() {
             platform built for modern financial firms.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <span className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-medium bg-bg text-green opacity-60 cursor-not-allowed select-none">
-              Request Early Access
-              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green text-bg px-1.5 py-0.5 leading-none">Soon</span>
-            </span>
             <Link
               href="/demo/clearview"
               className="px-8 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
@@ -1021,6 +1017,10 @@ function CTAFooter() {
             >
               GDPR Re-scan Demo
             </Link>
+            <span className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-medium bg-bg text-green opacity-60 cursor-not-allowed select-none">
+              Request Early Access
+              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green text-bg px-1.5 py-0.5 leading-none">Soon</span>
+            </span>
           </div>
         </Reveal>
       </div>
