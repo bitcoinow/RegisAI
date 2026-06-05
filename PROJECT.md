@@ -1,13 +1,15 @@
 # RegisAI — Project Status & Living Document
 
-> **Last updated:** 2026-06-04
+> **Last updated:** 2026-06-05
 > This file is the single source of truth for project state, feature history, and planned work. Updated at the end of every session with new plans and changes.
 
 ---
 
 ## What Is RegisAI
 
-Compliance auditing SaaS for financial firms (RIA, Fintech, Insurance, Banks). Users upload PDF compliance documents; the app extracts text, runs a gap analysis via Claude Sonnet, and presents findings with risk ratings, posture scores, and an actionable review workflow.
+AI-powered compliance review platform for FCA-regulated UK financial services firms. Users upload compliance manuals, Consumer Duty policies, SMCR documentation, and operational resilience plans. Regis maps content against FCA expectations, surfaces potential gaps with risk ratings, generates remediation recommendations, drafts compliance-manual language, and presents findings in an actionable human review workflow.
+
+**Beachhead:** UK financial services (FCA). Platform supports US and EU frameworks — UK is the primary market focus.
 
 **Stack:** Next.js 14 (App Router) · TypeScript · Supabase (Auth + DB + Storage) · Anthropic Claude API · Tailwind CSS · Vercel
 
@@ -120,19 +122,50 @@ components/
 - Demo nav bars: breadcrumbs + cross-demo links on both `/demo/clearview` and `/demo/gdpr`
 - GDPR Re-scan Demo CTA added to CTAFooter alongside "View Sample Audit"
 
+### 2026-06-05 — UK/FCA market repositioning
+- Landing page repositioned for UK financial services beachhead market
+- Hero: new FCA-focused headline ("AI-Assisted FCA Compliance Reviews for UK Financial Firms"), subheadline, CTAs
+- PAINS: updated to UK/FCA context (£50K+ spend, 4-8 wks prep, 1 in 3 firms)
+- FEATURES: updated "US, EU & UK Coverage" → "FCA Framework Coverage"
+- STEPS: expanded from 4 to 5 steps (added "Export Audit-Ready Report")
+- UseCases: updated from 3 generic cards to 6 FCA firm-type cards
+- AuditMockup: updated to show FCA findings (Consumer Duty, SMCR, OpRes, BCP)
+- New sections: DocumentTypes (10 doc types), FrameworkCoverage (10 FCA areas), ExampleFindings (3 illustrative findings), TrustSection (6 trust pillars), FutureExpansion (FCA → DORA/MiFID → SEC roadmap)
+- PLANS: updated descriptions for UK firm positioning
+- Footer: added compliance disclaimer ("does not provide legal or regulatory advice")
+- Testimonials: updated to FCA/UK context
+- CTAFooter: "Book a Demo" replaces "GDPR Re-scan Demo" (with "Soon" badge)
+- New docs: ROADMAP.md, MVP_SCOPE.md, ARCHITECTURE.md
+
 ---
 
 ## Planned / Next Up
 
 > Move items here when agreed with user; strike through when shipped.
 
+**Phase 1 (UK beachhead — immediate):**
 - [ ] Profile management UI in Settings (currently only MFA; onboarding promises profile editing)
+- [ ] Export audit report as PDF (currently display-only; print-via-browser available)
+- [ ] Stripe billing integration (early access → paid tiers)
+- [ ] UK-specific demo page (`/demo/fca`) to replace US Clearview demo as primary CTA target
+
+**Phase 2 (platform maturity):**
+- [ ] Multi-user team support (currently 1 user = 1 firm)
+- [ ] Role-based access controls (Admin, Editor, Reviewer, Viewer)
 - [ ] Bulk upload / multiple documents per audit
 - [ ] Webhook / email notification when analysis completes
-- [ ] Stripe billing integration (early access → paid tiers)
-- [ ] Additional frameworks: SOC 2, ISO 27001
-- [ ] Export audit report as PDF
-- [ ] Team/firm multi-user support (currently 1 user = 1 firm)
+- [ ] Re-scan available for UK/EU frameworks (currently US only)
+
+**Phase 3 (European expansion):**
+- [ ] DORA framework library
+- [ ] MiFID II framework library
+- [ ] EU GDPR (separate from UK GDPR)
+- [ ] AMLD6 updates
+
+**Phase 4 (US market):**
+- [ ] SEC/FINRA focused positioning and demo
+- [ ] API access (Enterprise tier)
+- [ ] SSO / SAML 2.0
 
 ---
 
