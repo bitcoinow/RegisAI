@@ -48,7 +48,7 @@ function StatusToggle({
   disabled: boolean
 }) {
   return (
-    <div className="flex border border-rule divide-x divide-rule">
+    <div className="flex border border-rule divide-x divide-rule overflow-x-auto flex-nowrap">
       {(Object.keys(STATUS_CONFIG) as FindingStatus[]).map((s) => {
         const { label, color } = STATUS_CONFIG[s]
         const active = s === status
@@ -188,7 +188,7 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
         tabIndex={0}
         onClick={() => setIsOpen((o) => !o)}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen((o) => !o)}
-        className="flex items-start justify-between gap-4 px-6 py-4 cursor-pointer select-none"
+        className="flex items-start justify-between gap-4 px-4 md:px-6 py-4 cursor-pointer select-none"
       >
         <div className="min-w-0">
           <p className="font-mono text-xs text-ink-3 mb-1">{finding.rule}</p>
@@ -206,7 +206,7 @@ function FindingCard({ finding, isDemo }: { finding: Finding; isDemo: boolean })
       </div>
 
       {isOpen && (
-      <div className="border-t border-rule px-6 py-5 space-y-4 text-sm">
+      <div className="border-t border-rule px-4 md:px-6 py-5 space-y-4 text-sm">
         {!isDemo && (
           <div className="print:hidden space-y-3">
             <div>
@@ -355,10 +355,10 @@ export function AuditReport({
   })
 
   return (
-    <div className="max-w-content mx-auto px-6 py-10">
+    <div className="max-w-content mx-auto px-4 md:px-6 py-10">
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="mb-10 pb-8 border-b border-rule flex justify-between items-start">
+      <div className="mb-10 pb-8 border-b border-rule flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
         <div>
           {isDemo && (
             <div className="inline-block font-mono text-xs tracking-widest uppercase border border-gold px-3 py-1 text-gold mb-4">
@@ -378,7 +378,7 @@ export function AuditReport({
               </span>
             )}
           </div>
-          <h1 className="font-serif text-4xl text-ink mb-2">{audit.firm_name}</h1>
+          <h1 className="font-serif text-2xl md:text-4xl text-ink mb-2">{audit.firm_name}</h1>
           <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
             Regulatory Gap Analysis &nbsp;·&nbsp; {formattedDate}
             {audit.scan_number && audit.scan_number > 1 ? ` · Re-scan #${audit.scan_number}` : ''}
@@ -387,7 +387,7 @@ export function AuditReport({
             {scopeLabel ?? JURISDICTION_FRAMEWORKS[audit.jurisdiction ?? 'US'] ?? JURISDICTION_FRAMEWORKS.US}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 lg:flex-nowrap lg:shrink-0">
           {audit.compliance_score != null && (
             <div className="text-center border border-rule px-4 py-2 bg-bg-2">
               <div className="font-serif text-3xl text-green leading-none">

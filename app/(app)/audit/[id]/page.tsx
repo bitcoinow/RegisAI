@@ -154,7 +154,7 @@ export default async function AuditReportPage({ params }: PageProps) {
   return (
     <>
       <div className="border-b border-rule bg-bg">
-        <div className="max-w-content mx-auto px-6 py-3">
+        <div className="max-w-content mx-auto px-4 md:px-6 py-3">
           <Link href="/dashboard" className="text-ink-3 text-xs font-mono hover:text-ink">
             ← Dashboard
           </Link>

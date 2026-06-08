@@ -674,12 +674,12 @@ function Hero() {
           backgroundSize: '28px 28px',
         }}
       />
-      <div className="max-w-content mx-auto px-6 py-24 grid md:grid-cols-[1fr_1.1fr] gap-16 items-center relative">
+      <div className="max-w-content mx-auto px-4 md:px-6 py-24 grid md:grid-cols-[1fr_1.1fr] gap-16 items-center relative">
         <div>
           <p className="font-mono text-xs tracking-widest uppercase mb-6 text-green-tint opacity-60">
             FCA Compliance Review Platform
           </p>
-          <h1 className="font-serif text-5xl md:text-6xl leading-[1.06] mb-6 text-bg">
+          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.06] mb-6 text-bg">
             AI-Assisted FCA Compliance Reviews for{' '}
             <em className="not-italic text-gold">UK Financial Firms</em>
           </h1>
@@ -688,14 +688,14 @@ function Hero() {
             Regis AI helps identify potential compliance gaps, suggest remediation actions,
             and generate audit-ready review reports.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col xs:flex-row flex-wrap gap-3">
             <Link
               href="/demo/clearview"
-              className="px-6 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
+              className="min-h-[48px] w-full xs:w-auto flex items-center justify-center px-6 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
             >
               Run Sample FCA Review
             </Link>
-            <span className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint opacity-60 cursor-not-allowed select-none">
+            <span className="min-h-[48px] w-full xs:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint opacity-60 cursor-not-allowed select-none">
               Book a Demo
               <span className="text-[10px] font-semibold tracking-wide uppercase bg-green-2 text-bg px-1.5 py-0.5 leading-none">Soon</span>
             </span>
@@ -727,9 +727,9 @@ function Problem() {
       className="py-24 border-t border-rule bg-bg"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
-          <h2 className="font-serif text-4xl text-ink mb-4">
+          <h2 className="font-serif text-2xl md:text-4xl text-ink mb-4">
             Compliance is still a manual, expensive, error-prone process.
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
@@ -776,7 +776,7 @@ function Features() {
       className="py-24 border-t border-rule bg-bg-2"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 700px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Capabilities</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
@@ -786,7 +786,7 @@ function Features() {
             Built specifically for FCA-regulated financial firms — not a generic compliance checklist repurposed as software.
           </p>
         </Reveal>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {FEATURES.map(({ Icon, title, benefit, desc }, i) => {
             const featured = i === 0
             return (
@@ -851,7 +851,7 @@ function HowItWorks() {
       className="py-24 border-t border-green-2 bg-green"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-bg mb-4">
             From upload to review report in under 10 minutes.
@@ -893,16 +893,16 @@ function UseCases() {
       className="py-24 border-t border-rule bg-bg"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 640px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
-          <h2 className="font-serif text-4xl text-ink mb-4">
+          <h2 className="font-serif text-2xl md:text-4xl text-ink mb-4">
             Built for <em className="not-italic text-gold">FCA-Regulated</em> Firms
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
             Whether you're a solo compliance officer at a financial adviser or a compliance team at a large asset manager, Regis adapts to your firm type and regulatory context.
           </p>
         </Reveal>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {USE_CASES.map((u, i) => (
             <Reveal key={i} delay={i * 70}>
               <div className="border border-rule bg-bg-2 h-full flex flex-col">
@@ -941,7 +941,7 @@ function DocumentTypes() {
       className="py-24 border-t border-rule bg-bg-2"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Document Coverage</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
@@ -978,7 +978,7 @@ function FrameworkCoverage() {
       className="py-24 border-t border-rule bg-bg"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Regulatory Scope</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
@@ -1020,7 +1020,7 @@ function ExampleFindings() {
       className="py-24 border-t border-rule bg-bg-2"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Sample Output</p>
           <h2 className="font-serif text-4xl text-ink mb-3">
@@ -1030,7 +1030,7 @@ function ExampleFindings() {
             Illustrative examples — not drawn from real client data.
           </p>
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {EXAMPLE_FINDINGS.map((f, i) => (
             <Reveal key={i} delay={i * 90}>
               <div className="border border-rule bg-bg p-7 h-full flex flex-col">
@@ -1072,7 +1072,7 @@ function TrustSection() {
         containIntrinsicSize: '0 520px',
       } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Responsible AI</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
@@ -1082,7 +1082,7 @@ function TrustSection() {
             Regis is built for regulated environments where accuracy, accountability, and security are non-negotiable.
           </p>
         </Reveal>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {TRUST_PILLARS.map(({ Icon, title, desc }, i) => (
             <Reveal key={i} delay={i * 70}>
               <div className="border border-rule bg-bg p-7 h-full">
@@ -1109,14 +1109,14 @@ function Testimonials() {
       className="py-24 border-t border-rule bg-bg"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">From the Field</p>
           <h2 className="font-serif text-4xl text-ink mb-16">
             Trusted by compliance professionals who can't afford surprises.
           </h2>
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
             <Reveal key={i} delay={i * 90}>
               <div className="border border-rule bg-bg-2 p-8 h-full flex flex-col">
@@ -1141,7 +1141,7 @@ function FutureExpansion() {
       className="py-24 border-t border-rule bg-bg-2"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Roadmap</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
@@ -1152,7 +1152,7 @@ function FutureExpansion() {
             Regis AI starts with UK financial services. The platform is designed to support future expansion into European and global regulatory frameworks — so the investment you make now scales with your firm.
           </p>
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Reveal>
             <div className="border border-rule bg-bg p-7">
               <div className="w-8 h-8 flex items-center justify-center mb-5" style={{ backgroundColor: 'var(--green)', color: 'var(--bg)' }}>
@@ -1216,7 +1216,7 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
       className="py-24 border-t border-rule bg-bg"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 720px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-ink mb-4">Simple, transparent pricing.</h2>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-16">
@@ -1249,7 +1249,7 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
             </div>
           </div>
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           {PLANS.map((p, i) => (
             <Reveal key={i} delay={i * 90}>
               <div
@@ -1309,7 +1309,7 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
                   </ul>
                   <Link
                     href="/login"
-                    className="block text-center py-3 px-4 text-sm font-medium transition-colors"
+                    className="block text-center min-h-[48px] flex items-center justify-center py-3 px-4 text-sm font-medium transition-colors"
                     style={{
                       backgroundColor: p.highlight ? 'var(--bg)' : 'var(--green)',
                       color: p.highlight ? 'var(--green)' : 'var(--bg)',
@@ -1344,7 +1344,7 @@ function FAQ() {
       className="py-24 border-t border-rule bg-bg-2"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 540px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div className="max-w-content mx-auto px-4 md:px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-ink mb-16">Common questions.</h2>
         </Reveal>
@@ -1388,10 +1388,10 @@ function CTAFooter() {
       className="py-28 border-t border-green-2 bg-green"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 440px' } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6 text-center">
+      <div className="max-w-content mx-auto px-4 md:px-6 text-center">
         <Reveal>
           <RegisLogo className="text-3xl" light />
-          <h2 className="font-serif text-4xl md:text-5xl text-bg mt-8 mb-5 leading-tight">
+          <h2 className="font-serif text-3xl md:text-5xl text-bg mt-8 mb-5 leading-tight">
             Your next FCA review is coming.
             <br />
             <em className="not-italic text-gold">Are your documents ready?</em>
@@ -1400,14 +1400,14 @@ function CTAFooter() {
             Join our design partner programme and get early access to the compliance review
             platform built for FCA-regulated firms.
           </p>
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="flex flex-col xs:flex-row flex-wrap gap-3 justify-center">
             <Link
               href="/demo/clearview"
-              className="px-8 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
+              className="min-h-[48px] w-full xs:w-auto flex items-center justify-center px-8 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
             >
               Run Sample FCA Review
             </Link>
-            <span className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-medium border border-green-2 text-green-tint opacity-60 cursor-not-allowed select-none">
+            <span className="min-h-[48px] w-full xs:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-medium border border-green-2 text-green-tint opacity-60 cursor-not-allowed select-none">
               Book a Demo
               <span className="text-[10px] font-semibold tracking-wide uppercase bg-green-2 text-bg px-1.5 py-0.5 leading-none">Soon</span>
             </span>
@@ -1421,7 +1421,7 @@ function CTAFooter() {
 function SiteFooter() {
   return (
     <footer className="border-t border-green-2 bg-green">
-      <div className="max-w-content mx-auto px-6 pt-8 pb-4">
+      <div className="max-w-content mx-auto px-4 md:px-6 pt-8 pb-4">
         <p className="text-xs text-green-tint text-center max-w-2xl mx-auto mb-6 pb-6 border-b border-green-2" style={{ opacity: 0.7 }}>
           Regis AI provides AI-assisted compliance review support and does not provide legal or regulatory advice.
           All findings and recommendations should be reviewed by qualified compliance and legal professionals before use.

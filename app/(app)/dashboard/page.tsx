@@ -48,16 +48,16 @@ export default async function DashboardPage() {
   const rows = (audits ?? []) as AuditRow[]
 
   return (
-    <div className="max-w-content mx-auto px-6 py-10">
+    <div className="max-w-content mx-auto px-4 md:px-6 py-10">
 
       {/* ── Page header ────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-4 mb-8">
         <div>
           <h1 className="font-serif text-3xl text-ink">Compliance Audits</h1>
         </div>
         <Link
           href="/audit/new"
-          className="bg-green text-white text-sm px-5 py-2.5 hover:bg-green-2 transition-colors"
+          className="min-h-[48px] flex items-center justify-center xs:justify-start bg-green text-white text-sm px-5 py-2.5 hover:bg-green-2 transition-colors"
         >
           New Audit
         </Link>
@@ -72,14 +72,14 @@ export default async function DashboardPage() {
           </p>
           <Link
             href="/audit/new"
-            className="inline-block bg-green text-white text-sm px-6 py-2.5 hover:bg-green-2 transition-colors"
+            className="inline-flex items-center justify-center min-h-[48px] bg-green text-white text-sm px-6 py-2.5 hover:bg-green-2 transition-colors"
           >
             Run First Audit
           </Link>
         </div>
       ) : (
-        <div className="border border-rule overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="border border-rule overflow-x-auto">
+          <table className="w-full text-sm min-w-[600px]">
             <thead>
               <tr className="border-b border-rule bg-bg-2">
                 <th className="text-left px-5 py-3 font-mono text-xs tracking-widest uppercase text-ink-3">
