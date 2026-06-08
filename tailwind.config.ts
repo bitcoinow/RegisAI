@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: '375px',
+      },
       fontFamily: {
         sans: ['var(--font-inter)', 'ui-sans-serif', 'sans-serif'],
         serif: ['var(--font-playfair)', 'ui-serif', 'Georgia', 'serif'],
