@@ -33,7 +33,7 @@ export default async function NewAuditPage({ searchParams }: PageProps) {
       const framework = (parentAudit.framework as RegulatoryFramework | null) ?? null
       const scanLabel = `Re-scan #${((parentAudit.scan_number as number) ?? 1) + 1}`
       return (
-        <div className="max-w-content mx-auto px-6 py-10">
+        <div className="max-w-content mx-auto px-4 md:px-6 py-10">
           <div className="mb-8">
             <Link href={`/audit/${parent}`} className="text-ink-3 text-xs font-mono hover:text-ink">
               ← Back to audit
@@ -65,7 +65,7 @@ export default async function NewAuditPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="max-w-content mx-auto px-6 py-10">
+    <div className="max-w-content mx-auto px-4 md:px-6 py-10">
       <div className="mb-8">
         <Link href="/dashboard" className="text-ink-3 text-xs font-mono hover:text-ink">
           ← Dashboard
