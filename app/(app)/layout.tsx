@@ -34,7 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <>
       <Nav email={user.email ?? ''} firmName={profile?.firm_name ?? undefined} />
-      <main>{children}</main>
+      <main className="pb-16 md:pb-0">{children}</main>
     </>
   )
 }
