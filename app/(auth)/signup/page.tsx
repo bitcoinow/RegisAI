@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { RegisLogo } from '@/components/ui/logo'
@@ -11,6 +12,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [state, setState] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const router = useRouter()
   const supabase = createClient()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -31,7 +33,7 @@ export default function SignupPage() {
     setState('loading')
     setErrorMsg(null)
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -42,6 +44,8 @@ export default function SignupPage() {
     if (error) {
       setState('error')
       setErrorMsg(error.message)
+    } else if (data?.session) {
+      router.push('/dashboard')
     } else {
       setState('sent')
     }
@@ -76,7 +80,7 @@ export default function SignupPage() {
   return (
     <div className="w-full max-w-md">
       <div className="mb-10 text-center">
-        <RegisLogo className="text-4xl" />
+        <RegisLogo className="text-4xl" href="/" />
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
           Compliance Operations
         </p>

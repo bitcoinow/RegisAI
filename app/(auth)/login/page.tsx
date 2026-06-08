@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -11,21 +11,77 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [showResend, setShowResend] = useState(false)
+  const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [resendError, setResendError] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('error') === 'email_not_confirmed') {
+        setErrorMsg('Please verify your email address before logging in.')
+        setShowResend(true)
+      }
+    }
+  }, [])
 
   async function handlePasswordSignIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setErrorMsg(null)
+    setShowResend(false)
+    setResendStatus('idle')
+    setResendError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setErrorMsg(error.message)
+      if (error.message.toLowerCase().includes('confirm') || error.message.toLowerCase().includes('verify')) {
+        setErrorMsg('Your email address has not been verified yet. Please check your inbox.')
+        setShowResend(true)
+      } else {
+        setErrorMsg(error.message)
+      }
       setLoading(false)
+      return
+    }
+
+    if (data.user && !data.user.email_confirmed_at) {
+      await supabase.auth.signOut()
+      setErrorMsg('Your email address has not been verified yet. Please check your inbox.')
+      setShowResend(true)
+      setLoading(false)
+      return
+    }
+
+    router.push('/dashboard')
+  }
+
+  async function handleResendVerification() {
+    if (!email) {
+      setResendError('Please enter your email address first.')
+      setResendStatus('error')
+      return
+    }
+
+    setResendStatus('loading')
+    setResendError(null)
+
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      setResendStatus('error')
+      setResendError(error.message)
     } else {
-      router.push('/dashboard')
+      setResendStatus('success')
     }
   }
 
@@ -49,7 +105,7 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-md">
       <div className="mb-10 text-center">
-        <RegisLogo className="text-4xl" />
+        <RegisLogo className="text-4xl" href="/" />
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
           Compliance Operations
         </p>
@@ -98,7 +154,29 @@ export default function LoginPage() {
             />
           </div>
 
-          {errorMsg && <p className="text-risk-high text-sm">{errorMsg}</p>}
+          {errorMsg && (
+            <div className="space-y-2">
+              <p className="text-risk-high text-sm">{errorMsg}</p>
+              {showResend && resendStatus !== 'success' && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendStatus === 'loading'}
+                  className="text-xs text-ink-3 hover:text-ink underline underline-offset-2 transition-colors disabled:opacity-50"
+                >
+                  {resendStatus === 'loading' ? 'Resending verification...' : 'Resend verification email'}
+                </button>
+              )}
+              {resendStatus === 'success' && (
+                <p className="text-ink-2 text-xs font-medium">
+                  Verification email resent! Please check your inbox.
+                </p>
+              )}
+              {resendStatus === 'error' && resendError && (
+                <p className="text-risk-high text-xs">{resendError}</p>
+              )}
+            </div>
+          )}
 
           <button
             type="submit"
