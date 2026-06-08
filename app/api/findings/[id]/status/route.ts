@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
 import type { ApiError, FindingStatus } from '@/types'
 
 const VALID_STATUSES: FindingStatus[] = ['open', 'in_progress', 'resolved', 'risk_accepted']
@@ -12,25 +12,46 @@ interface StatusResponse {
   reviewer_label: string | null
 }
 
+// ── Minimal inline D1 helper ─────────────────────────────────────────────────
+// db.ts doesn't export getDB() or a getFinding(id) method. We need a direct
+// SELECT to fetch the finding's audit_id for ownership verification.
+// TODO: add db.getFinding(id) to db.ts and remove this block.
+
+interface _D1Statement {
+  bind(...values: unknown[]): _D1Statement
+  first<T>(): Promise<T | null>
+}
+
+interface _D1 {
+  prepare(sql: string): _D1Statement
+}
+
+interface _CFContext {
+  env?: { DB?: _D1 }
+}
+
+const _CF_KEY = Symbol.for('__cloudflare-context__')
+
+function _getD1(): _D1 {
+  const ctx = (globalThis as unknown as Record<symbol, _CFContext | undefined>)[_CF_KEY]
+  const d1 = ctx?.env?.DB
+  if (!d1) throw new Error('D1 binding "DB" not found in Cloudflare context')
+  return d1
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<StatusResponse | ApiError>> {
   const { id } = await params
 
-  // Use cookie-based client for auth (service client has no session cookie access)
-  const authClient = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await authClient.auth.getUser()
-
-  if (authError || !user) {
+  const userId = req.headers.get('x-user-id')
+  const userEmail = req.headers.get('x-user-email')
+  if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  // Use service client for DB operations (bypasses RLS; ownership verified manually below)
-  const supabase = createServiceClient()
 
   let status: FindingStatus
   let reviewNote: string | null = null
@@ -48,23 +69,21 @@ export async function PATCH(
   }
 
   // Verify the finding exists and belongs to the authenticated user via audit ownership
-  const { data: finding } = await supabase
-    .from('findings')
-    .select('id, audit_id')
-    .eq('id', id)
-    .single()
-
-  if (!finding) {
+  let auditId: string
+  try {
+    const finding = await _getD1()
+      .prepare('SELECT id, audit_id FROM findings WHERE id = ?')
+      .bind(id)
+      .first<{ id: string; audit_id: string }>()
+    if (!finding) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+    auditId = finding.audit_id
+  } catch {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const { data: audit } = await supabase
-    .from('audits')
-    .select('id')
-    .eq('id', finding.audit_id)
-    .eq('user_id', user.id)
-    .single()
-
+  const audit = await db.getAudit(auditId, userId)
   if (!audit) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
@@ -72,23 +91,15 @@ export async function PATCH(
   // Any move away from 'open' records who reviewed it and when — the audit trail.
   const isReview = status !== 'open'
   const reviewedAt = isReview ? new Date().toISOString() : null
-  const reviewedBy = isReview ? user.id : null
+  const reviewedBy = isReview ? userId : null
 
-  const { error: updateError } = await supabase
-    .from('findings')
-    .update({
-      status,
-      reviewed_by: reviewedBy,
-      reviewed_at: reviewedAt,
-      review_note: reviewNote,
-    })
-    .eq('id', id)
-
-  if (updateError) {
+  try {
+    await db.updateFindingStatus(id, status, reviewedBy, reviewNote)
+  } catch {
     return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   }
 
-  const reviewerLabel = isReview ? user.email ?? null : null
+  const reviewerLabel = isReview ? userEmail ?? null : null
 
   return NextResponse.json({
     status,

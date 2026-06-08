@@ -406,21 +406,33 @@ export function AuditReport({
               Re-scan
             </Link>
           )}
-          <button
-            onClick={() => window.print()}
-            className="print:hidden border border-rule px-4 py-2 font-mono text-xs tracking-widest uppercase text-ink hover:bg-bg-2 transition-colors"
-          >
-            Download PDF
-          </button>
+          {!isDemo && (
+            <a
+              href={`/api/audit/${audit.id}/pdf`}
+              download
+              className="print:hidden border border-rule px-4 py-2 font-mono text-xs tracking-widest uppercase text-ink hover:bg-bg-2 transition-colors inline-block text-center"
+            >
+              Download PDF
+            </a>
+          )}
+          {isDemo && (
+            <a
+              href={`/api/demo/${audit.id.replace('demo-', '')}/pdf`}
+              download
+              className="print:hidden border border-rule px-4 py-2 font-mono text-xs tracking-widest uppercase text-ink hover:bg-bg-2 transition-colors inline-block text-center"
+            >
+              Download PDF
+            </a>
+          )}
         </div>
       </div>
 
       {/* ── Re-scan comparison (when this audit supersedes a prior one) ───────── */}
       {comparison && <AuditComparison data={comparison} />}
 
-      {/* ── Executive Summary ──────────────────────────────────────────────── */}
+      {/* ── Compliance Posture Overview ─────────────────────────────────────── */}
       <section className="mb-10">
-        <SectionHeading>Executive Summary</SectionHeading>
+        <SectionHeading>Compliance Posture Overview</SectionHeading>
         <div className="border-l-2 border-green pl-6 py-1">
           <p className="text-ink-2 leading-relaxed">{audit.exec_summary}</p>
         </div>

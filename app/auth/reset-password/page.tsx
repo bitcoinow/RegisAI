@@ -1,21 +1,37 @@
 'use client'
 
+import { Suspense } from 'react'
+
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { RegisLogo } from '@/components/ui/logo'
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-bg flex items-center justify-center"><p className="text-ink-3">Loading...</p></div>}>
+      <ResetPasswordForm />
+    </Suspense>
+  )
+}
+
+function ResetPasswordForm() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [state, setState] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const router = useRouter()
-  const supabase = createClient()
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
+    if (!token) {
+      setErrorMsg('Invalid or missing reset token')
+      setState('error')
+      return
+    }
 
     if (password !== confirmPassword) {
       setErrorMsg('Passwords do not match')
@@ -32,78 +48,106 @@ export default function ResetPasswordPage() {
     setState('loading')
     setErrorMsg(null)
 
-    const { error } = await supabase.auth.updateUser({ password })
+    const resp = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, password }),
+    })
 
-    if (error) {
+    const data = await resp.json()
+
+    if (!resp.ok) {
       setState('error')
-      setErrorMsg(error.message)
+      setErrorMsg(data.error ?? 'Failed to reset password')
     } else {
-      router.push('/dashboard')
+      setState('done')
+      setTimeout(() => router.push('/login'), 2000)
     }
+  }
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <RegisLogo />
+          <div className="mt-8 border border-rule bg-bg-2 p-8">
+            <h2 className="text-xl font-bold text-ink mb-3">Invalid Reset Link</h2>
+            <p className="text-sm text-ink-3">This password reset link is invalid or has expired.</p>
+            <Link href="/login" className="mt-4 inline-block text-sm text-green underline">
+              Back to sign in
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (state === 'done') {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <RegisLogo />
+          <div className="mt-8 border border-rule bg-bg-2 p-8">
+            <h2 className="text-xl font-bold text-ink mb-3">Password Updated</h2>
+            <p className="text-sm text-ink-3">Your password has been reset. Redirecting to sign in...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-10 text-center">
-          <RegisLogo className="text-4xl" />
-          <p className="font-mono text-xs tracking-widest uppercase text-ink-3">
-            Compliance Operations
-          </p>
+          <RegisLogo />
         </div>
 
         <div className="border border-rule bg-bg-2 p-8">
-          <h2 className="text-ink text-lg mb-1">Set new password</h2>
-          <p className="text-ink-3 text-sm mb-6">Choose a strong password for your account</p>
+          <h2 className="text-xl font-bold text-ink mb-1">Reset your password</h2>
+          <p className="text-sm text-ink-3 mb-6">Enter your new password below.</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-ink-2 text-sm mb-1" htmlFor="password">
-                New password
-              </label>
+              <label className="block text-sm font-medium text-ink mb-1">New password</label>
               <input
-                id="password"
                 type="password"
-                required
-                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
-                className="w-full border border-rule bg-bg px-3 py-2 text-ink text-sm focus:outline-none focus:border-green placeholder:text-ink-3"
+                className="w-full border border-ink bg-bg px-3 py-2 text-ink text-sm focus:outline-none focus:border-green"
+                required
+                minLength={8}
               />
             </div>
 
             <div>
-              <label className="block text-ink-2 text-sm mb-1" htmlFor="confirm-password">
-                Confirm password
-              </label>
+              <label className="block text-sm font-medium text-ink mb-1">Confirm password</label>
               <input
-                id="confirm-password"
                 type="password"
-                required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter password"
-                className="w-full border border-rule bg-bg px-3 py-2 text-ink text-sm focus:outline-none focus:border-green placeholder:text-ink-3"
+                className="w-full border border-ink bg-bg px-3 py-2 text-ink text-sm focus:outline-none focus:border-green"
+                required
+                minLength={8}
               />
             </div>
 
-            {errorMsg && <p className="text-risk-high text-sm">{errorMsg}</p>}
+            {state === 'error' && errorMsg && (
+              <p className="text-sm text-red-700">{errorMsg}</p>
+            )}
 
             <button
               type="submit"
               disabled={state === 'loading'}
-              className="w-full bg-green text-white px-4 py-2.5 text-sm hover:bg-green-2 disabled:opacity-50 transition-colors"
+              className="w-full bg-green text-white py-2 px-4 font-mono text-sm tracking-widest uppercase hover:bg-green-2 transition-colors disabled:opacity-50"
             >
-              {state === 'loading' ? 'Updating…' : 'Update password'}
+              {state === 'loading' ? 'Resetting...' : 'Reset password'}
             </button>
           </form>
         </div>
 
         <p className="mt-6 text-center text-xs text-ink-3">
-          <Link href="/login" className="text-ink-2 hover:text-ink underline underline-offset-2">
-            Back to sign in
-          </Link>
+          <Link href="/login" className="underline">Back to sign in</Link>
         </p>
       </div>
     </div>

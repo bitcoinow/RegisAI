@@ -1,16 +1,11 @@
-import { NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 import { fetchAndParseFeeds } from '@/lib/monitoring'
 import type { ApiError } from '@/types'
 
-export async function POST(): Promise<NextResponse<{ inserted: number; parsed: number } | ApiError>> {
-  const userClient = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await userClient.auth.getUser()
-
-  if (authError || !user) {
+export async function POST(request: NextRequest): Promise<NextResponse<{ inserted: number; parsed: number } | ApiError>> {
+  const userId = request.headers.get('x-user-id')
+  if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -20,14 +15,14 @@ export async function POST(): Promise<NextResponse<{ inserted: number; parsed: n
     return NextResponse.json({ inserted: 0, parsed: 0 })
   }
 
-  const serviceClient = createServiceClient()
-  const { error } = await serviceClient
-    .from('regulatory_updates')
-    .upsert(updates, { onConflict: 'url', ignoreDuplicates: true })
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  try {
+    await db.upsertRegulatoryUpdates(updates.map(u => ({
+      ...u,
+      published_at: u.published_at ?? undefined,
+    })))
+    return NextResponse.json({ inserted: updates.length, parsed: updates.length })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
-
-  return NextResponse.json({ inserted: updates.length, parsed: updates.length })
 }

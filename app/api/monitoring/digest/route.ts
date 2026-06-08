@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { env } from '@/lib/env'
-import { Resend } from 'resend'
+import { db } from '@/lib/db'
 
 // Shape of a regulatory update as consumed by the digest email template.
 interface DigestUpdate {
@@ -146,29 +144,11 @@ function generateEmailHtml(updates: DigestUpdate[], firmName: string): string {
 async function handleDigest(request: Request) {
   // ── Authorization ──────────────────────────────────────────────────────────
   const headersList = await headers()
-  const authHeader = headersList.get('authorization')
   const isVercelCron = headersList.get('x-vercel-cron') === 'true'
-  const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY
-  
-  let isAuthorized = false
-  
-  if (isVercelCron) {
-    isAuthorized = true
-  } else if (authHeader && authHeader.startsWith('Bearer ') && serviceKey) {
-    const token = authHeader.substring(7)
-    if (token === serviceKey) {
-      isAuthorized = true
-    }
-  } else {
-    // Check if browser user session is authenticated
-    const userClient = await createClient()
-    const { data: { user } } = await userClient.auth.getUser()
-    if (user) {
-      isAuthorized = true
-    }
-  }
-  
-  if (!isAuthorized) {
+  const userId = headersList.get('x-user-id')
+  const userEmail = headersList.get('x-user-email')
+
+  if (!isVercelCron && !userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -176,82 +156,85 @@ async function handleDigest(request: Request) {
   const { searchParams } = new URL(request.url)
   const testEmail = searchParams.get('test_email')
 
-  const serviceClient = createServiceClient()
-
   // ── Fetch Recent Regulatory Updates ────────────────────────────────────────
   const sevenDaysAgo = new Date()
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
-  const { data: updates, error: updatesError } = await serviceClient
-    .from('regulatory_updates')
-    .select('*')
-    .gte('published_at', sevenDaysAgo.toISOString())
-    .order('published_at', { ascending: false })
-
-  if (updatesError) {
-    return NextResponse.json({ error: updatesError.message }, { status: 500 })
+  let allUpdates: DigestUpdate[]
+  try {
+    const rows = await db.listRegulatoryUpdates()
+    allUpdates = rows
+      .filter(u => u.published_at && new Date(u.published_at) >= sevenDaysAgo)
+      .map(u => ({
+        regulator: u.regulator ?? '',
+        title: u.title ?? '',
+        summary: u.summary ?? '',
+        url: u.url ?? '',
+        relevance_score: u.relevance_score ?? 0,
+        affected_rules: u.affected_rules ?? [],
+      }))
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 
-  // Fallback to mock data for sandbox/developer preview testing if no updates exist in past week
-  const finalUpdates = (updates && updates.length > 0) ? updates : MOCK_UPDATES
-  const isUsingFallback = !updates || updates.length === 0
+  // Fallback to mock data if no updates exist in past week
+  const finalUpdates = allUpdates.length > 0 ? allUpdates : MOCK_UPDATES
+  const isUsingFallback = allUpdates.length === 0
 
   // ── Compile Recipient List ─────────────────────────────────────────────────
   let recipients: { email: string; firmName: string }[] = []
 
   if (testEmail) {
     recipients = [{ email: testEmail, firmName: 'Design Partner (Test)' }]
-  } else {
-    // Retrieve registered user emails from Supabase Auth admin API
-    const { data: authData, error: authError } = await serviceClient.auth.admin.listUsers()
-    if (authError) {
-      return NextResponse.json({ error: authError.message }, { status: 500 })
+  } else if (userId) {
+    const email = userEmail ?? ''
+    if (email) {
+      let firmName = 'Design Partner'
+      try {
+        const profile = await db.getProfile(userId)
+        if (profile?.firm_name) firmName = profile.firm_name
+      } catch {
+        // profile missing — use default firm name
+      }
+      recipients = [{ email, firmName }]
     }
-
-    const { data: profiles, error: profilesError } = await serviceClient
-      .from('profiles')
-      .select('*')
-
-    if (profilesError) {
-      return NextResponse.json({ error: profilesError.message }, { status: 500 })
-    }
-
-    const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
-    recipients = (authData?.users || [])
-      .map(user => {
-        const profile = profileMap.get(user.id)
-        return {
-          email: user.email || '',
-          firmName: profile?.firm_name || 'Design Partner'
-        }
-      })
-      .filter(r => r.email)
   }
+  // When triggered by Vercel cron without a user ID and no test_email,
+  // there are no recipients (batch enumeration requires a listProfiles method not yet available).
 
   if (recipients.length === 0) {
     return NextResponse.json({ success: true, sent: 0, message: 'No recipients with registered emails found.' })
   }
 
   // ── Deliver Emails via Resend ──────────────────────────────────────────────
-  const resend = new Resend(env.RESEND_API_KEY)
-  const fromEmail = process.env['RESEND_FROM_EMAIL'] || 'onboarding@resend.dev'
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'notifications@comply.regis.today'
   const from = `Regis Compliance <${fromEmail}>`
-  
+
   const results = []
-  
+
   for (const recipient of recipients) {
     const html = generateEmailHtml(finalUpdates, recipient.firmName)
     try {
-      const { data, error } = await resend.emails.send({
-        from,
-        to: recipient.email,
-        subject: `Weekly Regulatory Compliance Digest - RegisAI`,
-        html,
+      const resp = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from,
+          to: recipient.email,
+          subject: `Weekly Regulatory Compliance Digest - RegisAI`,
+          html,
+        }),
       })
-      
-      if (error) {
-        results.push({ email: recipient.email, success: false, error })
+
+      if (!resp.ok) {
+        const errBody = await resp.text()
+        results.push({ email: recipient.email, success: false, error: errBody })
       } else {
+        const data = await resp.json() as { id?: string }
         results.push({ email: recipient.email, success: true, id: data?.id })
       }
     } catch (err: unknown) {

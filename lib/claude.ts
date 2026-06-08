@@ -1,19 +1,30 @@
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import { getScopedRequirements } from '@/lib/coverage'
 import type { AuditResult, Finding, Jurisdiction, RegulatoryFramework } from '@/types'
 
-// All Claude API calls live here. Do not call the Anthropic SDK from API routes or components.
+// All AI API calls live here. Do not call the AI SDK from API routes or components.
+// Provider priority: CF_AI_PROXY_URL > OPENROUTER_API_KEY > ANTHROPIC_API_KEY
 
-const MODEL = 'claude-sonnet-4-6'
+const MODEL = process.env['AI_MODEL'] ?? '@cf/meta/llama-3.3-70b-instruct-fp8-fast'
 const MAX_DOCUMENT_CHARS = 12_000
 
-let _client: Anthropic | null = null
+let _client: OpenAI | null = null
 
-function getClient(): Anthropic {
+function getClient(): OpenAI {
   if (_client) return _client
-  const apiKey = process.env['ANTHROPIC_API_KEY']
-  if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set')
-  _client = new Anthropic({ apiKey })
+  // Cloudflare Workers AI proxy (free, no key needed)
+  const cfProxy = process.env['CF_AI_PROXY_URL']
+  if (cfProxy) {
+    _client = new OpenAI({ apiKey: 'cf-proxy', baseURL: cfProxy })
+    return _client
+  }
+  // OpenRouter or Anthropic fallback
+  const apiKey = process.env['OPENROUTER_API_KEY'] ?? process.env['ANTHROPIC_API_KEY']
+  if (!apiKey) throw new Error('CF_AI_PROXY_URL, OPENROUTER_API_KEY, or ANTHROPIC_API_KEY must be set')
+  const baseURL = process.env['OPENROUTER_API_KEY']
+    ? 'https://openrouter.ai/api/v1'
+    : 'https://api.anthropic.com/v1'
+  _client = new OpenAI({ apiKey, baseURL })
   return _client
 }
 
@@ -60,7 +71,7 @@ INSTRUCTIONS:
 OUTPUT FORMAT (strict JSON, no markdown fences):
 {
   "firm_name": "string — infer from document or use 'Unknown Firm'",
-  "exec_summary": "string — 2-3 sentence executive summary of overall compliance posture",
+  "exec_summary": "string — 2-3 sentence compliance posture overview: key strengths, material gaps, and overall readiness assessment",
   "gaps": [
     {
       "id": "REQ-XXX",
@@ -97,25 +108,19 @@ export async function runGapAnalysis(
     ? `Firm: ${firmName}\n\n--- COMPLIANCE MANUAL START ---\n${truncated}\n--- COMPLIANCE MANUAL END ---`
     : `--- COMPLIANCE MANUAL START ---\n${truncated}\n--- COMPLIANCE MANUAL END ---`
 
-  const message = await client.messages.create({
+  const completion = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 8096,
-    system: [
-      {
-        type: 'text',
-        text: buildSystemPrompt(jurisdiction, framework),
-        cache_control: { type: 'ephemeral' },
-      },
+    messages: [
+      { role: 'system', content: buildSystemPrompt(jurisdiction, framework) },
+      { role: 'user', content: userMessage },
     ],
-    messages: [{ role: 'user', content: userMessage }],
   })
 
-  const rawContent = message.content[0]
-  if (rawContent?.type !== 'text') {
-    throw new Error('Unexpected response type from Claude API')
+  const rawText = (completion.choices[0]?.message?.content ?? '').trim()
+  if (!rawText) {
+    throw new Error('Empty response from AI API')
   }
-
-  const rawText = rawContent.text.trim()
   const cleanText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
 
   try {
@@ -173,19 +178,19 @@ GAP TO REMEDIATE:
 
 Draft the compliance-manual language that closes this gap.`
 
-  const message = await client.messages.create({
+  const completion = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 2048,
-    system: [{ type: 'text', text: system }],
-    messages: [{ role: 'user', content: userMessage }],
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: userMessage },
+    ],
   })
 
-  const rawContent = message.content[0]
-  if (rawContent?.type !== 'text') {
-    throw new Error('Unexpected response type from Claude API')
+  const rawText = (completion.choices[0]?.message?.content ?? '').trim()
+  if (!rawText) {
+    throw new Error('Empty response from AI API')
   }
-
-  const rawText = rawContent.text.trim()
   const cleanText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
 
   try {

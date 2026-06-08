@@ -11,10 +11,13 @@ export type FindingStatus = 'open' | 'in_progress' | 'resolved' | 'risk_accepted
 export type RegulatoryFramework =
   // US
   | 'FINRA' | 'SEC' | 'AML' | 'RegBI' | 'BCP'
+  | 'SOX' | 'CCPA' | 'NIST'
   // EU
   | 'MiFID II' | 'GDPR' | 'AMLD' | 'DORA' | 'SFDR' | 'MAR'
+  | 'AI Act' | 'NIS2' | 'PSD2' | 'Whistleblowing'
   // UK
   | 'SM&CR' | 'FCA Conduct' | 'FCA Systems' | 'UK AML' | 'UK GDPR' | 'FCA OpRes'
+  | 'Bribery Act' | 'Financial Crime' | 'Pensions'
 
 export type Jurisdiction = 'US' | 'EU' | 'UK'
 

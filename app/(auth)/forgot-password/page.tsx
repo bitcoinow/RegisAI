@@ -2,27 +2,29 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { RegisLogo } from '@/components/ui/logo'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [state, setState] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const supabase = createClient()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setState('loading')
     setErrorMsg(null)
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+    const resp = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
     })
 
-    if (error) {
+    const data = await resp.json()
+
+    if (!resp.ok) {
       setState('error')
-      setErrorMsg(error.message)
+      setErrorMsg(data.error ?? 'Something went wrong')
     } else {
       setState('sent')
     }

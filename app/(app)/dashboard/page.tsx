@@ -1,6 +1,9 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { headers } from 'next/headers'
+import { db } from '@/lib/db'
 import { RiskBadge } from '@/components/ui/risk-badge'
+import { SkeletonCard } from '@/components/ui/skeleton'
 import type { RiskLevel } from '@/types'
 
 interface AuditRow {
@@ -37,15 +40,23 @@ function dominantRisk(row: AuditRow): RiskLevel {
   return 'Low'
 }
 
-export default async function DashboardPage() {
-  const supabase = await createClient()
+function DashboardSkeleton() {
+  return (
+    <div className="max-w-content mx-auto px-6 py-10">
+      <div className="space-y-4">
+        {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+      </div>
+    </div>
+  )
+}
 
-  const { data: audits } = await supabase
-    .from('audits')
-    .select('id, firm_name, total_gaps, high_risk, medium_risk, low_risk, jurisdiction, created_at')
-    .order('created_at', { ascending: false })
+async function DashboardContent() {
+  const headersList = await headers()
+  const userId = headersList.get('x-user-id')
+  if (!userId) return null
 
-  const rows = (audits ?? []) as AuditRow[]
+  const audits = await db.listAudits(userId)
+  const rows = audits as AuditRow[]
 
   return (
     <div className="max-w-content mx-auto px-6 py-10">
@@ -139,5 +150,13 @@ export default async function DashboardPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardSkeleton />}>
+      <DashboardContent />
+    </Suspense>
   )
 }

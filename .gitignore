@@ -40,3 +40,17 @@ next-env.d.ts
 *.docx
 
 .vercel
+
+# Cloudflare
+.open-next/
+.wrangler/
+
+# Video build output (source is in video/src/, output is generated)
+video/out/
+video/node_modules/
+video/assets/*.mp3
+video/public/
+
+# Mobbin research boards
+.mobbin/
+workers/*/node_modules/

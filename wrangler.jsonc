@@ -1,0 +1,50 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "regis-ai",
+  "compatibility_date": "2025-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": ".open-next/worker.js",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "r2_buckets": [
+    {
+      "binding": "DOCUMENTS_BUCKET",
+      "bucket_name": "regis-documents"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "regis-db",
+      "database_id": "639cdb3c-48eb-464b-8d77-7b42d884b7a8"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "eeb48121a8654f0bbc5b97a8ff74ec18"
+    }
+  ],
+  "vars": {
+    "NEXT_PUBLIC_APP_URL": "https://regis.today",
+    "APP_URL": "https://regis.today",
+    "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "CF_AI_PROXY_URL": "https://regis-ai-test.ayoinc.workers.dev/v1"
+  },
+  "routes": [
+    { "pattern": "regis.today", "custom_domain": true },
+    { "pattern": "www.regis.today", "custom_domain": true },
+    { "pattern": "platform.regis.today", "custom_domain": true },
+    { "pattern": "uk.regis.today", "custom_domain": true },
+    { "pattern": "eu.regis.today", "custom_domain": true },
+    { "pattern": "us.regis.today", "custom_domain": true }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

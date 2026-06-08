@@ -14,9 +14,9 @@ const JURISDICTIONS: { id: Jurisdiction; label: string; count: number; framework
 // Single-framework options per jurisdiction. The empty value scopes the analysis
 // to the entire jurisdiction library.
 const FRAMEWORKS_BY_JURISDICTION: Record<Jurisdiction, RegulatoryFramework[]> = {
-  US: ['FINRA', 'SEC', 'AML', 'RegBI', 'BCP'],
-  EU: ['MiFID II', 'GDPR', 'AMLD', 'DORA', 'SFDR', 'MAR'],
-  UK: ['SM&CR', 'FCA Conduct', 'FCA Systems', 'UK AML', 'UK GDPR', 'FCA OpRes'],
+  US: ['FINRA', 'SEC', 'AML', 'RegBI', 'BCP', 'SOX', 'CCPA', 'NIST'],
+  EU: ['MiFID II', 'GDPR', 'AMLD', 'DORA', 'SFDR', 'MAR', 'AI Act', 'NIS2', 'PSD2', 'Whistleblowing'],
+  UK: ['SM&CR', 'FCA Conduct', 'FCA Systems', 'UK AML', 'UK GDPR', 'FCA OpRes', 'Bribery Act', 'Financial Crime', 'Pensions'],
 }
 
 // Default single-framework focus per jurisdiction (empty = whole jurisdiction).
@@ -61,41 +61,31 @@ const FRAMEWORK_ITEMS: Record<Jurisdiction, string[]> = {
   ],
 }
 
-export function NewAuditForm() {
-  const [jurisdiction, setJurisdiction] = useState<Jurisdiction>('EU')
-  const [framework, setFramework] = useState<RegulatoryFramework | ''>(DEFAULT_FRAMEWORK['EU'])
+interface NewAuditFormProps {
+  /** Locked jurisdiction from subdomain. No tabs — single region only. */
+  jurisdiction?: Jurisdiction
+}
+
+export function NewAuditForm({ jurisdiction: lockedJurisdiction }: NewAuditFormProps) {
+  const jurisdiction = lockedJurisdiction ?? 'UK'
+  const [framework, setFramework] = useState<RegulatoryFramework | ''>(DEFAULT_FRAMEWORK[jurisdiction])
   const selected = JURISDICTIONS.find((j) => j.id === jurisdiction)!
 
-  function selectJurisdiction(id: Jurisdiction) {
-    setJurisdiction(id)
-    setFramework(DEFAULT_FRAMEWORK[id])
-  }
-
-  // Requirement count for the active scope (single framework or whole jurisdiction).
+  // Requirement count for the active scope
   const scopeCount = getScopedRequirements(jurisdiction, framework || null).length
 
   return (
     <>
-      {/* Jurisdiction tabs */}
-      <div className="flex gap-0 mb-4 border border-rule">
-        {JURISDICTIONS.map((j) => (
-          <button
-            key={j.id}
-            type="button"
-            onClick={() => selectJurisdiction(j.id)}
-            className={[
-              'flex-1 py-3 px-4 text-left border-r border-rule last:border-r-0 transition-colors',
-              jurisdiction === j.id
-                ? 'bg-green text-white'
-                : 'bg-bg-2 text-ink-2 hover:bg-bg',
-            ].join(' ')}
-          >
-            <span className="block text-xs font-mono tracking-widest uppercase mb-0.5">
-              {j.id}
-            </span>
-            <span className="block text-sm">{j.label}</span>
-          </button>
-        ))}
+      {/* Jurisdiction badge (locked to subdomain) */}
+      <div className="flex items-center gap-3 mb-4 border border-rule px-4 py-3 bg-bg-2">
+        <span className="font-mono text-xs tracking-widest uppercase font-bold text-green">
+          {selected.id}
+        </span>
+        <div>
+          <span className="text-sm font-medium text-ink">{selected.label}</span>
+          <span className="block text-xs text-ink-3">{selected.frameworks}</span>
+        </div>
+        <span className="ml-auto font-mono text-xs text-ink-3">{selected.count} requirements</span>
       </div>
 
       {/* Framework focus selector */}

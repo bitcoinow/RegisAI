@@ -1,0 +1,611 @@
+openapi: 3.1.0
+info:
+  title: RegisAI Compliance Platform API
+  version: 0.1.0
+  description: |
+    AI-powered compliance analysis platform. Upload compliance documentation,
+    run gap analysis against regulatory frameworks, draft remediation policy
+    language, and monitor regulatory changes.
+
+    **Authentication:** All endpoints require a valid Supabase session cookie
+    (set via /login or /auth/callback). Unauthenticated requests return 401.
+
+    **Data isolation:** Row-Level Security enforces per-user data isolation.
+    Users can only access their own documents, audits, and findings.
+  contact:
+    name: RegisAI Team
+    url: https://github.com/bitcoinow/RegisAI
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://regis-ai-nine.vercel.app
+    description: Production (Vercel)
+
+tags:
+  - name: Documents
+    description: PDF upload, listing, download, and deletion
+  - name: Analysis
+    description: AI-powered compliance gap analysis
+  - name: Findings
+    description: Individual gap finding management and policy drafting
+  - name: Monitoring
+    description: Regulatory update feed and refresh
+  - name: Profile
+    description: Firm profile and onboarding
+
+paths:
+  /api/documents:
+    get:
+      tags: [Documents]
+      summary: List documents
+      description: Returns all documents for the authenticated user, ordered by creation date descending.
+      operationId: listDocuments
+      responses:
+        "200":
+          description: Document list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Documents]
+      summary: Upload PDF document
+      description: |
+        Accepts a PDF file via multipart form data. Extracts text using pdf-parse,
+        uploads the original PDF to Supabase Storage, and creates a document record.
+        Only PDF files are accepted (415 for other types).
+      operationId: uploadDocument
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF file (max 10MB)
+      responses:
+        "201":
+          description: Document created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentUploadResponse"
+        "400":
+          description: Missing file
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "415":
+          description: Not a PDF file
+        "422":
+          description: PDF text extraction failed
+
+  /api/documents/{id}:
+    delete:
+      tags: [Documents]
+      summary: Delete document
+      description: |
+        Removes the original PDF from Storage and deletes the document row.
+        Cascades to audits and findings. Ownership enforced by RLS.
+      operationId: deleteDocument
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Document not found
+
+  /api/documents/{id}/download:
+    get:
+      tags: [Documents]
+      summary: Download original PDF
+      description: Returns the original uploaded PDF file from Supabase Storage.
+      operationId: downloadDocument
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Document or file not found
+
+  /api/analyse:
+    post:
+      tags: [Analysis]
+      summary: Run compliance gap analysis
+      description: |
+        Triggers an AI-powered gap analysis on an uploaded document. The analysis:
+        1. Loads the document's extracted text
+        2. Selects the regulatory library for the chosen jurisdiction/framework
+        3. Sends to AI for structured gap analysis
+        4. Computes compliance score, coverage matrix, and re-scan delta (if parent_audit_id provided)
+        5. Persists the audit record and individual findings
+
+        **AI Provider:** Configurable — Cloudflare Workers AI (default), OpenRouter, or Anthropic Claude.
+        **Document limit:** Text truncated to 12,000 characters before analysis.
+      operationId: runAnalysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [document_id]
+              properties:
+                document_id:
+                  type: string
+                  format: uuid
+                  description: ID of the uploaded document to analyse
+                jurisdiction:
+                  $ref: "#/components/schemas/Jurisdiction"
+                framework:
+                  $ref: "#/components/schemas/RegulatoryFramework"
+                parent_audit_id:
+                  type: string
+                  format: uuid
+                  description: If re-scanning, the ID of the previous audit. Locks scope to parent's jurisdiction/framework.
+            examples:
+              uk_fca:
+                summary: UK FCA analysis
+                value:
+                  document_id: "550e8400-e29b-41d4-a716-446655440000"
+                  jurisdiction: "UK"
+                  framework: "FCA Conduct"
+              us_full:
+                summary: US full-scope analysis
+                value:
+                  document_id: "550e8400-e29b-41d4-a716-446655440000"
+                  jurisdiction: "US"
+              rescan:
+                summary: Re-scan after remediation
+                value:
+                  document_id: "550e8400-e29b-41d4-a716-446655440001"
+                  parent_audit_id: "660e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Analysis complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyseResponse"
+        "400":
+          description: Missing document_id or invalid framework for jurisdiction
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Document not found
+        "409":
+          description: Analysis already in progress for this document
+        "422":
+          description: Document has no extracted text
+        "500":
+          description: AI analysis failed
+
+  /api/findings/{id}/status:
+    patch:
+      tags: [Findings]
+      summary: Update finding status
+      description: |
+        Transitions a finding's status. Moving away from 'open' records the reviewer
+        identity, timestamp, and optional review note as an audit trail.
+      operationId: updateFindingStatus
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: "#/components/schemas/FindingStatus"
+                review_note:
+                  type: string
+                  description: Optional rationale for the status change
+            examples:
+              resolve:
+                summary: Mark finding as resolved
+                value:
+                  status: resolved
+                  review_note: "Policy updated in section 4.2"
+              accept_risk:
+                summary: Accept the risk
+                value:
+                  status: risk_accepted
+                  review_note: "Low materiality — board accepted residual risk"
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FindingStatusResponse"
+        "400":
+          description: Invalid status value
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Finding not found or not owned by user
+
+  /api/findings/{id}/draft:
+    post:
+      tags: [Findings]
+      summary: Draft remediation policy language
+      description: |
+        Generates compliance-manual language that closes the specified gap.
+        Written in formal regulatory voice, scoped to the audit's jurisdiction.
+        The drafted text is persisted on the finding record for future retrieval.
+
+        **AI-generated:** Output should be reviewed by a compliance professional before adoption.
+      operationId: draftPolicyLanguage
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Policy language drafted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DraftPolicyResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Finding not found or not owned by user
+        "500":
+          description: AI drafting failed
+
+  /api/monitoring/feed:
+    get:
+      tags: [Monitoring]
+      summary: Get regulatory update feed
+      description: |
+        Returns stored regulatory updates from FCA, PRA, Bank of England, SEC,
+        FINRA, ESMA, and EBA. Ordered by publication date descending. Max 500 items.
+      operationId: getMonitoringFeed
+      responses:
+        "200":
+          description: Regulatory updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/monitoring/refresh:
+    post:
+      tags: [Monitoring]
+      summary: Refresh regulatory feeds
+      description: |
+        Fetches latest updates from all regulatory feed sources (Federal Register API
+        for US; RSS feeds for FCA, PRA, ESMA, EBA). Upserts into the database,
+        deduplicating by URL.
+      operationId: refreshMonitoringFeeds
+      responses:
+        "200":
+          description: Feed refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inserted:
+                    type: integer
+                    description: Number of updates inserted/updated
+                  parsed:
+                    type: integer
+                    description: Number of updates parsed from sources
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/monitoring/digest:
+    post:
+      tags: [Monitoring]
+      summary: Send weekly regulatory digest email
+      description: Sends a regulatory digest email via Resend to the authenticated user.
+      operationId: sendDigest
+      responses:
+        "200":
+          description: Digest sent
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/profile:
+    patch:
+      tags: [Profile]
+      summary: Update firm profile
+      description: |
+        Upserts the authenticated user's firm profile. Used during onboarding
+        and in settings. All fields are required.
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [firm_name, firm_type, aum_range, regulator]
+              properties:
+                firm_name:
+                  type: string
+                  example: "Meridian Wealth Advisers Ltd"
+                firm_type:
+                  $ref: "#/components/schemas/FirmType"
+                aum_range:
+                  type: string
+                  example: "$50M-$100M"
+                regulator:
+                  $ref: "#/components/schemas/Regulator"
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "400":
+          description: Invalid profile fields
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid session
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+
+  schemas:
+    Jurisdiction:
+      type: string
+      enum: [US, EU, UK]
+      default: US
+
+    RegulatoryFramework:
+      type: string
+      enum:
+        # US
+        - FINRA
+        - SEC
+        - AML
+        - RegBI
+        - BCP
+        # EU
+        - MiFID II
+        - GDPR
+        - AMLD
+        - DORA
+        - SFDR
+        - MAR
+        # UK
+        - SM&CR
+        - FCA Conduct
+        - FCA Systems
+        - UK AML
+        - UK GDPR
+        - FCA OpRes
+
+    FindingStatus:
+      type: string
+      enum: [open, in_progress, resolved, risk_accepted]
+
+    FirmType:
+      type: string
+      enum: [RIA, Fintech, Insurance, Bank]
+
+    Regulator:
+      type: string
+      enum: [FINRA, SEC, State, Multiple]
+
+    RiskLevel:
+      type: string
+      enum: [High, Medium, Low]
+
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+
+    DocumentSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file_name:
+          type: string
+        page_count:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum: [uploaded, analysing, complete, error]
+        created_at:
+          type: string
+          format: date-time
+
+    DocumentUploadResponse:
+      type: object
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        page_count:
+          type: integer
+
+    AnalyseResponse:
+      type: object
+      properties:
+        audit_id:
+          type: string
+          format: uuid
+
+    Finding:
+      type: object
+      properties:
+        id:
+          type: string
+        req_id:
+          type: string
+          description: Stable requirement ID from the regulatory library
+        rule:
+          type: string
+          description: Regulatory rule citation
+        requirement:
+          type: string
+          description: Short requirement name
+        policy_says:
+          type: string
+          description: What the document actually says (or "Not addressed")
+        gap:
+          type: string
+          description: What is missing or non-compliant
+        risk:
+          $ref: "#/components/schemas/RiskLevel"
+        recommendation:
+          type: string
+          description: Specific remediation step
+        status:
+          $ref: "#/components/schemas/FindingStatus"
+        drafted_policy:
+          type: string
+          nullable: true
+          description: AI-drafted compliance manual language
+        reviewed_by:
+          type: string
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        review_note:
+          type: string
+          nullable: true
+
+    FindingStatusResponse:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/FindingStatus"
+        reviewed_by:
+          type: string
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        review_note:
+          type: string
+          nullable: true
+        reviewer_label:
+          type: string
+          nullable: true
+          description: Display name/email of the reviewer
+
+    DraftPolicyResponse:
+      type: object
+      properties:
+        drafted_policy:
+          type: string
+          description: Formal compliance-manual language closing the gap
+
+    FeedResponse:
+      type: object
+      properties:
+        updates:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegulatoryUpdate"
+
+    RegulatoryUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        regulator:
+          type: string
+        jurisdiction:
+          $ref: "#/components/schemas/Jurisdiction"
+        title:
+          type: string
+        summary:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        relevance_score:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        affected_rules:
+          type: array
+          items:
+            type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firm_name:
+          type: string
+          nullable: true
+        firm_type:
+          $ref: "#/components/schemas/FirmType"
+        aum_range:
+          type: string
+          nullable: true
+        regulator:
+          $ref: "#/components/schemas/Regulator"
+        plan:
+          type: string
+        created_at:
+          type: string
+          format: date-time

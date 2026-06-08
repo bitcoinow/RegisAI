@@ -1,0 +1,8 @@
+name = "regis-pdf-extract"
+main = "index.ts"
+compatibility_date = "2025-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "regis-documents"

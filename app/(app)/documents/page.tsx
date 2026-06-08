@@ -1,15 +1,11 @@
+import { Suspense } from 'react'
+import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
 import { DocumentActions } from '@/components/documents/document-actions'
+import { SkeletonCard } from '@/components/ui/skeleton'
 import type { DocumentStatus } from '@/types'
-
-interface DocumentRow {
-  id: string
-  file_name: string
-  page_count: number | null
-  status: DocumentStatus
-  created_at: string
-}
 
 interface AuditRef {
   id: string
@@ -43,31 +39,37 @@ function StatusBadge({ status }: { status: DocumentStatus }) {
   )
 }
 
-export default async function DocumentsPage() {
-  const supabase = await createClient()
+function DocumentsSkeleton() {
+  return (
+    <div className="max-w-content mx-auto px-6 py-10">
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
+      </div>
+    </div>
+  )
+}
 
-  const { data: documents } = await supabase
-    .from('documents')
-    .select('id, file_name, page_count, status, created_at')
-    .order('created_at', { ascending: false })
+async function DocumentsContent() {
+  const hdrs = await headers()
+  const userId = hdrs.get('x-user-id')
+  if (!userId) redirect('/login')
 
-  const rows = (documents ?? []) as DocumentRow[]
+  const rows = await db.listDocuments(userId)
 
   // Group the audits each document produced (most recent first).
   const auditsByDocument = new Map<string, AuditRef[]>()
   if (rows.length > 0) {
-    const { data: audits } = await supabase
-      .from('audits')
-      .select('id, document_id, total_gaps, created_at')
-      .in(
-        'document_id',
-        rows.map((r) => r.id)
-      )
-      .order('created_at', { ascending: false })
-
-    for (const audit of (audits ?? []) as AuditRef[]) {
+    const docIds = new Set(rows.map((r) => r.id))
+    const allAudits = await db.listAudits(userId)
+    for (const audit of allAudits) {
+      if (!docIds.has(audit.document_id)) continue
       const list = auditsByDocument.get(audit.document_id) ?? []
-      list.push(audit)
+      list.push({
+        id: audit.id,
+        document_id: audit.document_id,
+        total_gaps: audit.total_gaps,
+        created_at: audit.created_at,
+      })
       auditsByDocument.set(audit.document_id, list)
     }
   }
@@ -182,5 +184,13 @@ export default async function DocumentsPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function DocumentsPage() {
+  return (
+    <Suspense fallback={<DocumentsSkeleton />}>
+      <DocumentsContent />
+    </Suspense>
   )
 }

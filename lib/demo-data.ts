@@ -1,14 +1,14 @@
 import type { Audit } from '@/types'
 
-// Pre-seeded demo audit for Clearview Capital — shown at /demo/clearview without login.
+// Pre-seeded demo audit for Example Financial Services — shown at /demo/clearview without login.
 export const CLEARVIEW_DEMO: Audit = {
   id: 'demo-clearview',
   document_id: 'demo-doc',
   user_id: 'demo-user',
   jurisdiction: 'US',
-  firm_name: 'Clearview Capital Management',
+  firm_name: 'Example Financial Services Ltd',
   exec_summary:
-    "Clearview Capital Management's compliance manual demonstrates a foundational compliance framework; however, the analysis identifies 18 significant gaps against applicable FINRA, SEC, AML/BSA, and Regulation Best Interest requirements. Seven findings present High risk exposure requiring immediate remediation before the firm's next regulatory examination. The firm demonstrates strength in investment policy documentation and Form ADV disclosures, but critical deficiencies exist in supervisory procedures, AML controls, and Reg BI implementation.",
+    "Example Financial Services Ltd's compliance manual demonstrates a foundational compliance framework; however, the analysis identifies 18 significant gaps against applicable FINRA, SEC, AML/BSA, and Regulation Best Interest requirements. Seven findings present High risk exposure requiring immediate remediation before the firm's next regulatory examination. The firm demonstrates strength in investment policy documentation and Form ADV disclosures, but critical deficiencies exist in supervisory procedures, AML controls, and Reg BI implementation.",
   total_gaps: 18,
   high_risk: 7,
   medium_risk: 8,
@@ -235,7 +235,7 @@ export const CLEARVIEW_DEMO: Audit = {
   created_at: '2026-04-28T09:00:00.000Z',
 }
 
-// ── GDPR end-to-end proof point (Northwind Payments) ──────────────────────────
+// ── GDPR end-to-end proof point (Example Payments Co Payments) ──────────────────────────
 // Two linked audits demonstrating the full lifecycle for a single framework:
 //   V1 — initial scan: 13 gaps, posture 40%
 //   V2 — re-scan of the remediated manual: 10 gaps closed, posture 90%
@@ -248,9 +248,9 @@ export const GDPR_DEMO_V1: Audit = {
   user_id: 'demo-user',
   jurisdiction: 'EU',
   framework: 'GDPR',
-  firm_name: 'Northwind Payments Ltd',
+  firm_name: 'Example Payments Co Ltd',
   exec_summary:
-    'Northwind Payments Ltd, an EU-authorised electronic money institution, submitted its Data Protection Policy for a focused GDPR gap analysis against all 16 in-scope GDPR requirements. The manual establishes a baseline — encryption is in place, a consent mechanism exists, and a customer privacy notice is published — but 13 gaps remain, 5 of them High risk. The most serious deficiencies concern the lawful basis for processing, breach notification timelines, processor contracts, and international transfer safeguards. Overall compliance posture is assessed at 40%.',
+    'Example Payments Co Ltd, an EU-authorised electronic money institution, submitted its Data Protection Policy for a focused GDPR gap analysis against all 16 in-scope GDPR requirements. The manual establishes a baseline — encryption is in place, a consent mechanism exists, and a customer privacy notice is published — but 13 gaps remain, 5 of them High risk. The most serious deficiencies concern the lawful basis for processing, breach notification timelines, processor contracts, and international transfer safeguards. Overall compliance posture is assessed at 40%.',
   total_gaps: 13,
   high_risk: 5,
   medium_risk: 6,
@@ -279,7 +279,7 @@ export const GDPR_DEMO_V1: Audit = {
       rule: 'GDPR Article 5',
       requirement: 'Lawfulness of Processing — Principles',
       policy_says:
-        'The policy states that "Northwind respects customer privacy and handles data responsibly," but does not articulate the data protection principles or how they are applied.',
+        'The policy states that "Example Payments Co respects customer privacy and handles data responsibly," but does not articulate the data protection principles or how they are applied.',
       gap: 'The Article 5 principles (purpose limitation, data minimisation, accuracy, storage limitation, integrity and confidentiality, and accountability) are not reflected in the policy. There is no evidence the principles govern processing decisions.',
       risk: 'High',
       recommendation:
@@ -442,9 +442,9 @@ export const GDPR_DEMO_V2: Audit = {
   user_id: 'demo-user',
   jurisdiction: 'EU',
   framework: 'GDPR',
-  firm_name: 'Northwind Payments Ltd',
+  firm_name: 'Example Payments Co Ltd',
   exec_summary:
-    'Following remediation, Northwind Payments resubmitted its updated Data Protection Policy for a GDPR re-scan. Of the 13 gaps identified in the initial audit, 10 have been fully closed — including the lawful basis register, breach procedure, processor DPAs, ROPA, DPIA methodology, and DPO designation. Two High-risk findings (international transfers and processor terms) have been materially improved but are not yet fully closed, one Low-risk retention gap has been formally risk-accepted, and one new Low-risk gap was identified in the revised privacy notice. Overall compliance posture has risen from 40% to 90%.',
+    'Following remediation, Example Payments Co Payments resubmitted its updated Data Protection Policy for a GDPR re-scan. Of the 13 gaps identified in the initial audit, 10 have been fully closed — including the lawful basis register, breach procedure, processor DPAs, ROPA, DPIA methodology, and DPO designation. Two High-risk findings (international transfers and processor terms) have been materially improved but are not yet fully closed, one Low-risk retention gap has been formally risk-accepted, and one new Low-risk gap was identified in the revised privacy notice. Overall compliance posture has risen from 40% to 90%.',
   total_gaps: 4,
   high_risk: 0,
   medium_risk: 1,

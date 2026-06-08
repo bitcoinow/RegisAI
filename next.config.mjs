@@ -14,6 +14,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '10mb', // Allow PDF uploads up to 10MB
     },
+    viewTransition: true,
   },
   images: {
     dangerouslyAllowSVG: true,

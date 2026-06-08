@@ -9,16 +9,18 @@ function requireEnv(name: string): string {
   return value
 }
 
+function optionalEnv(name: string): string {
+  return process.env[name] ?? ''
+}
+
 // Server-only variables — never expose to the browser
+// AI key is optional here; lib/claude.ts resolves the provider chain itself.
 export const env = {
-  ANTHROPIC_API_KEY: requireEnv('ANTHROPIC_API_KEY'),
-  SUPABASE_SERVICE_ROLE_KEY: requireEnv('SUPABASE_SERVICE_ROLE_KEY'),
-  RESEND_API_KEY: requireEnv('RESEND_API_KEY'),
+  ANTHROPIC_API_KEY: optionalEnv('ANTHROPIC_API_KEY'),
+  RESEND_API_KEY: optionalEnv('RESEND_API_KEY'),
 } as const
 
 // Public variables — safe for browser bundles
 export const publicEnv = {
-  SUPABASE_URL: requireEnv('NEXT_PUBLIC_SUPABASE_URL'),
-  SUPABASE_ANON_KEY: requireEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
   APP_URL: process.env['NEXT_PUBLIC_APP_URL'] ?? 'http://localhost:3000',
 } as const

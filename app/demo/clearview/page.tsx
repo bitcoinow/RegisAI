@@ -4,7 +4,7 @@ import { AuditReport } from '@/components/audit/audit-report'
 
 export const dynamic = 'force-dynamic'
 
-export default function ClearviewDemoPage() {
+export default function SampleUSDemoPage() {
   return (
     <>
       <div className="border-b border-rule bg-bg print:hidden">

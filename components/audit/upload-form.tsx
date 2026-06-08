@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { AnalysisProgress } from '@/components/ui/analysis-progress'
 import type { Jurisdiction, RegulatoryFramework } from '@/types'
 
 type Stage = 'idle' | 'uploading' | 'analysing' | 'error'
@@ -25,10 +26,19 @@ export function UploadForm({
   }
   const [stage, setStage] = useState<Stage>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [apiDone, setApiDone] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const auditIdRef = useRef<string | null>(null)
 
   const busy = stage === 'uploading' || stage === 'analysing'
+
+  // Called by AnalysisProgress when done=true AND animation completes
+  const handleProgressComplete = useCallback(() => {
+    if (auditIdRef.current) {
+      router.push(`/audit/${auditIdRef.current}`)
+    }
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -69,7 +79,13 @@ export function UploadForm({
     }
 
     const { audit_id } = (await analyseRes.json()) as { audit_id: string }
-    router.push(`/audit/${audit_id}`)
+    auditIdRef.current = audit_id
+    setApiDone(true)
+  }
+
+  // During analysis replace the full form with the step-by-step progress UI.
+  if (stage === 'analysing') {
+    return <AnalysisProgress done={apiDone} onComplete={handleProgressComplete} />
   }
 
   return (
@@ -86,10 +102,10 @@ export function UploadForm({
         <p className="mt-3 text-xs text-ink-3">PDF only · Max 10 MB</p>
       </div>
 
-      {stage !== 'idle' && stage !== 'error' && (
+      {stage === 'uploading' && (
         <div className="flex items-center gap-3 mb-6 p-4 border border-rule bg-bg-2">
           <span className="inline-block w-3 h-3 border-2 border-green border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-ink-2">{stageLabel[stage]}</p>
+          <p className="text-sm text-ink-2">{stageLabel.uploading}</p>
         </div>
       )}
 

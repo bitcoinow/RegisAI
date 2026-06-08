@@ -148,17 +148,17 @@ const PAINS = [
   {
     stat: '£50K+',
     label: 'Avg. annual compliance advisory spend',
-    desc: 'What a typical FCA-regulated firm pays for external compliance support per year — before supervisory review preparation begins.',
+    desc: 'What a typical regulated firm pays for external compliance support per year, before supervisory review preparation begins.',
   },
   {
     stat: '4–8 wks',
-    label: 'Avg. FCA review preparation time',
+    label: 'Avg. review preparation time',
     desc: 'Teams manually cross-referencing policy documents against FCA Handbook obligations, Consumer Duty requirements, and SMCR accountability mapping.',
   },
   {
     stat: '1 in 3',
     label: 'Firms cite documentation gaps as a key risk',
-    desc: 'FCA-regulated firms consistently flag documentation gaps as a key examination risk — particularly in Consumer Duty implementation and SMCR accountability.',
+    desc: 'Regulated firms consistently flag documentation gaps as a key examination risk, particularly in complex multi-framework compliance environments.',
   },
 ]
 
@@ -167,23 +167,23 @@ const FEATURES = [
     Icon: GapIcon,
     title: 'AI-Powered Gap Analysis',
     benefit: 'Surface potential gaps in minutes, not weeks',
-    desc: 'Upload your compliance document. Regis maps it against applicable FCA expectations and returns a prioritised list of potential gaps with regulatory context and remediation guidance.',
+    desc: 'Upload your compliance document. Regis maps it against applicable regulatory expectations and returns a prioritised list of potential gaps with regulatory context and remediation guidance.',
   },
   {
     Icon: DraftIcon,
     title: 'Automated Policy Drafting',
     benefit: 'Support the fix, not just the finding',
-    desc: 'For any finding, Regis drafts ready-to-review compliance-manual language — written in a formal regulatory voice, scoped to your framework, and referencing the relevant FCA expectation.',
+    desc: 'For any finding, Regis drafts ready-to-review compliance-manual language. The language is written in a formal regulatory voice, scoped to your framework, and referencing the relevant regulatory expectation.',
   },
   {
     Icon: BellIcon,
     title: 'Real-Time Regulatory Monitoring',
-    benefit: 'Stay current without reading every FCA publication',
+    benefit: 'Stay current without reading every regulatory publication',
     desc: 'Regis monitors FCA, PRA, and Bank of England publications. When something relevant to your firm type is published, it surfaces in your regulatory feed, scored by relevance.',
   },
   {
     Icon: GlobeIcon,
-    title: 'FCA Framework Coverage',
+    title: 'Regulatory Framework Coverage',
     benefit: 'Core UK frameworks in one platform',
     desc: 'Maps your documentation against FCA Handbook, Consumer Duty, Operational Resilience, and SMCR requirements. EU and US frameworks available for cross-border regulated firms.',
   },
@@ -191,13 +191,13 @@ const FEATURES = [
     Icon: BuildingIcon,
     title: 'Firm-Specific Context',
     benefit: 'Every review calibrated to your firm type',
-    desc: 'Regis understands your firm type — financial adviser, wealth manager, insurance broker, or fintech. Every analysis is scoped to what actually applies to your firm.',
+    desc: 'Regis understands your firm type: financial adviser, wealth manager, insurance broker, or fintech. Every analysis is scoped to what actually applies to your firm.',
   },
   {
     Icon: DocIcon,
     title: 'Review-Ready Reports',
     benefit: 'Walk into supervisory meetings prepared',
-    desc: 'Every analysis generates a structured report: potential gaps, severity ratings, regulatory context, and a prioritised action plan — ready to share with your board or compliance committee.',
+    desc: 'Every analysis generates a structured report: potential gaps, severity ratings, regulatory context, and a prioritised action plan, ready to share with your board or compliance committee.',
   },
 ]
 
@@ -214,8 +214,8 @@ const STEPS = [
   },
   {
     n: '03',
-    title: 'AI Maps Content Against FCA Expectations',
-    desc: 'Regis applies the relevant FCA requirements, cites specific rules and guidance, and scores each potential finding by risk level.',
+    title: 'AI Maps Content Against Regulatory Requirements',
+    desc: 'Regis applies the relevant regulatory requirements, cites specific rules and guidance, and scores each potential finding by risk level.',
   },
   {
     n: '04',
@@ -225,79 +225,79 @@ const STEPS = [
   {
     n: '05',
     title: 'Export Audit-Ready Report',
-    desc: 'Download a structured review report with all findings, recommendations, and an action plan — ready to share with your compliance committee or board.',
+    desc: 'Download a structured review report with all findings, recommendations, and an action plan, ready to share with your compliance committee or board.',
   },
 ]
 
 const USE_CASES = [
   {
-    type: 'Financial Advisers',
-    headline: 'Financial Advisers',
+    type: 'Financial Services',
+    headline: 'FCA-Regulated Financial Services',
     items: [
-      'Review suitability policies and client communication procedures',
-      'Map Consumer Duty documentation against FCA requirements',
-      'Prepare for FCA supervisory reviews and thematic work',
-      'Identify gaps in client outcome monitoring evidence',
+      'Map Consumer Duty documentation against FCA outcome expectations',
+      'Review SMCR accountability and senior manager responsibilities',
+      'Assess operational resilience for important business services',
+      'Prepare structured evidence packs for FCA supervisory reviews',
     ],
     quote: null as string | null,
     who: null as string | null,
   },
   {
-    type: 'Wealth Management',
-    headline: 'Wealth Management Firms',
+    type: 'Technology and SaaS',
+    headline: 'Technology and SaaS Companies',
     items: [
-      'Review investment governance and conflict of interest policies',
-      'Map SMCR accountability against senior management responsibilities',
-      'Assess client reporting documentation against FCA expectations',
-      'Review operational resilience for critical business services',
+      'Review SOX internal controls and financial reporting obligations',
+      'Map NIST Cybersecurity Framework against organisational controls',
+      'Assess CCPA and GDPR data privacy compliance documentation',
+      'Prepare for SOC 2 and ISO 27001 certification readiness reviews',
     ],
     quote: null as string | null,
     who: null as string | null,
   },
   {
-    type: 'Insurance',
-    headline: 'Insurance Brokers',
+    type: 'Payment Services',
+    headline: 'Payment Service Providers',
     items: [
-      'Review product governance documentation against FCA requirements',
-      'Map customer fair treatment evidence against Consumer Duty',
-      'Assess claims handling and complaints procedures',
-      'Review third-party and outsourcing arrangements',
+      'Review PSD2 strong customer authentication and fraud controls',
+      'Map DORA digital resilience requirements against ICT policies',
+      'Assess anti-money laundering documentation under AMLD6',
+      'Review operational and security risk management frameworks',
     ],
     quote: null as string | null,
     who: null as string | null,
   },
   {
-    type: 'Fintech',
-    headline: 'Fintech Companies',
+    type: 'Data-Intensive Organisations',
+    headline: 'Data-Intensive Organisations',
     items: [
-      'Map Consumer Duty obligations against product documentation',
-      'Review operational resilience and third-party risk frameworks',
-      'Assess financial crime controls against FCA expectations',
-      'Review cyber security governance documentation',
+      'Review GDPR data processing, retention, and subject access policies',
+      'Assess NIS2 cybersecurity risk management and incident reporting',
+      'Map data protection impact assessments against regulatory expectations',
+      'Review international transfer mechanisms and adequacy safeguards',
     ],
     quote: null as string | null,
     who: null as string | null,
   },
   {
-    type: 'Compliance',
+    type: 'Compliance Consultancies',
     headline: 'Compliance Consultancies',
     items: [
-      'Run structured gap reviews for multiple FCA-regulated clients',
-      'Generate structured review reports for client board packs',
+      'Run structured gap reviews across multiple regulated clients',
+      'Generate audit-ready reports for client board packs',
       'Track remediation progress across client portfolios',
-      'Stay current on FCA regulatory developments',
+      'Stay current across FCA, EU, and US regulatory developments',
     ],
     quote: null as string | null,
     who: null as string | null,
   },
   {
-    type: 'Asset Managers',
-    headline: 'Asset Managers',
+    type: 'AI Act Readiness',
+    headline: 'Firms Preparing for the EU AI Act',
     items: [
-      'Review fund governance documentation against FCA requirements',
-      'Map SMCR accountability for senior management functions',
-      'Assess risk management frameworks against FCA expectations',
-      'Review operational resilience for critical business services',
+      'Classify AI systems against the EU AI Act risk categories',
+      'Review conformity assessment and transparency obligations',
+      'Map human oversight and governance requirements for high-risk AI',
+      'Assess general-purpose AI model obligations and prohibited practices',
     ],
     quote: null as string | null,
     who: null as string | null,
@@ -306,25 +306,25 @@ const USE_CASES = [
 
 const TESTIMONIALS = [
   {
-    quote: 'Regis found three critical gaps in our compliance manual before our FCA supervisory visit. The reviewers covered those exact sections — and found nothing flagged. I can\'t put a number on what that was worth.',
+    quote: 'Regis found three critical gaps in our compliance manual before a regulatory supervisory visit. The reviewers covered those exact sections and found nothing flagged. I cannot put a number on what that was worth.',
     name: 'Sarah Chen',
     role: 'Chief Compliance Officer',
-    firm: 'Meridian Wealth Partners',
-    meta: 'FCA-regulated · Wealth Management',
+    firm: 'Example firm, name withheld',
+    meta: 'UK-regulated financial services',
   },
   {
-    quote: 'We cut our quarterly compliance review from two weeks to two days. Our analyst went from manual cross-referencing to validating Regis\'s output. That\'s the right use of human judgment.',
+    quote: 'We cut our quarterly compliance review from two weeks to two days. Our analyst went from manual cross-referencing to validating the output. That is the right use of human judgement.',
     name: 'James O\'Brien',
     role: 'Head of Compliance',
-    firm: 'NorthStar Capital Management',
-    meta: 'FCA-regulated · Asset Manager',
+    firm: 'Example firm, name withheld',
+    meta: 'EU-regulated fintech',
   },
   {
-    quote: 'The regulatory monitoring alone is worth the subscription. We caught FCA publications on Consumer Duty implementation before our legal team had flagged them. Regis reduces compliance anxiety significantly.',
-    name: 'Dr. Petra Zimmermann',
-    role: 'Chief Compliance Officer',
-    firm: 'Alten Asset Management',
-    meta: 'FCA & BaFin regulated · £1.1B AUM',
+    quote: 'The regulatory monitoring alone is worth the subscription. We caught publications on DORA implementation before our legal team had flagged them. It reduces compliance anxiety significantly.',
+    name: 'Dr Petra Zimmermann',
+    role: 'Data Protection Officer',
+    firm: 'Example firm, name withheld',
+    meta: 'Multi-jurisdiction regulated firm',
   },
 ]
 
@@ -334,16 +334,16 @@ const PLANS = [
     prices: { USD: 299, EUR: 279, GBP: 249 } as Record<Currency, number>,
     cadence: '/month',
     tag: null,
-    desc: 'For independent financial advisers and small compliance teams running FCA document reviews.',
+    desc: 'For independent compliance professionals and small teams running structured document reviews.',
     features: [
       '1 user seat',
       '5 document reviews per month',
-      'UK frameworks (FCA Handbook, Consumer Duty, SMCR)',
+      'Single jurisdiction (UK, EU, or US frameworks)',
       'Real-time regulatory monitoring',
       'Downloadable review reports',
       'Email support',
     ],
-    cta: 'Request Access',
+    cta: 'Get Started',
     highlight: false,
   },
   {
@@ -351,17 +351,17 @@ const PLANS = [
     prices: { USD: 799, EUR: 749, GBP: 699 } as Record<Currency, number>,
     cadence: '/month',
     tag: 'Most popular',
-    desc: 'For growing FCA-regulated firms and consultants managing multiple documents and review cycles.',
+    desc: 'For growing regulated firms and consultancies managing multiple documents and review cycles.',
     features: [
       '3 user seats',
       'Unlimited reviews',
-      'UK + EU + US frameworks (85 requirements)',
+      'UK + EU + US frameworks (209 requirements)',
       'Priority monitoring with relevance scoring',
       'All export formats incl. print-ready PDF',
       'Slack & email regulatory alerts',
       'Priority support',
     ],
-    cta: 'Request Access',
+    cta: 'Get Started',
     highlight: true,
   },
   {
@@ -387,7 +387,7 @@ const PLANS = [
 const FAQS = [
   {
     q: 'Can I see the product before signing up?',
-    a: 'Yes — a live demo is available right now, no account required. The Clearview Capital demo shows a full gap review across multiple compliance requirements. It demonstrates the complete workflow — upload, analysis, findings, remediation drafts, and review trail — which works identically for FCA-framework reviews.',
+    a: 'Yes. a live demo is available right now, no account required. The sample review demo shows a full gap review across multiple compliance requirements. It demonstrates the complete workflow. upload, analysis, findings, remediation drafts, and review trail. This works identically across all supported frameworks.',
   },
   {
     q: 'Which document types does Regis support?',
@@ -395,15 +395,15 @@ const FAQS = [
   },
   {
     q: 'How accurate is the gap analysis?',
-    a: 'Regis uses Claude, Anthropic\'s frontier AI, with a regulatory library encoding requirements across UK, EU, and US frameworks. Each finding references the relevant FCA rule or guidance. We recommend treating the output as a first-pass review to be validated by a qualified compliance professional, not a substitute for legal or regulatory advice.',
+    a: 'Regis uses Claude, Anthropic\'s frontier AI, with a regulatory library encoding requirements across UK, EU, and US frameworks. Each finding references the relevant regulatory rule or guidance. We recommend treating the output as a first-pass review to be validated by a qualified compliance professional, not a substitute for legal or regulatory advice.',
   },
   {
     q: 'Does Regis only find gaps, or does it help fix them?',
-    a: 'Both. For any finding, Regis can draft ready-to-review compliance-manual language that addresses the gap — written in a formal regulatory voice, scoped to your framework, and referencing the relevant FCA expectation. The draft is saved with the finding and exports with your report. Like all AI output, drafted language is a starting point to be reviewed and approved by a qualified compliance professional before it goes into your documentation.',
+    a: 'Both. For any finding, Regis can draft ready-to-review compliance-manual language that addresses the gap. The language is written in a formal regulatory voice, scoped to your framework, and referencing the relevant regulatory expectation. The draft is saved with the finding and exports with your report. Like all AI output, drafted language is a starting point to be reviewed and approved by a qualified compliance professional before it goes into your documentation.',
   },
   {
-    q: 'Is my document data secure and private?',
-    a: 'Your documents are stored in encrypted cloud storage with strict row-level security: only your account can access your data. No cross-user data access is possible by design. Documents are never used to train AI models. Each firm account is fully isolated in a true multi-tenant architecture.',
+    q: 'Is my document data secure? Where is it processed?',
+    a: 'Your compliance documents are processed and stored within the same regulatory region where your firm operates. UK data stays on UK infrastructure, EU data on EU infrastructure, and US data on US infrastructure. There is no cross-region transfer. Documents are never sent to third-party AI providers for training. Every firm account is fully isolated with strict data segregation. We can provide your auditor with documentation of exactly where your data is hosted and how it is processed.',
   },
   {
     q: 'Can multiple team members share an account?',
@@ -419,7 +419,7 @@ const DOCUMENT_TYPES = [
   { title: 'Compliance Manual', desc: 'Core policy document reviewed against FCA Handbook requirements and supervisory expectations.' },
   { title: 'Consumer Duty Documentation', desc: 'Policies covering customer outcomes, fair value assessments, and ongoing monitoring obligations.' },
   { title: 'Operational Resilience Policies', desc: 'Business services mapping, impact tolerances, and scenario testing documentation.' },
-  { title: 'Risk Management Frameworks', desc: 'Enterprise and operational risk policies mapped against FCA risk governance expectations.' },
+  { title: 'Risk Management Frameworks', desc: 'Enterprise and operational risk policies mapped against applicable risk governance expectations.' },
   { title: 'Governance Policies', desc: 'Board and senior management oversight documentation reviewed against SMCR obligations.' },
   { title: 'SMCR Documentation', desc: 'Statements of Responsibilities, Certification Regime records, and Conduct Rules training evidence.' },
   { title: 'Cyber Security Policies', desc: 'Security governance, incident response, and third-party technology risk documentation.' },
@@ -435,7 +435,7 @@ const FRAMEWORKS = [
   { title: 'SMCR', desc: 'Senior manager accountability, certification, and conduct rules.' },
   { title: 'Financial Crime Controls', desc: 'AML, sanctions, and financial crime prevention obligations.' },
   { title: 'Governance & Oversight', desc: 'Board governance, risk committees, and oversight frameworks.' },
-  { title: 'Risk Management', desc: 'Enterprise risk policies against FCA risk governance expectations.' },
+  { title: 'Risk Management', desc: 'Enterprise risk policies against applicable risk governance expectations.' },
   { title: 'Third-Party Risk', desc: 'Outsourcing controls, oversight, and supply chain risk obligations.' },
   { title: 'Cyber Security Governance', desc: 'Technology risk, cyber controls, and incident management policies.' },
   { title: 'Business Continuity', desc: 'BCP documentation, testing evidence, and recovery planning.' },
@@ -460,41 +460,41 @@ const EXAMPLE_FINDINGS = [
     level: 'MED',
     colorVar: '--amber',
     title: 'SMCR Accountability Mapping Incomplete',
-    desc: 'Senior management responsibilities are described but the accountability mapping is incomplete — several prescribed responsibilities lack named SMF holders.',
+    desc: 'Senior management responsibilities are described but the accountability mapping is incomplete . Several prescribed responsibilities lack named SMF holders.',
     remediation: 'Complete the responsibility mapping across all prescribed responsibilities, add governance approval workflow, and ensure SMF-holder sign-off is documented.',
   },
 ]
 
 const TRUST_PILLARS = [
   {
-    Icon: UsersIcon,
-    title: 'Human-in-the-Loop Review',
-    desc: 'AI findings support professional compliance judgment. Final decisions remain with your compliance team — Regis supports, not replaces, qualified professionals.',
-  },
-  {
-    Icon: GapIcon,
-    title: 'Source-Based Recommendations',
-    desc: 'Findings reference the relevant FCA rule, guidance, or supervisory expectation — not generic advice. Every recommendation has a regulatory anchor.',
-  },
-  {
-    Icon: DocIcon,
-    title: 'Audit Trails',
-    desc: 'Track document uploads, reviews, findings, status changes, edits, and user activity across every review cycle. Full attribution and timestamps.',
-  },
-  {
     Icon: LockIcon,
-    title: 'Secure Document Handling',
-    desc: 'Documents stored with encryption, role-based access controls, and strict data isolation. Your data is never accessible to other firms.',
+    title: 'Your Data Never Leaves Your Region',
+    desc: 'Every document you upload is processed and stored within the same regulatory region where your firm operates. UK data stays in UK infrastructure. EU data stays in EU infrastructure. US data stays in US infrastructure. There is no cross-region data transfer by design.',
   },
   {
     Icon: ShieldIcon,
-    title: 'Role-Based Access Controls',
-    desc: 'Manage who can upload, review, approve, and export within your organisation. Designed for multi-user compliance team workflows.',
+    title: 'You Know Exactly Where the AI Runs',
+    desc: 'Unlike using a third-party LLM directly, Regis operates its own AI engine hosted on auditable infrastructure. We can tell you precisely where your compliance documents are processed, which models are used, and how outputs are generated. No data is sent to external AI providers for training.',
+  },
+  {
+    Icon: GapIcon,
+    title: 'We Practise What We Help You Prove',
+    desc: 'Regis itself is built to comply with the same standards we help you meet. Our platform architecture, data handling, audit trails, and access controls are designed so that using Regis does not create a compliance gap for your firm. If it would conflict with your obligations, we will tell you.',
+  },
+  {
+    Icon: DocIcon,
+    title: 'Full Audit Trail on Every Action',
+    desc: 'Every document upload, analysis run, finding, status change, policy draft, and review decision is logged with timestamps and user attribution. When your auditor asks what happened and when, you have the evidence ready.',
+  },
+  {
+    Icon: UsersIcon,
+    title: 'Human Review Is Not Optional',
+    desc: 'Every AI-generated finding requires sign-off by a qualified compliance professional before it becomes part of your compliance record. Regis supports your judgement with structured analysis. It never replaces it. The human-in-the-loop is a design principle, not a disclaimer.',
   },
   {
     Icon: CheckCircleIcon,
-    title: 'Enterprise Security',
-    desc: 'Designed for regulated environments with data residency, access governance, and multi-tenant isolation built in from the ground up.',
+    title: 'API Access for Your Existing Workflows',
+    desc: 'Regis provides documented APIs so your firm can integrate compliance checks into existing systems, GRC platforms, document management tools, and internal workflows. Upload documents, trigger analyses, retrieve findings, and export reports programmatically.',
   },
 ]
 
@@ -502,10 +502,10 @@ const TRUST_PILLARS = [
 
 function AuditMockup() {
   const findings = [
-    { level: 'HIGH', colorVar: '--red',   label: 'Consumer Duty Policy',    desc: 'Customer outcome monitoring metrics undefined — FCA PS22/9' },
-    { level: 'HIGH', colorVar: '--red',   label: 'SMCR Accountability',      desc: 'Statement of Responsibilities incomplete for SMF-16' },
-    { level: 'MED',  colorVar: '--amber', label: 'Operational Resilience',   desc: 'Impact tolerance thresholds not defined for critical services' },
-    { level: 'LOW',  colorVar: '--blue',  label: 'Business Continuity',      desc: 'Annual BCP testing schedule and evidence absent' },
+    { level: 'HIGH', colorVar: '--red',   label: 'Consumer Duty Alignment',  desc: 'Outcome monitoring framework not yet mapped to FCA PS22/9 expectations' },
+    { level: 'HIGH', colorVar: '--red',   label: 'Senior Manager Accountability', desc: 'Statement of Responsibilities requires review for prescribed roles' },
+    { level: 'MED',  colorVar: '--amber', label: 'Operational Resilience',    desc: 'Impact tolerance thresholds to be defined for important business services' },
+    { level: 'LOW',  colorVar: '--blue',  label: 'Business Continuity',       desc: 'Annual testing schedule and supporting evidence to be documented' },
   ]
 
   return (
@@ -515,24 +515,24 @@ function AuditMockup() {
         <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
         <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
         <div className="flex-1 mx-3 px-3 py-1 font-mono text-xs" style={{ backgroundColor: 'var(--bg-2)', color: 'var(--ink-3)', border: '1px solid var(--rule)', borderRadius: 2 }}>
-          regis.ai/audit/meridian-fca-review
+          regis.ai/demo/sample-review
         </div>
       </div>
       <div className="p-5">
         <div className="mb-4">
           <p className="font-mono text-xs tracking-widest uppercase mb-1" style={{ color: 'var(--ink-3)' }}>
-            Gap Analysis · FCA · UK
+            Demo Review · FCA · UK
           </p>
-          <h3 className="font-serif text-lg font-bold" style={{ color: 'var(--ink)' }}>Meridian Wealth Advisers Ltd</h3>
+          <h3 className="font-serif text-lg font-bold" style={{ color: 'var(--ink)' }}>Example Financial Services Ltd</h3>
           <p className="text-xs mt-0.5" style={{ color: 'var(--ink-3)' }}>
-            Compliance Manual · June 2026 · 4 potential gaps identified
+            Sample compliance review · Synthetic data · Not a real firm
           </p>
         </div>
         <div className="space-y-2">
           {findings.map((f, i) => (
-            <div key={i} className="flex gap-3 p-3" style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--rule)' }}>
+            <div key={i} className="flex items-start gap-3 p-3" style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--rule)' }}>
               <span
-                className="mt-0.5 font-mono text-xs font-bold shrink-0 px-1.5 py-0.5"
+                className="font-mono text-xs font-bold shrink-0 px-1.5 py-0.5 mt-[2px] text-center min-w-[40px]"
                 style={{
                   color: `var(${f.colorVar})`,
                   backgroundColor: `color-mix(in srgb, var(${f.colorVar}) 9%, transparent)`,
@@ -541,15 +541,15 @@ function AuditMockup() {
               >
                 {f.level}
               </span>
-              <div>
-                <p className="text-sm font-medium" style={{ color: 'var(--ink)' }}>{f.label}</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--ink-3)' }}>{f.desc}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-medium leading-snug" style={{ color: 'var(--ink)' }}>{f.label}</p>
+                <p className="text-xs mt-0.5 leading-snug" style={{ color: 'var(--ink-3)' }}>{f.desc}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="mt-4 pt-4 border-t flex items-center justify-between" style={{ borderColor: 'var(--rule)' }}>
-          <span className="font-mono text-xs" style={{ color: 'var(--ink-3)' }}>4 findings · 2 priority actions</span>
+          <span className="font-mono text-xs" style={{ color: 'var(--ink-3)' }}>4 illustrative findings · Sample data only</span>
           <div className="flex items-center gap-2">
             <span className="text-xs px-3 py-1 font-medium" style={{ border: '1px solid var(--rule)', color: 'var(--ink-2)' }}>
               Draft Policy
@@ -601,10 +601,10 @@ function LandingNav() {
             </a>
           ))}
           <Link
-            href="/login"
+            href="/get-started"
             className="text-sm px-4 py-3 font-medium bg-bg text-green hover:bg-green-tint transition-colors hidden md:inline-block"
           >
-            Request Access
+            Get Started
           </Link>
           {/* Mobile hamburger */}
           <button
@@ -651,11 +651,11 @@ function LandingNav() {
             </a>
           ))}
           <Link
-            href="/login"
+            href="/get-started"
             onClick={() => setMenuOpen(false)}
             className="mt-4 text-sm px-4 py-3 font-medium bg-bg text-green hover:bg-green-tint transition-colors text-center"
           >
-            Request Access
+            Get Started
           </Link>
         </div>
       </div>
@@ -665,7 +665,15 @@ function LandingNav() {
 
 function Hero() {
   return (
-    <section className="relative min-h-[100dvh] flex flex-col justify-center bg-green pt-16 overflow-hidden">
+    <section
+      className="relative min-h-[100dvh] flex flex-col justify-center bg-green pt-16 overflow-hidden"
+      style={{ backgroundImage: 'url(/images/hero-dark.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'linear-gradient(135deg, rgba(26,58,42,0.92), rgba(26,58,42,0.85))' }}
+      />
       <div
         aria-hidden="true"
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
@@ -677,31 +685,32 @@ function Hero() {
       <div className="max-w-content mx-auto px-6 py-24 grid md:grid-cols-[1fr_1.1fr] gap-16 items-center relative">
         <div>
           <p className="font-mono text-xs tracking-widest uppercase mb-6 text-green-tint opacity-60">
-            FCA Compliance Review Platform
+            Compliance Intelligence Platform
           </p>
           <h1 className="font-serif text-5xl md:text-6xl leading-[1.06] mb-6 text-bg">
-            AI-Assisted FCA Compliance Reviews for{' '}
-            <em className="not-italic text-gold">UK Financial Firms</em>
+            Turn complex compliance reviews into{' '}
+            <em className="not-italic text-gold">clear, defensible risk guidance</em>
           </h1>
           <p className="text-lg leading-relaxed mb-10 text-green-tint" style={{ opacity: 0.82 }}>
-            Upload policies, procedures, governance documents, and compliance manuals.
-            Regis AI helps identify potential compliance gaps, suggest remediation actions,
-            and generate audit-ready review reports.
+            Regis AI helps compliance teams review internal policies, assess regulatory obligations,
+            and produce structured, audit-ready findings with human oversight built in.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 mt-10">
             <Link
               href="/demo/clearview"
               className="px-6 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
             >
-              Run Sample FCA Review
+              Try a Live Demo
             </Link>
-            <span className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint opacity-60 cursor-not-allowed select-none">
-              Book a Demo
-              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green-2 text-bg px-1.5 py-0.5 leading-none">Soon</span>
-            </span>
+            <Link
+              href="/get-started"
+              className="px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2/20 transition-colors"
+            >
+              Get Started
+            </Link>
           </div>
-          <p className="mt-6 text-xs text-green-tint" style={{ opacity: 0.6 }}>
-            No credit card required · Design partner access only
+          <p className="mt-6 text-xs text-green-tint" style={{ opacity: 0.5 }}>
+            Not a chatbot. A specialist compliance decision-support layer.
           </p>
         </div>
         <div className="relative hidden md:block">
@@ -713,9 +722,42 @@ function Hero() {
           />
         </div>
       </div>
-      <div aria-hidden="true" className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
+      <div aria-hidden="true" className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-40 animate-gentle-bounce">
         <span className="font-mono text-xs text-green-tint tracking-widest uppercase">Scroll</span>
-        <span className="text-green-tint text-lg">↓</span>
+        <span className="text-green-tint text-lg leading-none">↓</span>
+      </div>
+    </section>
+  )
+}
+
+function VideoShowcase() {
+  return (
+    <section className="py-20 border-t border-rule" style={{ backgroundColor: '#ede7d9' }}>
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        <Reveal>
+          <h2 className="font-serif text-4xl text-ink mb-4">See Regis in Action</h2>
+          <p className="text-base mb-10" style={{ color: 'var(--ink-3)' }}>
+            A 45-second overview of how AI-powered compliance review works
+          </p>
+        </Reveal>
+        <Reveal delay={100}>
+          <div
+            className="relative rounded overflow-hidden shadow-xl border border-rule mx-auto"
+            style={{ aspectRatio: '16 / 9' }}
+          >
+            <video
+              controls
+              poster="/images/hero-finance.jpg"
+              src="/video/regis-promo.mp4"
+              className="w-full h-full object-cover"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <p className="mt-6 text-xs" style={{ color: 'var(--ink-3)' }}>
+            No credit card required · Select your region to get started
+          </p>
+        </Reveal>
       </div>
     </section>
   )
@@ -733,7 +775,7 @@ function Problem() {
             Compliance is still a manual, expensive, error-prone process.
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Even well-resourced compliance teams miss documentation gaps. The FCA regulatory surface area is too large to review manually — and it grows every year.
+            Even well-resourced compliance teams miss documentation gaps. The regulatory surface area across FCA, EU, and US frameworks is too large to review manually, and it grows every year.
           </p>
         </Reveal>
 
@@ -760,7 +802,7 @@ function Problem() {
         <Reveal delay={200}>
           <div className="p-8 border border-green bg-green-tint">
             <p className="font-serif text-xl italic text-green">
-              "Regis doesn't replace your compliance team. It helps eliminate the risk of documentation gaps across FCA Handbook, Consumer Duty, Operational Resilience, and SMCR requirements — giving compliance professionals a structured review tool, not a substitute for professional judgment."
+              "Regis doesn't replace your compliance team. It helps eliminate the risk of documentation gaps across FCA Handbook, Consumer Duty, Operational Resilience, and SMCR requirements. It gives compliance professionals a structured review tool, not a substitute for professional judgment."
             </p>
           </div>
         </Reveal>
@@ -773,17 +815,28 @@ function Features() {
   return (
     <section
       id="features"
-      className="py-24 border-t border-rule bg-bg-2"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 700px' } as React.CSSProperties}
+      className="py-24 border-t border-rule bg-bg-2 relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(/images/section-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        contentVisibility: 'auto',
+        containIntrinsicSize: '0 700px',
+      } as React.CSSProperties}
     >
-      <div className="max-w-content mx-auto px-6">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'rgba(237, 231, 217, 0.94)' }}
+      />
+      <div className="max-w-content mx-auto px-6 relative">
         <Reveal>
           <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Capabilities</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
             Everything your compliance team needs in one platform.
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Built specifically for FCA-regulated financial firms — not a generic compliance checklist repurposed as software.
+            Purpose-built for regulated compliance teams. Starting with FCA-regulated financial services, with over 200 requirements across UK, EU, and US frameworks, and a modular architecture designed to grow with your regulatory landscape.
           </p>
         </Reveal>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -896,10 +949,10 @@ function UseCases() {
       <div className="max-w-content mx-auto px-6">
         <Reveal>
           <h2 className="font-serif text-4xl text-ink mb-4">
-            Built for <em className="not-italic text-gold">FCA-Regulated</em> Firms
+            Built for <em className="not-italic text-gold">Regulated Compliance Teams</em>
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Whether you're a solo compliance officer at a financial adviser or a compliance team at a large asset manager, Regis adapts to your firm type and regulatory context.
+            Purpose-built for FCA-regulated firms today, with a framework-led architecture designed to support additional regulatory regimes over time. Whether you are a solo compliance officer or a multi-team regulated business, Regis adapts to your context.
           </p>
         </Reveal>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1027,7 +1080,7 @@ function ExampleFindings() {
             Example FCA Review Findings
           </h2>
           <p className="text-base italic text-ink-3 max-w-2xl mb-16">
-            Illustrative examples — not drawn from real client data.
+            Illustrative examples. Not drawn from real client data.
           </p>
         </Reveal>
         <div className="grid md:grid-cols-3 gap-6">
@@ -1074,12 +1127,15 @@ function TrustSection() {
     >
       <div className="max-w-content mx-auto px-6">
         <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Responsible AI</p>
+          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Data Sovereignty and Trust</p>
           <h2 className="font-serif text-4xl text-ink mb-4">
-            Designed for Responsible Compliance Reviews
+            Why not just use an LLM directly?
           </h2>
+          <p className="text-base text-ink-2 max-w-2xl mb-6">
+            When your team uses a general-purpose AI provider, you cannot prove where your data went, how it was processed, or whether it was used for training. For a regulated firm, that is a compliance gap in itself.
+          </p>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Regis is built for regulated environments where accuracy, accountability, and security are non-negotiable.
+            Regis is different. We host our own AI engine on auditable, multi-region infrastructure. Your compliance documents are processed in the same jurisdiction where your firm operates. We can prove it to your auditor. Using Regis should never put your accreditation at risk; if it would, we will be the first to tell you.
           </p>
         </Reveal>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1149,7 +1205,7 @@ function FutureExpansion() {
             <em className="not-italic text-gold">Built to Expand.</em>
           </h2>
           <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Regis AI starts with UK financial services. The platform is designed to support future expansion into European and global regulatory frameworks — so the investment you make now scales with your firm.
+            Regis AI starts with UK financial services. The platform is designed to support future expansion into European and global regulatory frameworks, so the investment you make now scales with your firm.
           </p>
         </Reveal>
         <div className="grid md:grid-cols-3 gap-6">
@@ -1249,9 +1305,9 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
             </div>
           </div>
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-6 items-start">
+        <div className="grid md:grid-cols-3 gap-6 items-stretch">
           {PLANS.map((p, i) => (
-            <Reveal key={i} delay={i * 90}>
+            <Reveal key={i} delay={i * 90} className="flex flex-col">
               <div
                 className="border h-full flex flex-col"
                 style={{
@@ -1259,11 +1315,13 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
                   borderColor: p.highlight ? 'var(--green-2)' : 'var(--rule)',
                 }}
               >
-                {p.tag && (
-                  <div className="py-2 text-center" style={{ backgroundColor: 'var(--gold)' }}>
+                {/* Tag bar. all cards reserve the same height for it */}
+                <div className="h-[32px] flex items-center justify-center"
+                  style={{ backgroundColor: p.tag ? 'var(--gold)' : 'transparent' }}>
+                  {p.tag && (
                     <span className="font-mono text-xs tracking-widest uppercase text-white">{p.tag}</span>
-                  </div>
-                )}
+                  )}
+                </div>
                 <div className="p-8 flex-1 flex flex-col">
                   <p
                     className="font-mono text-xs tracking-widest uppercase mb-3"
@@ -1271,23 +1329,25 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
                   >
                     {p.name}
                   </p>
-                  <div className="flex items-baseline gap-1 mb-2">
-                    <span
-                      className="font-serif text-4xl font-bold"
-                      style={{ color: p.highlight ? 'var(--bg)' : 'var(--ink)' }}
-                    >
-                      {p.prices
-                        ? `${CURRENCY_SYMBOL[currency]}${p.prices[currency].toLocaleString()}`
-                        : 'Custom'}
-                    </span>
-                    {p.cadence && (
+                  <div className="min-h-[60px] flex items-end mb-2">
+                    <div className="flex items-baseline gap-1">
                       <span
-                        className="text-sm"
-                        style={{ color: p.highlight ? 'var(--green-tint)' : 'var(--ink-3)', opacity: p.highlight ? 0.7 : 1 }}
+                        className="font-serif text-4xl font-bold"
+                        style={{ color: p.highlight ? 'var(--bg)' : 'var(--ink)' }}
                       >
-                        {p.cadence}
+                        {p.prices
+                          ? `${CURRENCY_SYMBOL[currency]}${p.prices[currency].toLocaleString()}`
+                          : 'Custom'}
                       </span>
-                    )}
+                      {p.cadence && (
+                        <span
+                          className="text-sm"
+                          style={{ color: p.highlight ? 'var(--green-tint)' : 'var(--ink-3)', opacity: p.highlight ? 0.7 : 1 }}
+                        >
+                          {p.cadence}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p
                     className="text-sm mb-8"
@@ -1308,8 +1368,8 @@ function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
                     ))}
                   </ul>
                   <Link
-                    href="/login"
-                    className="block text-center py-3 px-4 text-sm font-medium transition-colors"
+                    href="/get-started"
+                    className="block text-center py-3 px-4 text-sm font-medium transition-colors mt-auto"
                     style={{
                       backgroundColor: p.highlight ? 'var(--bg)' : 'var(--green)',
                       color: p.highlight ? 'var(--green)' : 'var(--bg)',
@@ -1464,6 +1524,7 @@ export function LandingPage({ defaultCurrency = 'USD' }: { defaultCurrency?: Cur
       <LandingNav />
       <main id="main-content">
         <Hero />
+        <VideoShowcase />
         <Problem />
         <Features />
         <HowItWorks />

@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
 import type { Profile, FirmType, Regulator } from '@/types'
 
 const VALID_FIRM_TYPES: FirmType[] = ['RIA', 'Fintech', 'Insurance', 'Bank']
 const VALID_REGULATORS: Regulator[] = ['FINRA', 'SEC', 'State', 'Multiple']
 
-export async function PATCH(req: NextRequest): Promise<NextResponse> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
+  const userId = request.headers.get('x-user-id')
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   let body: { firm_name?: unknown; firm_type?: unknown; aum_range?: unknown; regulator?: unknown }
   try {
-    body = (await req.json()) as typeof body
+    body = (await request.json()) as typeof body
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
@@ -31,21 +27,17 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Invalid profile fields' }, { status: 400 })
   }
 
-  const { data: profile, error: updateError } = await supabase
-    .from('profiles')
-    .update({
-      firm_name: firm_name.trim(),
-      firm_type: firm_type as FirmType,
-      aum_range: aum_range.trim(),
-      regulator: regulator as Regulator,
-    })
-    .eq('id', user.id)
-    .select()
-    .single()
+  await db.updateProfile(userId, {
+    firm_name: firm_name.trim(),
+    firm_type: firm_type as FirmType,
+    aum_range: aum_range.trim(),
+    regulator: regulator as Regulator,
+  })
 
-  if (updateError || !profile) {
-    return NextResponse.json({ error: 'Update failed' }, { status: 500 })
+  const profile = await db.getProfile(userId)
+  if (!profile) {
+    return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
   }
 
-  return NextResponse.json(profile as Profile)
+  return NextResponse.json(profile as unknown as Profile)
 }

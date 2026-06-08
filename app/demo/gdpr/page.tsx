@@ -57,7 +57,7 @@ export default function GdprDemoPage() {
             </Link>
             <span className="text-ink-3 text-xs">/</span>
             <span className="font-mono text-xs tracking-widest uppercase text-ink-3">
-              GDPR Demo · Northwind Payments
+              GDPR Demo · Example Payments Co
             </span>
           </div>
 

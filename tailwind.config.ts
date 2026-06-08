@@ -49,6 +49,20 @@ const config: Config = {
       maxWidth: {
         content: '72rem',
       },
+      keyframes: {
+        'gentle-bounce': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(6px)' },
+        },
+        'shimmer': {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+      },
+      animation: {
+        'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
+        'shimmer': 'shimmer 1.5s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

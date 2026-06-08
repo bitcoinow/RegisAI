@@ -1,6 +1,7 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
 import { AuditReport } from '@/components/audit/audit-report'
 import type { ComparisonData } from '@/components/audit/audit-comparison'
 import { buildCoverageMatrix, computeDelta } from '@/lib/coverage'
@@ -16,9 +17,6 @@ import type {
 interface PageProps {
   params: Promise<{ id: string }>
 }
-
-const FINDING_COLUMNS =
-  'id, req_id, rule, requirement, policy_says, gap, risk, recommendation, status, drafted_policy, reviewed_by, reviewed_at, review_note'
 
 function mapFinding(raw: unknown, currentUser: { id: string; email?: string }): Finding {
   const f = raw as Record<string, unknown>
@@ -37,69 +35,50 @@ function mapFinding(raw: unknown, currentUser: { id: string; email?: string }): 
     reviewed_by: reviewedBy,
     reviewed_at: (f['reviewed_at'] as string | null) ?? null,
     review_note: (f['review_note'] as string | null) ?? null,
-    // RLS scopes audits to the owner, so the reviewer is almost always the
-    // current user — surface their email as the attribution label.
+    // RLS scoped by userId; reviewer label is surfaced when reviewer matches current user.
     reviewer_label: reviewedBy && reviewedBy === currentUser.id ? currentUser.email ?? null : null,
   }
 }
 
 export default async function AuditReportPage({ params }: PageProps) {
   const { id } = await params
-  const supabase = await createClient()
+  const hdrs = await headers()
+  const userId = hdrs.get('x-user-id')
+  if (!userId) redirect('/login')
+  const email = hdrs.get('x-user-email')
+  const currentUser = { id: userId, ...(email ? { email } : {}) }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) notFound()
-  const currentUser = { id: user.id, ...(user.email ? { email: user.email } : {}) }
-
-  const { data: row } = await supabase
-    .from('audits')
-    .select(
-      `id, firm_name, exec_summary, total_gaps, high_risk, medium_risk, low_risk,
-       strengths, priority_actions, created_at, document_id, jurisdiction, framework,
-       parent_audit_id, scan_number, compliance_score, requirements_total, requirements_met,
-       gaps_closed, gaps_new, gaps_persisting,
-       findings (${FINDING_COLUMNS})`
-    )
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .single()
-
+  const row = await db.getAudit(id, userId)
   if (!row) notFound()
 
-  const findings: Finding[] = ((row.findings as unknown[]) ?? []).map((raw) =>
+  const findings: Finding[] = (await db.getFindings(id)).map((raw) =>
     mapFinding(raw, currentUser)
   )
 
-  const jurisdiction = (((row as unknown as Record<string, unknown>)['jurisdiction'] as string) ??
-    'US') as Jurisdiction
-  const framework = ((row as unknown as Record<string, unknown>)['framework'] as
-    | RegulatoryFramework
-    | null) ?? null
+  const jurisdiction = (row.jurisdiction ?? 'US') as Jurisdiction
+  const framework = (row.framework as RegulatoryFramework | null) ?? null
 
   const audit: Audit = {
-    id: row.id as string,
-    document_id: row.document_id as string,
-    user_id: user.id,
+    id: row.id,
+    document_id: row.document_id,
+    user_id: userId,
     jurisdiction,
     framework,
-    firm_name: row.firm_name as string,
-    exec_summary: (row.exec_summary as string) ?? '',
-    total_gaps: (row.total_gaps as number) ?? 0,
-    high_risk: (row.high_risk as number) ?? 0,
-    medium_risk: (row.medium_risk as number) ?? 0,
-    low_risk: (row.low_risk as number) ?? 0,
-    strengths: (row.strengths as string[]) ?? [],
-    priority_actions: (row.priority_actions as string[]) ?? [],
+    firm_name: row.firm_name,
+    exec_summary: row.exec_summary ?? '',
+    total_gaps: row.total_gaps ?? 0,
+    high_risk: row.high_risk ?? 0,
+    medium_risk: row.medium_risk ?? 0,
+    low_risk: row.low_risk ?? 0,
+    strengths: row.strengths ?? [],
+    priority_actions: row.priority_actions ?? [],
     findings,
-    created_at: row.created_at as string,
-    parent_audit_id: (row.parent_audit_id as string | null) ?? null,
-    scan_number: (row.scan_number as number) ?? 1,
-    compliance_score: (row.compliance_score as number | null) ?? null,
-    requirements_total: (row.requirements_total as number | null) ?? null,
-    requirements_met: (row.requirements_met as number | null) ?? null,
+    created_at: row.created_at,
+    parent_audit_id: row.parent_audit_id ?? null,
+    scan_number: row.scan_number ?? 1,
+    compliance_score: row.compliance_score ?? null,
+    requirements_total: row.requirements_total ?? null,
+    requirements_met: row.requirements_met ?? null,
   }
 
   // ── Coverage matrix (every in-scope requirement, met or gap) ───────────────
@@ -107,32 +86,25 @@ export default async function AuditReportPage({ params }: PageProps) {
 
   // ── Re-scan comparison (only when this audit supersedes a prior one) ───────
   let comparison: ComparisonData | undefined
+
   if (audit.parent_audit_id) {
-    const { data: parentRow } = await supabase
-      .from('audits')
-      .select(
-        `id, created_at, compliance_score, high_risk, medium_risk, low_risk, total_gaps,
-         findings (${FINDING_COLUMNS})`
-      )
-      .eq('id', audit.parent_audit_id)
-      .eq('user_id', user.id)
-      .single()
+    const parentRow = await db.getAudit(audit.parent_audit_id, userId)
 
     if (parentRow) {
-      const parentFindings: Finding[] = ((parentRow.findings as unknown[]) ?? []).map((raw) =>
+      const parentFindings: Finding[] = (await db.getFindings(audit.parent_audit_id)).map((raw) =>
         mapFinding(raw, currentUser)
       )
       const delta = computeDelta(parentFindings, findings)
       comparison = {
         scanNumber: audit.scan_number ?? 2,
-        previousDate: parentRow.created_at as string,
-        previousScore: (parentRow.compliance_score as number | null) ?? null,
+        previousDate: parentRow.created_at,
+        previousScore: parentRow.compliance_score ?? null,
         currentScore: audit.compliance_score ?? null,
         previous: {
-          high: (parentRow.high_risk as number) ?? 0,
-          medium: (parentRow.medium_risk as number) ?? 0,
-          low: (parentRow.low_risk as number) ?? 0,
-          total: (parentRow.total_gaps as number) ?? 0,
+          high: parentRow.high_risk ?? 0,
+          medium: parentRow.medium_risk ?? 0,
+          low: parentRow.low_risk ?? 0,
+          total: parentRow.total_gaps ?? 0,
         },
         current: {
           high: audit.high_risk,
@@ -152,7 +124,7 @@ export default async function AuditReportPage({ params }: PageProps) {
   }
 
   return (
-    <>
+    <div style={{ viewTransitionName: `audit-${id}` }}>
       <div className="border-b border-rule bg-bg">
         <div className="max-w-content mx-auto px-6 py-3">
           <Link href="/dashboard" className="text-ink-3 text-xs font-mono hover:text-ink">
@@ -167,6 +139,6 @@ export default async function AuditReportPage({ params }: PageProps) {
         {...(framework ? { frameworkLabel: framework } : {})}
         rescanHref={`/audit/new?parent=${audit.id}`}
       />
-    </>
+    </div>
   )
 }

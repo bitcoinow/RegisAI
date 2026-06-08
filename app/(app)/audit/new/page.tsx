@@ -1,7 +1,9 @@
+import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import Link from 'next/link'
+import { db } from '@/lib/db'
 import { NewAuditForm } from '@/components/audit/new-audit-form'
 import { UploadForm } from '@/components/audit/upload-form'
-import { createClient } from '@/lib/supabase/server'
 import type { Jurisdiction, RegulatoryFramework } from '@/types'
 
 interface PageProps {
@@ -11,27 +13,21 @@ interface PageProps {
 export default async function NewAuditPage({ searchParams }: PageProps) {
   const { parent } = await searchParams
 
+  const hdrs = await headers()
+  const userId = hdrs.get('x-user-id')
+  const jurisdiction = (hdrs.get('x-jurisdiction') ?? 'UK') as Jurisdiction
+  if (!userId) redirect('/login')
+
   // ── Re-scan mode ──────────────────────────────────────────────────────────
   // When ?parent=<auditId> is present, lock the scope to the parent audit so the
   // re-scan delta is apples-to-apples, and tag the new audit as a re-scan.
   if (parent) {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    const { data: parentAudit } = user
-      ? await supabase
-          .from('audits')
-          .select('id, firm_name, jurisdiction, framework, scan_number')
-          .eq('id', parent)
-          .eq('user_id', user.id)
-          .single()
-      : { data: null }
+    const parentAudit = await db.getAudit(parent, userId)
 
     if (parentAudit) {
       const jurisdiction = (parentAudit.jurisdiction as Jurisdiction) ?? 'US'
       const framework = (parentAudit.framework as RegulatoryFramework | null) ?? null
-      const scanLabel = `Re-scan #${((parentAudit.scan_number as number) ?? 1) + 1}`
+      const scanLabel = `Re-scan #${(parentAudit.scan_number ?? 1) + 1}`
       return (
         <div className="max-w-content mx-auto px-6 py-10">
           <div className="mb-8">
@@ -55,7 +51,7 @@ export default async function NewAuditPage({ searchParams }: PageProps) {
             <UploadForm
               jurisdiction={jurisdiction}
               framework={framework}
-              parentAuditId={parentAudit.id as string}
+              parentAuditId={parentAudit.id}
             />
           </div>
         </div>
@@ -80,7 +76,7 @@ export default async function NewAuditPage({ searchParams }: PageProps) {
           risk-rated gaps, rule citations, and remediation recommendations.
         </p>
 
-        <NewAuditForm />
+        <NewAuditForm jurisdiction={jurisdiction} />
       </div>
     </div>
   )

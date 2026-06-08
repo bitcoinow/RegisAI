@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 import type { ApiError } from '@/types'
 
 export interface FeedResponse {
@@ -17,27 +17,20 @@ export interface FeedResponse {
   }[]
 }
 
-export async function GET(): Promise<NextResponse<FeedResponse | ApiError>> {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const userId = request.headers.get('x-user-id')
+  if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { data, error } = await supabase
-    .from('regulatory_updates')
-    .select('id, regulator, jurisdiction, title, summary, url, published_at, relevance_score, affected_rules, created_at')
-    .order('published_at', { ascending: false, nullsFirst: false })
-    .limit(500)
+  const { searchParams } = new URL(request.url)
+  const jurisdiction = searchParams.get('jurisdiction') ?? undefined
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  try {
+    const updates = await db.listRegulatoryUpdates(jurisdiction)
+    return NextResponse.json({ updates })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
-
-  return NextResponse.json({ updates: data ?? [] })
 }
