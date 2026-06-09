@@ -23,8 +23,8 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Regis — Compliance Operations',
-  description: 'AI-native compliance operations for financial services firms.',
+  title: 'Regis AI — UK Compliance Scenario & Policy Risk Engine',
+  description: 'AI-assisted compliance scenario risk assessment, policy gap analysis, and human review workflows for UK compliance, legal, risk, and governance teams.',
 }
 
 export default function RootLayout({

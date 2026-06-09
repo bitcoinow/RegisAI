@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode, type FormEvent, type ChangeEvent } from 'react'
 import Link from 'next/link'
 import { RegisLogo } from '@/components/ui/logo'
-import { CURRENCIES, CURRENCY_SYMBOL, type Currency } from '@/lib/currency'
 
 // ─── Scroll-triggered fade-in ─────────────────────────────────────────────────
 // Starts visible (SSR-safe: crawlers and prerenderers see full content).
@@ -12,7 +11,7 @@ import { CURRENCIES, CURRENCY_SYMBOL, type Currency } from '@/lib/currency'
 
 function useFadeIn(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(true) // SSR default: visible
+  const [visible, setVisible] = useState(true)
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -43,843 +42,431 @@ function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; 
   return <div ref={ref} style={style} className={className}>{children}</div>
 }
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
+// ─── Icons ────────────────────────────────────────────────────────────────────
 
-function GapIcon() {
+function ScenarioIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+      <line x1="9" y1="10" x2="15" y2="10" />
+      <line x1="9" y1="14" x2="13" y2="14" />
+    </svg>
+  )
+}
+
+function PolicyIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
       <polyline points="14 2 14 8 20 8" />
-      <line x1="9" y1="12" x2="15" y2="12" />
-      <line x1="9" y1="16" x2="13" y2="16" />
-      <circle cx="18.5" cy="18.5" r="2.5" />
-      <line x1="20.5" y1="20.5" x2="22" y2="22" />
+      <polyline points="9 15 11 17 15 13" />
     </svg>
   )
 }
 
-function BellIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 01-3.46 0" />
-    </svg>
-  )
-}
-
-function GlobeIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 3c-4.97 5.5-4.97 12.5 0 18M12 3c4.97 5.5 4.97 12.5 0 18M3 12h18" />
-    </svg>
-  )
-}
-
-function BuildingIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  )
-}
-
-function DocIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="8" y1="13" x2="16" y2="13" />
-      <line x1="8" y1="17" x2="13" y2="17" />
-    </svg>
-  )
-}
-
-function DraftIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4z" />
-    </svg>
-  )
-}
-
-function ShieldIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  )
-}
-
-function CheckCircleIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-  )
-}
-
-function LockIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0110 0v4" />
-    </svg>
-  )
-}
-
-function UsersIcon() {
+function ReviewIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
       <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
       <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 00-3-3.87" />
-      <path d="M16 3.13a4 4 0 010 7.75" />
+      <polyline points="16 11 18 13 22 9" />
     </svg>
   )
 }
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-
-const PAINS = [
-  {
-    stat: '£50K+',
-    label: 'Avg. annual compliance advisory spend',
-    desc: 'What a typical FCA-regulated firm pays for external compliance support per year — before supervisory review preparation begins.',
-  },
-  {
-    stat: '4–8 wks',
-    label: 'Avg. FCA review preparation time',
-    desc: 'Teams manually cross-referencing policy documents against FCA Handbook obligations, Consumer Duty requirements, and SMCR accountability mapping.',
-  },
-  {
-    stat: '1 in 3',
-    label: 'Firms cite documentation gaps as a key risk',
-    desc: 'FCA-regulated firms consistently flag documentation gaps as a key examination risk — particularly in Consumer Duty implementation and SMCR accountability.',
-  },
-]
-
-const FEATURES = [
-  {
-    Icon: GapIcon,
-    title: 'AI-Powered Gap Analysis',
-    benefit: 'Surface potential gaps in minutes, not weeks',
-    desc: 'Upload your compliance document. Regis maps it against applicable FCA expectations and returns a prioritised list of potential gaps with regulatory context and remediation guidance.',
-  },
-  {
-    Icon: DraftIcon,
-    title: 'Automated Policy Drafting',
-    benefit: 'Support the fix, not just the finding',
-    desc: 'For any finding, Regis drafts ready-to-review compliance-manual language — written in a formal regulatory voice, scoped to your framework, and referencing the relevant FCA expectation.',
-  },
-  {
-    Icon: BellIcon,
-    title: 'Real-Time Regulatory Monitoring',
-    benefit: 'Stay current without reading every FCA publication',
-    desc: 'Regis monitors FCA, PRA, and Bank of England publications. When something relevant to your firm type is published, it surfaces in your regulatory feed, scored by relevance.',
-  },
-  {
-    Icon: GlobeIcon,
-    title: 'FCA Framework Coverage',
-    benefit: 'Core UK frameworks in one platform',
-    desc: 'Maps your documentation against FCA Handbook, Consumer Duty, Operational Resilience, and SMCR requirements. EU and US frameworks available for cross-border regulated firms.',
-  },
-  {
-    Icon: BuildingIcon,
-    title: 'Firm-Specific Context',
-    benefit: 'Every review calibrated to your firm type',
-    desc: 'Regis understands your firm type — financial adviser, wealth manager, insurance broker, or fintech. Every analysis is scoped to what actually applies to your firm.',
-  },
-  {
-    Icon: DocIcon,
-    title: 'Review-Ready Reports',
-    benefit: 'Walk into supervisory meetings prepared',
-    desc: 'Every analysis generates a structured report: potential gaps, severity ratings, regulatory context, and a prioritised action plan — ready to share with your board or compliance committee.',
-  },
-]
-
-const STEPS = [
-  {
-    n: '01',
-    title: 'Upload Documents',
-    desc: 'Drop in any PDF: compliance manual, Consumer Duty policy, SMCR documentation, or operational resilience plan. Regis extracts the full text and prepares it for analysis.',
-  },
-  {
-    n: '02',
-    title: 'Select Review Framework',
-    desc: 'Choose from FCA Handbook, Consumer Duty, Operational Resilience, or SMCR. Regis scopes the analysis to the framework most relevant to your firm.',
-  },
-  {
-    n: '03',
-    title: 'AI Maps Content Against FCA Expectations',
-    desc: 'Regis applies the relevant FCA requirements, cites specific rules and guidance, and scores each potential finding by risk level.',
-  },
-  {
-    n: '04',
-    title: 'Review Findings and Recommendations',
-    desc: 'Your prioritised findings list is ready in minutes. Review potential gaps, assign findings, draft remediation language, and track resolution progress.',
-  },
-  {
-    n: '05',
-    title: 'Export Audit-Ready Report',
-    desc: 'Download a structured review report with all findings, recommendations, and an action plan — ready to share with your compliance committee or board.',
-  },
-]
-
-const USE_CASES = [
-  {
-    type: 'Financial Advisers',
-    headline: 'Financial Advisers',
-    items: [
-      'Review suitability policies and client communication procedures',
-      'Map Consumer Duty documentation against FCA requirements',
-      'Prepare for FCA supervisory reviews and thematic work',
-      'Identify gaps in client outcome monitoring evidence',
-    ],
-    quote: null as string | null,
-    who: null as string | null,
-  },
-  {
-    type: 'Wealth Management',
-    headline: 'Wealth Management Firms',
-    items: [
-      'Review investment governance and conflict of interest policies',
-      'Map SMCR accountability against senior management responsibilities',
-      'Assess client reporting documentation against FCA expectations',
-      'Review operational resilience for critical business services',
-    ],
-    quote: null as string | null,
-    who: null as string | null,
-  },
-  {
-    type: 'Insurance',
-    headline: 'Insurance Brokers',
-    items: [
-      'Review product governance documentation against FCA requirements',
-      'Map customer fair treatment evidence against Consumer Duty',
-      'Assess claims handling and complaints procedures',
-      'Review third-party and outsourcing arrangements',
-    ],
-    quote: null as string | null,
-    who: null as string | null,
-  },
-  {
-    type: 'Fintech',
-    headline: 'Fintech Companies',
-    items: [
-      'Map Consumer Duty obligations against product documentation',
-      'Review operational resilience and third-party risk frameworks',
-      'Assess financial crime controls against FCA expectations',
-      'Review cyber security governance documentation',
-    ],
-    quote: null as string | null,
-    who: null as string | null,
-  },
-  {
-    type: 'Compliance',
-    headline: 'Compliance Consultancies',
-    items: [
-      'Run structured gap reviews for multiple FCA-regulated clients',
-      'Generate structured review reports for client board packs',
-      'Track remediation progress across client portfolios',
-      'Stay current on FCA regulatory developments',
-    ],
-    quote: null as string | null,
-    who: null as string | null,
-  },
-  {
-    type: 'Asset Managers',
-    headline: 'Asset Managers',
-    items: [
-      'Review fund governance documentation against FCA requirements',
-      'Map SMCR accountability for senior management functions',
-      'Assess risk management frameworks against FCA expectations',
-      'Review operational resilience for critical business services',
-    ],
-    quote: null as string | null,
-    who: null as string | null,
-  },
-]
-
-const TESTIMONIALS = [
-  {
-    quote: 'Regis found three critical gaps in our compliance manual before our FCA supervisory visit. The reviewers covered those exact sections — and found nothing flagged. I can\'t put a number on what that was worth.',
-    name: 'Sarah Chen',
-    role: 'Chief Compliance Officer',
-    firm: 'Meridian Wealth Partners',
-    meta: 'FCA-regulated · Wealth Management',
-  },
-  {
-    quote: 'We cut our quarterly compliance review from two weeks to two days. Our analyst went from manual cross-referencing to validating Regis\'s output. That\'s the right use of human judgment.',
-    name: 'James O\'Brien',
-    role: 'Head of Compliance',
-    firm: 'NorthStar Capital Management',
-    meta: 'FCA-regulated · Asset Manager',
-  },
-  {
-    quote: 'The regulatory monitoring alone is worth the subscription. We caught FCA publications on Consumer Duty implementation before our legal team had flagged them. Regis reduces compliance anxiety significantly.',
-    name: 'Dr. Petra Zimmermann',
-    role: 'Chief Compliance Officer',
-    firm: 'Alten Asset Management',
-    meta: 'FCA & BaFin regulated · £1.1B AUM',
-  },
-]
-
-const PLANS = [
-  {
-    name: 'Starter',
-    prices: { USD: 299, EUR: 279, GBP: 249 } as Record<Currency, number>,
-    cadence: '/month',
-    tag: null,
-    desc: 'For independent financial advisers and small compliance teams running FCA document reviews.',
-    features: [
-      '1 user seat',
-      '5 document reviews per month',
-      'UK frameworks (FCA Handbook, Consumer Duty, SMCR)',
-      'Real-time regulatory monitoring',
-      'Downloadable review reports',
-      'Email support',
-    ],
-    cta: 'Request Access',
-    highlight: false,
-  },
-  {
-    name: 'Professional',
-    prices: { USD: 799, EUR: 749, GBP: 699 } as Record<Currency, number>,
-    cadence: '/month',
-    tag: 'Most popular',
-    desc: 'For growing FCA-regulated firms and consultants managing multiple documents and review cycles.',
-    features: [
-      '3 user seats',
-      'Unlimited reviews',
-      'UK + EU + US frameworks (85 requirements)',
-      'Priority monitoring with relevance scoring',
-      'All export formats incl. print-ready PDF',
-      'Slack & email regulatory alerts',
-      'Priority support',
-    ],
-    cta: 'Request Access',
-    highlight: true,
-  },
-  {
-    name: 'Enterprise',
-    prices: null,
-    cadence: '',
-    tag: null,
-    desc: 'For larger regulated firms requiring team access, audit trails, custom workflows, and deployment options.',
-    features: [
-      'Unlimited user seats',
-      'Unlimited reviews across entities',
-      'API access for workflow integration',
-      'Custom regulatory framework additions',
-      'SSO / SAML 2.0',
-      'Dedicated customer success manager',
-      'SLA-backed uptime guarantee',
-    ],
-    cta: 'Contact Sales',
-    highlight: false,
-  },
-]
-
-const FAQS = [
-  {
-    q: 'Can I see the product before signing up?',
-    a: 'Yes — a live demo is available right now, no account required. The Clearview Capital demo shows a full gap review across multiple compliance requirements. It demonstrates the complete workflow — upload, analysis, findings, remediation drafts, and review trail — which works identically for FCA-framework reviews.',
-  },
-  {
-    q: 'Which document types does Regis support?',
-    a: 'Regis currently supports PDF documents. This covers compliance manuals, Consumer Duty policies, SMCR documentation, operational resilience plans, business continuity plans, cybersecurity policies, and any other compliance document in PDF format. DOCX support is on the roadmap.',
-  },
-  {
-    q: 'How accurate is the gap analysis?',
-    a: 'Regis uses Claude, Anthropic\'s frontier AI, with a regulatory library encoding requirements across UK, EU, and US frameworks. Each finding references the relevant FCA rule or guidance. We recommend treating the output as a first-pass review to be validated by a qualified compliance professional, not a substitute for legal or regulatory advice.',
-  },
-  {
-    q: 'Does Regis only find gaps, or does it help fix them?',
-    a: 'Both. For any finding, Regis can draft ready-to-review compliance-manual language that addresses the gap — written in a formal regulatory voice, scoped to your framework, and referencing the relevant FCA expectation. The draft is saved with the finding and exports with your report. Like all AI output, drafted language is a starting point to be reviewed and approved by a qualified compliance professional before it goes into your documentation.',
-  },
-  {
-    q: 'Is my document data secure and private?',
-    a: 'Your documents are stored in encrypted cloud storage with strict row-level security: only your account can access your data. No cross-user data access is possible by design. Documents are never used to train AI models. Each firm account is fully isolated in a true multi-tenant architecture.',
-  },
-  {
-    q: 'Can multiple team members share an account?',
-    a: 'Yes. Professional and Enterprise plans support multiple user seats with shared access to the firm\'s review history and profile. Role-based access controls (Admin, Editor, Viewer) are on the roadmap for later this year.',
-  },
-  {
-    q: 'What if my regulatory framework isn\'t covered?',
-    a: 'Reach out. We expand our regulatory libraries based on design partner feedback. If you\'re in a jurisdiction or sector we don\'t yet cover, we can often add frameworks within 4–6 weeks. Enterprise customers get custom framework additions as part of their plan.',
-  },
-]
-
-const DOCUMENT_TYPES = [
-  { title: 'Compliance Manual', desc: 'Core policy document reviewed against FCA Handbook requirements and supervisory expectations.' },
-  { title: 'Consumer Duty Documentation', desc: 'Policies covering customer outcomes, fair value assessments, and ongoing monitoring obligations.' },
-  { title: 'Operational Resilience Policies', desc: 'Business services mapping, impact tolerances, and scenario testing documentation.' },
-  { title: 'Risk Management Frameworks', desc: 'Enterprise and operational risk policies mapped against FCA risk governance expectations.' },
-  { title: 'Governance Policies', desc: 'Board and senior management oversight documentation reviewed against SMCR obligations.' },
-  { title: 'SMCR Documentation', desc: 'Statements of Responsibilities, Certification Regime records, and Conduct Rules training evidence.' },
-  { title: 'Cyber Security Policies', desc: 'Security governance, incident response, and third-party technology risk documentation.' },
-  { title: 'Business Continuity Plans', desc: 'Recovery time objectives, testing schedules, and crisis communication procedures.' },
-  { title: 'Third-Party Risk Policies', desc: 'Outsourcing policies, supplier due diligence, and critical third-party oversight frameworks.' },
-  { title: 'Incident Response Procedures', desc: 'Regulatory notification timelines, escalation procedures, and post-incident review processes.' },
-]
-
-const FRAMEWORKS = [
-  { title: 'FCA Handbook', desc: 'Core FCA rules and guidance mapped against your documentation.' },
-  { title: 'Consumer Duty', desc: 'PS22/9 customer outcome and fair value obligations.' },
-  { title: 'Operational Resilience', desc: 'Critical services, impact tolerances, and scenario testing.' },
-  { title: 'SMCR', desc: 'Senior manager accountability, certification, and conduct rules.' },
-  { title: 'Financial Crime Controls', desc: 'AML, sanctions, and financial crime prevention obligations.' },
-  { title: 'Governance & Oversight', desc: 'Board governance, risk committees, and oversight frameworks.' },
-  { title: 'Risk Management', desc: 'Enterprise risk policies against FCA risk governance expectations.' },
-  { title: 'Third-Party Risk', desc: 'Outsourcing controls, oversight, and supply chain risk obligations.' },
-  { title: 'Cyber Security Governance', desc: 'Technology risk, cyber controls, and incident management policies.' },
-  { title: 'Business Continuity', desc: 'BCP documentation, testing evidence, and recovery planning.' },
-]
-
-const EXAMPLE_FINDINGS = [
-  {
-    level: 'HIGH',
-    colorVar: '--red',
-    title: 'Consumer Duty Monitoring Evidence Missing',
-    desc: 'The policy references Consumer Duty obligations but does not define measurable customer outcome monitoring, KPIs, or governance ownership.',
-    remediation: 'Add customer outcome monitoring procedures, measurable KPIs, reporting frequency, and named governance ownership to the Consumer Duty policy.',
-  },
-  {
-    level: 'MED',
-    colorVar: '--amber',
-    title: 'Operational Resilience Impact Tolerances Not Defined',
-    desc: 'The document references operational resilience requirements but does not define maximum tolerable disruption periods for critical business services.',
-    remediation: 'Define impact tolerance thresholds for each critical business service, including maximum tolerable disruption periods and escalation procedures.',
-  },
-  {
-    level: 'MED',
-    colorVar: '--amber',
-    title: 'SMCR Accountability Mapping Incomplete',
-    desc: 'Senior management responsibilities are described but the accountability mapping is incomplete — several prescribed responsibilities lack named SMF holders.',
-    remediation: 'Complete the responsibility mapping across all prescribed responsibilities, add governance approval workflow, and ensure SMF-holder sign-off is documented.',
-  },
-]
-
-const TRUST_PILLARS = [
-  {
-    Icon: UsersIcon,
-    title: 'Human-in-the-Loop Review',
-    desc: 'AI findings support professional compliance judgment. Final decisions remain with your compliance team — Regis supports, not replaces, qualified professionals.',
-  },
-  {
-    Icon: GapIcon,
-    title: 'Source-Based Recommendations',
-    desc: 'Findings reference the relevant FCA rule, guidance, or supervisory expectation — not generic advice. Every recommendation has a regulatory anchor.',
-  },
-  {
-    Icon: DocIcon,
-    title: 'Audit Trails',
-    desc: 'Track document uploads, reviews, findings, status changes, edits, and user activity across every review cycle. Full attribution and timestamps.',
-  },
-  {
-    Icon: LockIcon,
-    title: 'Secure Document Handling',
-    desc: 'Documents stored with encryption, role-based access controls, and strict data isolation. Your data is never accessible to other firms.',
-  },
-  {
-    Icon: ShieldIcon,
-    title: 'Role-Based Access Controls',
-    desc: 'Manage who can upload, review, approve, and export within your organisation. Designed for multi-user compliance team workflows.',
-  },
-  {
-    Icon: CheckCircleIcon,
-    title: 'Enterprise Security',
-    desc: 'Designed for regulated environments with data residency, access governance, and multi-tenant isolation built in from the ground up.',
-  },
-]
-
-// ─── Audit preview mockup ─────────────────────────────────────────────────────
-
-function AuditMockup() {
-  const findings = [
-    { level: 'HIGH', colorVar: '--red',   label: 'Consumer Duty Policy',    desc: 'Customer outcome monitoring metrics undefined — FCA PS22/9' },
-    { level: 'HIGH', colorVar: '--red',   label: 'SMCR Accountability',      desc: 'Statement of Responsibilities incomplete for SMF-16' },
-    { level: 'MED',  colorVar: '--amber', label: 'Operational Resilience',   desc: 'Impact tolerance thresholds not defined for critical services' },
-    { level: 'LOW',  colorVar: '--blue',  label: 'Business Continuity',      desc: 'Annual BCP testing schedule and evidence absent' },
-  ]
-
+function DashboardIcon() {
   return (
-    <div className="border shadow-2xl overflow-hidden" style={{ backgroundColor: 'var(--bg-2)', borderColor: 'rgba(255,255,255,0.12)' }}>
-      <div className="px-4 py-3 flex items-center gap-2" style={{ backgroundColor: 'var(--bg)', borderBottom: '1px solid var(--rule)' }}>
-        <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
-        <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
-        <span className="w-3 h-3 rounded-full bg-rule" aria-hidden="true" />
-        <div className="flex-1 mx-3 px-3 py-1 font-mono text-xs" style={{ backgroundColor: 'var(--bg-2)', color: 'var(--ink-3)', border: '1px solid var(--rule)', borderRadius: 2 }}>
-          regis.ai/audit/meridian-fca-review
-        </div>
-      </div>
-      <div className="p-5">
-        <div className="mb-4">
-          <p className="font-mono text-xs tracking-widest uppercase mb-1" style={{ color: 'var(--ink-3)' }}>
-            Gap Analysis · FCA · UK
-          </p>
-          <h3 className="font-serif text-lg font-bold" style={{ color: 'var(--ink)' }}>Meridian Wealth Advisers Ltd</h3>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--ink-3)' }}>
-            Compliance Manual · June 2026 · 4 potential gaps identified
-          </p>
-        </div>
-        <div className="space-y-2">
-          {findings.map((f, i) => (
-            <div key={i} className="flex gap-3 p-3" style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--rule)' }}>
-              <span
-                className="mt-0.5 font-mono text-xs font-bold shrink-0 px-1.5 py-0.5"
-                style={{
-                  color: `var(${f.colorVar})`,
-                  backgroundColor: `color-mix(in srgb, var(${f.colorVar}) 9%, transparent)`,
-                  border: `1px solid color-mix(in srgb, var(${f.colorVar}) 19%, transparent)`,
-                }}
-              >
-                {f.level}
-              </span>
-              <div>
-                <p className="text-sm font-medium" style={{ color: 'var(--ink)' }}>{f.label}</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--ink-3)' }}>{f.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 pt-4 border-t flex items-center justify-between" style={{ borderColor: 'var(--rule)' }}>
-          <span className="font-mono text-xs" style={{ color: 'var(--ink-3)' }}>4 findings · 2 priority actions</span>
-          <div className="flex items-center gap-2">
-            <span className="text-xs px-3 py-1 font-medium" style={{ border: '1px solid var(--rule)', color: 'var(--ink-2)' }}>
-              Draft Policy
-            </span>
-            <span className="text-xs px-3 py-1 font-medium" style={{ backgroundColor: 'var(--green)', color: 'var(--bg)' }}>
-              Export Report
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+    </svg>
   )
 }
 
-// ─── Sections ────────────────────────────────────────────────────────────────
+function AuditIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+      <polyline points="9 11 12 14 22 4" />
+      <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+    </svg>
+  )
+}
+
+function AlertIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+      <line x1="12" y1="9" x2="12" y2="13" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  )
+}
+
+function HamburgerIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  )
+}
+
+function CloseIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 shrink-0">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  )
+}
+
+// ─── LandingNav ───────────────────────────────────────────────────────────────
+
+const NAV_LINKS = [
+  { label: 'Features', href: '#features' },
+  { label: 'How it Works', href: '#how-it-works' },
+  { label: 'Use Cases', href: '#use-cases' },
+  { label: 'Request Access', href: '#access' },
+]
 
 function LandingNav() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', h, { passive: true })
-    h()
-    return () => window.removeEventListener('scroll', h)
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const navLinks = [
-    { href: '#features', label: 'Features' },
-    { href: '#how-it-works', label: 'How It Works' },
-    { href: '#pricing', label: 'Pricing' },
-  ]
+  const navBg = scrolled || menuOpen
+    ? 'bg-[--bg] border-b border-[--rule] shadow-sm'
+    : 'bg-transparent'
 
   return (
     <nav
-      aria-label="Site navigation"
-      className="fixed top-0 inset-x-0 z-50 transition-all duration-300"
-      style={{
-        backgroundColor: scrolled || menuOpen ? 'var(--green)' : 'transparent',
-        borderBottom: scrolled || menuOpen ? '1px solid var(--green-2)' : '1px solid transparent',
-      }}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${navBg}`}
+      aria-label="Main navigation"
     >
-      <div className="max-w-content mx-auto px-6 h-16 flex items-center justify-between">
-        <RegisLogo className="text-lg md:text-xl" light href="/" />
-        <div className="flex items-center gap-7">
-          {navLinks.map(({ href, label }) => (
-            <a key={href} href={href} className="text-sm hidden md:block text-green-tint hover:text-bg transition-colors">
-              {label}
+      <div className="max-w-6xl mx-auto px-4 md:px-6 flex items-center justify-between h-16">
+        <RegisLogo href="/" />
+
+        {/* Desktop links */}
+        <div className="hidden md:flex items-center gap-8">
+          {NAV_LINKS.map(l => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-sm text-[--ink-2] hover:text-[--ink] transition-colors"
+            >
+              {l.label}
             </a>
           ))}
+        </div>
+
+        <div className="hidden md:flex items-center gap-3">
           <Link
             href="/login"
-            className="text-sm px-4 py-3 font-medium bg-bg text-green hover:bg-green-tint transition-colors hidden md:inline-block"
+            className="text-sm text-[--ink-2] hover:text-[--ink] transition-colors px-3 py-1.5"
           >
-            Request Access
+            Sign in
           </Link>
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden flex flex-col justify-center items-center w-11 h-11 gap-[5px]"
-            onClick={() => setMenuOpen(m => !m)}
-            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-nav-menu"
+          <a
+            href="#access"
+            className="text-sm font-medium bg-[--green] text-[--bg] px-4 py-2 rounded hover:opacity-90 transition-opacity"
           >
-            <span
-              className="block w-5 h-px bg-green-tint transition-all duration-200 origin-center"
-              style={{ transform: menuOpen ? 'rotate(45deg) translateY(6px)' : 'none' }}
-            />
-            <span
-              className="block w-5 h-px bg-green-tint transition-all duration-200"
-              style={{ opacity: menuOpen ? 0 : 1 }}
-            />
-            <span
-              className="block w-5 h-px bg-green-tint transition-all duration-200 origin-center"
-              style={{ transform: menuOpen ? 'rotate(-45deg) translateY(-6px)' : 'none' }}
-            />
-          </button>
+            Request Early Access
+          </a>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen(v => !v)}
+          className="md:hidden p-2 text-[--ink-2] hover:text-[--ink] transition-colors"
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        >
+          {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
+        </button>
       </div>
 
       {/* Mobile menu */}
-      <div
-        id="mobile-nav-menu"
-        className="md:hidden overflow-hidden transition-all duration-300"
-        style={{
-          maxHeight: menuOpen ? '360px' : '0',
-          borderTop: menuOpen ? '1px solid var(--green-2)' : 'none',
-        }}
-      >
-        <div className="px-6 py-4 flex flex-col">
-          {navLinks.map(({ href, label }) => (
+      {menuOpen && (
+        <div className="md:hidden bg-[--bg] border-t border-[--rule] px-4 py-4 flex flex-col gap-1">
+          {NAV_LINKS.map(l => (
             <a
-              key={href}
-              href={href}
+              key={l.href}
+              href={l.href}
               onClick={() => setMenuOpen(false)}
-              className="text-sm py-3.5 text-green-tint hover:text-bg transition-colors border-b border-green-2 last:border-0"
+              className="py-3 text-sm text-[--ink-2] hover:text-[--ink] border-b border-[--rule] last:border-0 transition-colors"
             >
-              {label}
+              {l.label}
             </a>
           ))}
-          <Link
-            href="/login"
-            onClick={() => setMenuOpen(false)}
-            className="mt-4 text-sm px-4 py-3 font-medium bg-bg text-green hover:bg-green-tint transition-colors text-center"
-          >
-            Request Access
-          </Link>
+          <div className="pt-3 flex flex-col gap-2">
+            <Link
+              href="/login"
+              className="py-2.5 text-sm text-center text-[--ink-2] border border-[--rule] rounded hover:border-[--ink-3] transition-colors"
+            >
+              Sign in
+            </Link>
+            <a
+              href="#access"
+              onClick={() => setMenuOpen(false)}
+              className="py-2.5 text-sm text-center font-medium bg-[--green] text-[--bg] rounded hover:opacity-90 transition-opacity"
+            >
+              Request Early Access
+            </a>
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   )
 }
 
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
 function Hero() {
   return (
-    <section className="relative min-h-[100dvh] flex flex-col justify-center bg-green pt-16 overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, var(--bg) 1px, transparent 0)',
-          backgroundSize: '28px 28px',
-        }}
-      />
-      <div className="max-w-content mx-auto px-4 md:px-6 py-24 grid md:grid-cols-[1fr_1.1fr] gap-16 items-center relative">
-        <div>
-          <p className="font-mono text-xs tracking-widest uppercase mb-6 text-green-tint opacity-60">
-            FCA Compliance Review Platform
-          </p>
-          <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.06] mb-6 text-bg">
-            AI-Assisted FCA Compliance Reviews for{' '}
-            <em className="not-italic text-gold">UK Financial Firms</em>
-          </h1>
-          <p className="text-lg leading-relaxed mb-10 text-green-tint" style={{ opacity: 0.82 }}>
-            Upload policies, procedures, governance documents, and compliance manuals.
-            Regis AI helps identify potential compliance gaps, suggest remediation actions,
-            and generate audit-ready review reports.
-          </p>
-          <div className="flex flex-col xs:flex-row flex-wrap gap-3">
-            <Link
-              href="/demo/clearview"
-              className="min-h-[48px] w-full xs:w-auto flex items-center justify-center px-6 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
-            >
-              Run Sample FCA Review
-            </Link>
-            <span className="min-h-[48px] w-full xs:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium border border-green-2 text-green-tint opacity-60 cursor-not-allowed select-none">
-              Book a Demo
-              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green-2 text-bg px-1.5 py-0.5 leading-none">Soon</span>
-            </span>
+    <section className="bg-[--green] pt-28 pb-20 md:pt-36 md:pb-28 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div>
+            <Reveal>
+              <p className="font-mono text-xs uppercase tracking-widest text-[--gold] mb-5">
+                UK Compliance Intelligence Platform
+              </p>
+              <h1 className="font-serif text-4xl md:text-5xl xl:text-6xl text-[--bg] leading-tight mb-6">
+                Assess UK compliance risks before they become problems.
+              </h1>
+              <p className="text-base md:text-lg text-[--bg] opacity-75 leading-relaxed mb-8 max-w-lg">
+                Regis AI helps compliance, legal, risk, and governance teams analyse real-world business scenarios, review internal policies, identify potential gaps, and produce structured risk assessments with human oversight.
+              </p>
+              <div className="flex flex-col xs:flex-row gap-3 mb-5">
+                <Link
+                  href="/demo/gdpr"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[--gold] text-white font-medium text-sm rounded hover:opacity-90 transition-opacity"
+                >
+                  Analyse a Sample Scenario
+                </Link>
+                <a
+                  href="#access"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/30 text-[--bg] font-medium text-sm rounded hover:bg-white/10 transition-colors"
+                >
+                  Request Early Access
+                </a>
+              </div>
+              <p className="text-xs text-[--bg] opacity-45 max-w-sm leading-relaxed">
+                AI-assisted guidance only. Final decisions remain with authorised compliance, legal, or risk professionals.
+              </p>
+            </Reveal>
           </div>
-          <p className="mt-6 text-xs text-green-tint" style={{ opacity: 0.6 }}>
-            No credit card required · Design partner access only
-          </p>
+
+          {/* Scenario preview card */}
+          <Reveal delay={150} className="w-full lg:max-w-md lg:justify-self-end">
+            <div className="rounded border border-white/15 bg-white/5 p-6">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-[--gold] mb-4">
+                Sample scenario assessment
+              </p>
+              <p className="text-sm text-[--bg] opacity-85 leading-relaxed mb-5 pl-3 border-l-2 border-[--gold]">
+                A team member takes a prospective client to dinner during a pitch process. The client later asks for monthly benefits before approving the company as a vendor.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-[--bg] opacity-50">Risk level</span>
+                  <span className="font-mono text-[10px] font-bold text-red-300 bg-red-950/40 border border-red-700/30 px-2.5 py-1 rounded uppercase tracking-wider">
+                    ● Critical
+                  </span>
+                </div>
+                <div className="border-t border-white/10 pt-3">
+                  <p className="font-mono text-[10px] uppercase tracking-wider text-[--bg] opacity-50 mb-2">Risk areas</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Bribery', 'Gifts & Hospitality', 'Conflict of Interest', 'Reputational Risk'].map(tag => (
+                      <span
+                        key={tag}
+                        className="text-xs text-[--bg] opacity-75 border border-white/20 px-2 py-0.5 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-t border-white/10 pt-3 flex items-start gap-2 text-[--bg] opacity-75">
+                  <AlertIcon className="w-4 h-4 mt-0.5 shrink-0 text-red-300" />
+                  <p className="text-xs leading-relaxed">
+                    <span className="font-medium">Escalate to compliance/legal review.</span>{' '}
+                    Human review required before any response to client.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
-        <div className="relative hidden md:block">
-          <AuditMockup />
-          <div
-            aria-hidden="true"
-            className="absolute -inset-12 blur-3xl opacity-15 pointer-events-none rounded-full"
-            style={{ backgroundColor: 'var(--bg)' }}
-          />
-        </div>
-      </div>
-      <div aria-hidden="true" className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
-        <span className="font-mono text-xs text-green-tint tracking-widest uppercase">Scroll</span>
-        <span className="text-green-tint text-lg">↓</span>
       </div>
     </section>
   )
 }
+
+// ─── Problem ──────────────────────────────────────────────────────────────────
+
+const PROBLEMS = [
+  {
+    title: 'Grey-area decisions',
+    text: 'Real-world scenarios often require judgement, context, and escalation — not a simple yes or no answer.',
+  },
+  {
+    title: 'Inconsistent guidance',
+    text: 'Different teams may interpret the same risk differently without a structured, repeatable process.',
+  },
+  {
+    title: 'Weak audit trail',
+    text: 'Decisions often live in email threads, spreadsheets, or verbal conversations instead of a reviewable compliance record.',
+  },
+]
 
 function Problem() {
   return (
-    <section
-      className="py-24 border-t border-rule bg-bg"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
+    <section className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
         <Reveal>
-          <h2 className="font-serif text-2xl md:text-4xl text-ink mb-4">
-            Compliance is still a manual, expensive, error-prone process.
+          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">The problem</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-6 max-w-2xl leading-tight">
+            Compliance risk rarely arrives as a simple yes-or-no question.
           </h2>
-          <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Even well-resourced compliance teams miss documentation gaps. The FCA regulatory surface area is too large to review manually — and it grows every year.
+          <p className="text-[--ink-2] leading-relaxed mb-12 max-w-2xl">
+            Teams face practical situations where policy, law, and business pressure overlap. A client offers hospitality. A vendor has sanctions exposure. A policy is outdated. A business unit wants to know whether an activity is acceptable, risky, or requires escalation.
           </p>
         </Reveal>
-
-        {/* Asymmetric stat layout: one dominant figure + two supporting */}
-        <div className="grid md:grid-cols-[3fr_2fr] gap-0 border border-rule mb-12">
-          <Reveal className="p-10 border-b border-rule md:border-b-0 md:border-r">
-            <p className="font-serif font-bold text-green leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 8vw, 5rem)' }}>
-              {PAINS[0]?.stat}
-            </p>
-            <p className="text-xl font-medium text-ink mb-3">{PAINS[0]?.label}</p>
-            <p className="text-base leading-relaxed text-ink-2 max-w-md">{PAINS[0]?.desc}</p>
-          </Reveal>
-          <div className="flex flex-col">
-            {PAINS.slice(1).map((p, i) => (
-              <Reveal key={i} delay={i * 80} className={`p-8 flex-1 ${i === 0 ? 'border-b border-rule' : ''}`}>
-                <p className="font-serif text-4xl font-bold text-green leading-none mb-3">{p.stat}</p>
-                <p className="font-medium text-ink text-sm mb-1">{p.label}</p>
-                <p className="text-sm leading-relaxed text-ink-2">{p.desc}</p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-
-        <Reveal delay={200}>
-          <div className="p-8 border border-green bg-green-tint">
-            <p className="font-serif text-xl italic text-green">
-              "Regis doesn't replace your compliance team. It helps eliminate the risk of documentation gaps across FCA Handbook, Consumer Duty, Operational Resilience, and SMCR requirements — giving compliance professionals a structured review tool, not a substitute for professional judgment."
-            </p>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
-function Features() {
-  return (
-    <section
-      id="features"
-      className="py-24 border-t border-rule bg-bg-2"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 700px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Capabilities</p>
-          <h2 className="font-serif text-4xl text-ink mb-4">
-            Everything your compliance team needs in one platform.
-          </h2>
-          <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Built specifically for FCA-regulated financial firms — not a generic compliance checklist repurposed as software.
-          </p>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {FEATURES.map(({ Icon, title, benefit, desc }, i) => {
-            const featured = i === 0
-            return (
-              <Reveal key={i} delay={i * 70} className={featured ? 'lg:col-span-2' : ''}>
-                <div
-                  className={`border h-full transition-transform duration-200 hover:-translate-y-0.5 ${
-                    featured ? 'p-9 lg:flex lg:gap-10 items-start' : 'p-7'
-                  }`}
-                  style={{
-                    borderColor: featured ? 'var(--green-2)' : 'var(--rule)',
-                    backgroundColor: featured ? 'var(--green)' : 'var(--bg)',
-                  }}
-                >
-                  <div className={featured ? 'lg:shrink-0 mb-5 lg:mb-0 lg:pt-1' : ''}>
-                    <div
-                      className="w-10 h-10 flex items-center justify-center mb-5"
-                      style={{
-                        backgroundColor: featured ? 'var(--green-2)' : 'var(--green-tint)',
-                        color: featured ? 'var(--green-tint)' : 'var(--green)',
-                      }}
-                    >
-                      <Icon />
-                    </div>
-                  </div>
-                  <div>
-                    <p
-                      className="font-mono text-xs tracking-widest uppercase mb-2"
-                      style={{ color: featured ? 'var(--green-tint)' : 'var(--green)' }}
-                    >
-                      {benefit}
-                    </p>
-                    <h3
-                      className={`font-serif mb-3 ${featured ? 'text-2xl lg:text-3xl' : 'text-xl'}`}
-                      style={{ color: featured ? 'var(--bg)' : 'var(--ink)' }}
-                    >
-                      {title}
-                    </h3>
-                    <p
-                      className={`leading-relaxed ${featured ? 'text-base' : 'text-sm'}`}
-                      style={{
-                        color: featured ? 'var(--green-tint)' : 'var(--ink-2)',
-                        opacity: featured ? 0.85 : 1,
-                      }}
-                    >
-                      {desc}
-                    </p>
-                  </div>
-                </div>
-              </Reveal>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function HowItWorks() {
-  return (
-    <section
-      id="how-it-works"
-      className="py-24 border-t border-green-2 bg-green"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <h2 className="font-serif text-4xl text-bg mb-4">
-            From upload to review report in under 10 minutes.
-          </h2>
-          <p className="text-base text-green-tint max-w-2xl mb-16" style={{ opacity: 0.75 }}>
-            Upload your document, select the FCA framework, and get a structured gap review in minutes. No sales call, no implementation project, no lengthy setup.
-          </p>
-        </Reveal>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
-          {STEPS.map((s, i) => (
-            <Reveal key={i} delay={i * 90}>
-              <div className="relative border border-green-2 p-7 h-full" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}>
-                {i < STEPS.length - 1 && (
-                  <div aria-hidden="true" className="hidden lg:block absolute top-8 left-full w-5 h-px bg-green-2" style={{ zIndex: 1 }} />
-                )}
-                <p className="font-mono text-3xl font-bold text-gold mb-5">{s.n}</p>
-                <h3 className="font-serif text-lg text-bg mb-3">{s.title}</h3>
-                <p className="text-sm leading-relaxed text-green-tint" style={{ opacity: 0.72 }}>{s.desc}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {PROBLEMS.map((p, i) => (
+            <Reveal key={p.title} delay={i * 70}>
+              <div className="border border-[--rule] bg-[--bg] rounded p-6 h-full">
+                <h3 className="font-serif text-lg text-[--ink] mb-3">{p.title}</h3>
+                <p className="text-sm text-[--ink-2] leading-relaxed">{p.text}</p>
               </div>
             </Reveal>
           ))}
         </div>
-        <Reveal delay={400} className="mt-12 text-center">
+      </div>
+    </section>
+  )
+}
+
+// ─── What Regis Does ──────────────────────────────────────────────────────────
+
+const WHAT_REGIS_DOES = [
+  {
+    icon: <ScenarioIcon />,
+    title: 'Analyse business scenarios',
+    text: 'Enter a real-world scenario in plain English. Regis identifies key facts, missing information, risk categories, evidence needed, and next steps.',
+  },
+  {
+    icon: <PolicyIcon />,
+    title: 'Review internal policies',
+    text: 'Upload or paste policies such as anti-bribery, gifts and hospitality, sanctions, GDPR, HR, fraud, vendor onboarding, and conflict of interest policies.',
+  },
+  {
+    icon: <AuditIcon />,
+    title: 'Create review-ready outputs',
+    text: 'Generate structured assessments with risk ratings, rationale, escalation guidance, human review status, and exportable reports.',
+  },
+]
+
+function WhatRegisDoes() {
+  return (
+    <section id="features" className="bg-[--bg] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
+      <div className="max-w-6xl mx-auto">
+        <Reveal>
+          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">What Regis does</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-16 max-w-xl leading-tight">
+            From scenario to structured risk assessment.
+          </h2>
+        </Reveal>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {WHAT_REGIS_DOES.map((item, i) => (
+            <Reveal key={item.title} delay={i * 80}>
+              <div className="flex flex-col gap-4">
+                <div className="w-10 h-10 rounded border border-[--rule] bg-[--bg-2] flex items-center justify-center text-[--green]">
+                  {item.icon}
+                </div>
+                <h3 className="font-serif text-xl text-[--ink]">{item.title}</h3>
+                <p className="text-sm text-[--ink-2] leading-relaxed">{item.text}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── How It Works ─────────────────────────────────────────────────────────────
+
+const STEPS = [
+  {
+    num: '01',
+    title: 'Describe the scenario or upload a policy',
+    text: 'Enter a real-world business situation in plain English, or upload your internal policy document for gap analysis.',
+  },
+  {
+    num: '02',
+    title: 'Regis analyses against UK compliance expectations',
+    text: 'The AI identifies risk categories, potential gaps, missing information, relevant UK regulations, and required evidence.',
+  },
+  {
+    num: '03',
+    title: 'Review the draft risk assessment',
+    text: 'A structured draft output is generated with risk ratings, rationale, escalation guidance, and recommended next steps — all marked as AI-assisted and requiring human review.',
+  },
+  {
+    num: '04',
+    title: 'Approve, escalate, or close — with full audit trail',
+    text: 'Compliance reviewers edit, approve, reject, or escalate. Every action is timestamped and recorded in the audit history.',
+  },
+]
+
+function HowItWorks() {
+  return (
+    <section id="how-it-works" className="bg-[--green] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
+      <div className="max-w-6xl mx-auto">
+        <Reveal>
+          <p className="font-mono text-xs uppercase tracking-widest text-[--gold] mb-4">How it works</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--bg] mb-16 max-w-xl leading-tight">
+            A consistent, reviewable process for every compliance question.
+          </h2>
+        </Reveal>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10">
+          {STEPS.map((step, i) => (
+            <Reveal key={step.num} delay={i * 70}>
+              <div className="flex gap-5">
+                <span className="font-mono text-2xl font-bold text-[--gold] shrink-0 leading-none mt-1">
+                  {step.num}
+                </span>
+                <div>
+                  <h3 className="font-serif text-lg text-[--bg] mb-2">{step.title}</h3>
+                  <p className="text-sm text-[--bg] opacity-70 leading-relaxed">{step.text}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal delay={320} className="mt-12">
           <Link
-            href="/demo/clearview"
-            className="inline-block px-7 py-3.5 text-sm font-medium border border-green-2 text-green-tint hover:bg-green-2 transition-colors"
+            href="/demo/gdpr"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[--bg] border border-white/30 px-5 py-2.5 rounded hover:bg-white/10 transition-colors"
           >
-            See a sample review
+            See a sample review →
           </Link>
         </Reveal>
       </div>
@@ -887,561 +474,736 @@ function HowItWorks() {
   )
 }
 
-function UseCases() {
+// ─── Core MVP Modules ─────────────────────────────────────────────────────────
+
+const MODULES = [
+  {
+    icon: <ScenarioIcon />,
+    title: 'Scenario Risk Analyzer',
+    text: 'Analyse grey-area scenarios involving bribery, hospitality, sanctions, data protection, HR, fraud, vendor onboarding, and reputational risk.',
+    status: 'planned' as const,
+  },
+  {
+    icon: <PolicyIcon />,
+    title: 'Policy Gap Analyzer',
+    text: 'Review internal policies against UK compliance expectations and identify missing clauses, weak wording, outdated language, and priority actions.',
+    status: 'live' as const,
+  },
+  {
+    icon: <ReviewIcon />,
+    title: 'Human Review Workflow',
+    text: 'Mark AI outputs as draft, review findings, edit recommendations, approve, reject, escalate, and close assessments.',
+    status: 'live' as const,
+  },
+  {
+    icon: <DashboardIcon />,
+    title: 'Compliance Dashboard',
+    text: 'Track open assessments, high-risk cases, pending reviews, policy gaps, recent activity, and risk by category.',
+    status: 'live' as const,
+  },
+  {
+    icon: <AuditIcon />,
+    title: 'Audit Trail & Reporting',
+    text: 'Maintain a record of user inputs, AI outputs, reviewer edits, decisions, timestamps, escalation history, and exported reports.',
+    status: 'live' as const,
+  },
+]
+
+function ModuleStatusBadge({ status }: { status: 'live' | 'planned' }) {
+  if (status === 'live') {
+    return (
+      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[--green] border border-[--green]/30 bg-[--green-tint] px-2 py-0.5 rounded">
+        <span className="w-1.5 h-1.5 rounded-full bg-[--green] inline-block" />
+        Live
+      </span>
+    )
+  }
   return (
-    <section
-      className="py-24 border-t border-rule bg-bg"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 640px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <h2 className="font-serif text-2xl md:text-4xl text-ink mb-4">
-            Built for <em className="not-italic text-gold">FCA-Regulated</em> Firms
-          </h2>
-          <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Whether you're a solo compliance officer at a financial adviser or a compliance team at a large asset manager, Regis adapts to your firm type and regulatory context.
-          </p>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {USE_CASES.map((u, i) => (
-            <Reveal key={i} delay={i * 70}>
-              <div className="border border-rule bg-bg-2 h-full flex flex-col">
-                <div className="px-7 py-5 border-b border-green-2 bg-green">
-                  <p className="font-mono text-xs tracking-widest uppercase text-green-tint opacity-70 mb-0.5">{u.type}</p>
-                  <h3 className="font-serif text-lg text-bg">{u.headline}</h3>
-                </div>
-                <div className="p-7 flex-1 flex flex-col">
-                  <ul className="space-y-2.5">
-                    {u.items.map((item, j) => (
-                      <li key={j} className="flex gap-2 text-sm text-ink-2">
-                        <span aria-hidden="true" className="text-green shrink-0 mt-px">·</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  {u.quote && (
-                    <div className="mt-8 pt-6 border-t border-rule">
-                      <p className="text-sm italic text-ink mb-2">"{u.quote}"</p>
-                      <p className="font-mono text-xs text-ink-3">{u.who}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
+    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[--amber] border border-[--amber]/30 bg-amber-50 px-2 py-0.5 rounded">
+      Coming soon
+    </span>
   )
 }
 
-function DocumentTypes() {
+function CoreModules() {
   return (
-    <section
-      className="py-24 border-t border-rule bg-bg-2"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
+    <section className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
         <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Document Coverage</p>
-          <h2 className="font-serif text-4xl text-ink mb-4">
-            Documents Regis AI Reviews
+          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Core MVP modules</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-4 max-w-xl leading-tight">
+            Built around the work compliance teams actually do.
           </h2>
-          <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Upload any compliance or policy document in PDF format. Regis extracts the text and maps it against the relevant FCA expectations for your firm type.
+          <p className="text-sm text-[--ink-3] mb-12 max-w-lg leading-relaxed">
+            Modules marked <span className="font-medium text-[--ink-2]">Live</span> are available now. Modules marked <span className="font-medium text-[--ink-2]">Coming soon</span> are planned for the MVP.
           </p>
         </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {DOCUMENT_TYPES.map((d, i) => (
-            <Reveal key={i} delay={i * 40}>
-              <div className="border border-rule bg-bg p-5 h-full transition-transform duration-200 hover:-translate-y-0.5">
-                <div
-                  className="w-8 h-8 flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'var(--green-tint)', color: 'var(--green)' }}
-                >
-                  <DocIcon />
-                </div>
-                <h3 className="text-sm font-medium text-ink mb-2">{d.title}</h3>
-                <p className="text-xs leading-relaxed text-ink-3">{d.desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function FrameworkCoverage() {
-  return (
-    <section
-      className="py-24 border-t border-rule bg-bg"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Regulatory Scope</p>
-          <h2 className="font-serif text-4xl text-ink mb-4">
-            Coverage Areas
-          </h2>
-          <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Regis maps your documentation against FCA supervisory expectations across ten core coverage areas.
-          </p>
-        </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
-          {FRAMEWORKS.map((f, i) => (
-            <Reveal key={i} delay={i * 40}>
-              <div className="border border-rule bg-bg-2 p-5 h-full">
-                <div
-                  className="w-8 h-8 flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'var(--green-tint)', color: 'var(--green)' }}
-                >
-                  <GlobeIcon />
-                </div>
-                <h3 className="text-sm font-medium text-ink mb-1.5">{f.title}</h3>
-                <p className="text-xs leading-relaxed text-ink-3">{f.desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal delay={200}>
-          <p className="text-sm italic text-ink-3 text-center max-w-2xl mx-auto">
-            Regis AI assists firms in reviewing documentation against regulatory expectations. It does not provide legal or regulatory certification.
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
-function ExampleFindings() {
-  return (
-    <section
-      className="py-24 border-t border-rule bg-bg-2"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Sample Output</p>
-          <h2 className="font-serif text-4xl text-ink mb-3">
-            Example FCA Review Findings
-          </h2>
-          <p className="text-base italic text-ink-3 max-w-2xl mb-16">
-            Illustrative examples — not drawn from real client data.
-          </p>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {EXAMPLE_FINDINGS.map((f, i) => (
-            <Reveal key={i} delay={i * 90}>
-              <div className="border border-rule bg-bg p-7 h-full flex flex-col">
-                <div className="flex items-center gap-3 mb-5">
-                  <span
-                    className="font-mono text-xs font-bold px-1.5 py-0.5"
-                    style={{
-                      color: `var(${f.colorVar})`,
-                      backgroundColor: `color-mix(in srgb, var(${f.colorVar}) 9%, transparent)`,
-                      border: `1px solid color-mix(in srgb, var(${f.colorVar}) 19%, transparent)`,
-                    }}
-                  >
-                    {f.level}
-                  </span>
-                  <span className="font-mono text-xs text-ink-3 uppercase tracking-widest">Risk</span>
-                </div>
-                <h3 className="font-serif text-lg text-ink mb-3">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-ink-2 mb-6 flex-1">{f.desc}</p>
-                <div className="pt-5 border-t border-rule">
-                  <p className="font-mono text-xs tracking-widest uppercase text-green mb-2">Suggested Remediation</p>
-                  <p className="text-sm leading-relaxed text-ink-2">{f.remediation}</p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function TrustSection() {
-  return (
-    <section
-      className="py-24 border-t border-rule"
-      style={{
-        backgroundColor: 'var(--bg-2)',
-        contentVisibility: 'auto',
-        containIntrinsicSize: '0 520px',
-      } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Responsible AI</p>
-          <h2 className="font-serif text-4xl text-ink mb-4">
-            Designed for Responsible Compliance Reviews
-          </h2>
-          <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Regis is built for regulated environments where accuracy, accountability, and security are non-negotiable.
-          </p>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {TRUST_PILLARS.map(({ Icon, title, desc }, i) => (
-            <Reveal key={i} delay={i * 70}>
-              <div className="border border-rule bg-bg p-7 h-full">
-                <div
-                  className="w-10 h-10 flex items-center justify-center mb-5"
-                  style={{ backgroundColor: 'var(--green-tint)', color: 'var(--green)' }}
-                >
-                  <Icon />
-                </div>
-                <h3 className="font-serif text-lg text-ink mb-3">{title}</h3>
-                <p className="text-sm leading-relaxed text-ink-2">{desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Testimonials() {
-  return (
-    <section
-      className="py-24 border-t border-rule bg-bg"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 560px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">From the Field</p>
-          <h2 className="font-serif text-4xl text-ink mb-16">
-            Trusted by compliance professionals who can't afford surprises.
-          </h2>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t, i) => (
-            <Reveal key={i} delay={i * 90}>
-              <div className="border border-rule bg-bg-2 p-8 h-full flex flex-col">
-                <p className="font-serif text-xl italic leading-relaxed text-ink flex-1">"{t.quote}"</p>
-                <div className="pt-7 mt-7 border-t border-rule">
-                  <p className="text-sm font-medium text-ink">{t.name}</p>
-                  <p className="text-xs mt-0.5 text-ink-2">{t.role}, {t.firm}</p>
-                  <p className="font-mono text-xs mt-1 text-ink-3">{t.meta}</p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function FutureExpansion() {
-  return (
-    <section
-      className="py-24 border-t border-rule bg-bg-2"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Roadmap</p>
-          <h2 className="font-serif text-4xl text-ink mb-4">
-            Starting with the FCA.{' '}
-            <em className="not-italic text-gold">Built to Expand.</em>
-          </h2>
-          <p className="text-base text-ink-2 max-w-2xl mb-16">
-            Regis AI starts with UK financial services. The platform is designed to support future expansion into European and global regulatory frameworks — so the investment you make now scales with your firm.
-          </p>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Reveal>
-            <div className="border border-rule bg-bg p-7">
-              <div className="w-8 h-8 flex items-center justify-center mb-5" style={{ backgroundColor: 'var(--green)', color: 'var(--bg)' }}>
-                <CheckCircleIcon />
-              </div>
-              <p className="font-mono text-xs tracking-widest uppercase mb-4 text-green">Current Focus</p>
-              <ul className="space-y-2.5">
-                {['FCA Handbook', 'Consumer Duty', 'Operational Resilience', 'SMCR'].map((f) => (
-                  <li key={f} className="flex gap-2 text-sm text-ink">
-                    <span aria-hidden="true" className="text-green shrink-0">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-          <Reveal delay={90}>
-            <div className="border border-rule bg-bg p-7">
-              <div className="w-8 h-8 flex items-center justify-center mb-5" style={{ backgroundColor: 'var(--green-tint)', color: 'var(--green)' }}>
-                <GlobeIcon />
-              </div>
-              <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Planned Expansion</p>
-              <ul className="space-y-2.5">
-                {['DORA', 'MiFID II', 'GDPR', 'AMLD6'].map((f) => (
-                  <li key={f} className="flex gap-2 text-sm text-ink-2">
-                    <span aria-hidden="true" className="text-ink-3 shrink-0">·</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-          <Reveal delay={180}>
-            <div className="border border-rule bg-bg p-7">
-              <div className="w-8 h-8 flex items-center justify-center mb-5" style={{ backgroundColor: 'var(--green-tint)', color: 'var(--green)' }}>
-                <BuildingIcon />
-              </div>
-              <p className="font-mono text-xs tracking-widest uppercase mb-4 text-ink-3">Future</p>
-              <ul className="space-y-2.5">
-                {['SEC (United States)', 'FINRA (United States)'].map((f) => (
-                  <li key={f} className="flex gap-2 text-sm text-ink-2">
-                    <span aria-hidden="true" className="text-ink-3 shrink-0">·</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Pricing({ defaultCurrency }: { defaultCurrency: Currency }) {
-  const [currency, setCurrency] = useState<Currency>(defaultCurrency)
-
-  return (
-    <section
-      id="pricing"
-      className="py-24 border-t border-rule bg-bg"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 720px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <h2 className="font-serif text-4xl text-ink mb-4">Simple, transparent pricing.</h2>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-16">
-            <p className="text-base text-ink-2 max-w-xl">
-              All plans include a 14-day trial. Cancel anytime. Annual plans available at 20% off.
-            </p>
-            <div
-              role="group"
-              aria-label="Display currency"
-              className="inline-flex shrink-0 border border-rule bg-bg-2 p-0.5 self-start"
-            >
-              {CURRENCIES.map((c) => {
-                const active = c === currency
-                return (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setCurrency(c)}
-                    aria-pressed={active}
-                    className="font-mono text-xs tracking-widest uppercase px-3 py-1.5 transition-colors"
-                    style={{
-                      backgroundColor: active ? 'var(--green)' : 'transparent',
-                      color: active ? 'var(--bg)' : 'var(--ink-2)',
-                    }}
-                  >
-                    {c}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-          {PLANS.map((p, i) => (
-            <Reveal key={i} delay={i * 90}>
-              <div
-                className="border h-full flex flex-col"
-                style={{
-                  backgroundColor: p.highlight ? 'var(--green)' : 'var(--bg-2)',
-                  borderColor: p.highlight ? 'var(--green-2)' : 'var(--rule)',
-                }}
-              >
-                {p.tag && (
-                  <div className="py-2 text-center" style={{ backgroundColor: 'var(--gold)' }}>
-                    <span className="font-mono text-xs tracking-widest uppercase text-white">{p.tag}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {MODULES.map((m, i) => (
+            <Reveal key={m.title} delay={i * 60}>
+              <div className="border border-[--rule] bg-[--bg] rounded p-6 flex flex-col gap-4 h-full">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-9 h-9 rounded border border-[--rule] bg-[--bg-2] flex items-center justify-center text-[--green] shrink-0">
+                    {m.icon}
                   </div>
-                )}
-                <div className="p-8 flex-1 flex flex-col">
-                  <p
-                    className="font-mono text-xs tracking-widest uppercase mb-3"
-                    style={{ color: p.highlight ? 'var(--green-tint)' : 'var(--ink-3)' }}
-                  >
-                    {p.name}
-                  </p>
-                  <div className="flex items-baseline gap-1 mb-2">
+                  <ModuleStatusBadge status={m.status} />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-[--ink] mb-2">{m.title}</h3>
+                  <p className="text-sm text-[--ink-2] leading-relaxed">{m.text}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Example Scenarios ────────────────────────────────────────────────────────
+
+const SCENARIOS = [
+  {
+    title: 'Hospitality during a pitch process',
+    text: 'A prospective client is taken to dinner and a hotel during a live pitch, then asks for recurring monthly benefits before approving the vendor relationship.',
+    tags: ['Bribery risk', 'Gifts & hospitality', 'Conflict of interest', 'Escalation required'],
+    risk: 'High',
+  },
+  {
+    title: 'Monthly alcohol supply from a client',
+    text: "A client offers to fill the company's office fridge with alcohol every month as part of an ongoing commercial relationship.",
+    tags: ['Excessive hospitality', 'Business justification', 'Approval required', 'Human review'],
+    risk: 'Medium',
+  },
+  {
+    title: 'Vendor linked to a sanctioned person',
+    text: 'A supplier is not directly sanctioned, but one of its directors is connected to a sanctioned individual or a sanctioned country.',
+    tags: ['Sanctions exposure', 'Enhanced due diligence', 'Legal escalation', 'Critical review'],
+    risk: 'Critical',
+  },
+]
+
+const RISK_STYLE: Record<string, string> = {
+  Critical: 'text-[--red] border-[--red]/30 bg-red-50',
+  High: 'text-[--red] border-[--red]/30 bg-red-50',
+  Medium: 'text-[--amber] border-[--amber]/30 bg-amber-50',
+}
+
+function ExampleScenarios() {
+  return (
+    <section id="use-cases" className="bg-[--bg] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
+      <div className="max-w-6xl mx-auto">
+        <Reveal>
+          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Example scenarios</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-16 max-w-xl leading-tight">
+            Designed for real-world compliance questions.
+          </h2>
+        </Reveal>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {SCENARIOS.map((s, i) => (
+            <Reveal key={s.title} delay={i * 80}>
+              <div className="border border-[--rule] bg-[--bg-2] rounded p-6 flex flex-col gap-4 h-full">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="font-serif text-lg text-[--ink] leading-snug">{s.title}</h3>
+                  <span className={`shrink-0 font-mono text-[10px] uppercase tracking-wider border px-2 py-0.5 rounded ${RISK_STYLE[s.risk] ?? ''}`}>
+                    {s.risk}
+                  </span>
+                </div>
+                <p className="text-sm text-[--ink-2] leading-relaxed flex-1">{s.text}</p>
+                <div className="flex flex-wrap gap-1.5 pt-1 border-t border-[--rule]">
+                  {s.tags.map(tag => (
                     <span
-                      className="font-serif text-4xl font-bold"
-                      style={{ color: p.highlight ? 'var(--bg)' : 'var(--ink)' }}
+                      key={tag}
+                      className="font-mono text-[10px] uppercase tracking-wider text-[--ink-3] border border-[--rule] px-2 py-0.5 rounded"
                     >
-                      {p.prices
-                        ? `${CURRENCY_SYMBOL[currency]}${p.prices[currency].toLocaleString()}`
-                        : 'Custom'}
+                      {tag}
                     </span>
-                    {p.cadence && (
-                      <span
-                        className="text-sm"
-                        style={{ color: p.highlight ? 'var(--green-tint)' : 'var(--ink-3)', opacity: p.highlight ? 0.7 : 1 }}
-                      >
-                        {p.cadence}
-                      </span>
-                    )}
-                  </div>
-                  <p
-                    className="text-sm mb-8"
-                    style={{ color: p.highlight ? 'var(--green-tint)' : 'var(--ink-2)', opacity: p.highlight ? 0.8 : 1 }}
-                  >
-                    {p.desc}
-                  </p>
-                  <ul className="space-y-2.5 mb-8 flex-1">
-                    {p.features.map((f, j) => (
-                      <li
-                        key={j}
-                        className="flex gap-2 text-sm"
-                        style={{ color: p.highlight ? 'var(--green-tint)' : 'var(--ink-2)' }}
-                      >
-                        <span aria-hidden="true" style={{ color: p.highlight ? 'var(--gold)' : 'var(--green)' }}>✓</span>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/login"
-                    className="block text-center min-h-[48px] flex items-center justify-center py-3 px-4 text-sm font-medium transition-colors"
-                    style={{
-                      backgroundColor: p.highlight ? 'var(--bg)' : 'var(--green)',
-                      color: p.highlight ? 'var(--green)' : 'var(--bg)',
-                    }}
-                  >
-                    {p.cta}
-                  </Link>
+                  ))}
                 </div>
               </div>
             </Reveal>
           ))}
         </div>
-        <Reveal delay={300} className="mt-10 text-center">
-          <p className="text-sm text-ink-3">
-            All plans include end-to-end encryption, multi-tenant data isolation, and a 99.9% uptime SLA.{' '}
-            <a href="#faq" className="text-green underline underline-offset-2 hover:text-green-2 transition-colors">
-              See security FAQ
-            </a>
-          </p>
-        </Reveal>
       </div>
     </section>
   )
 }
 
-function FAQ() {
-  const [open, setOpen] = useState<number | null>(null)
+// ─── Industry Focus ───────────────────────────────────────────────────────────
 
+const MEDIA_AD_AREAS = [
+  'Client pitches and entertainment',
+  'Hospitality, gifts and events',
+  'Agency and vendor relationships',
+  'Vendor onboarding and due diligence',
+  'Personal data handling (UK GDPR)',
+  'Employee-related obligations',
+  'Global parent-company exposure',
+  'Sanctions and anti-bribery risk',
+  'Contractual compliance obligations',
+]
+
+function IndustryFocus() {
   return (
-    <section
-      id="faq"
-      className="py-24 border-t border-rule bg-bg-2"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 540px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6">
-        <Reveal>
-          <h2 className="font-serif text-4xl text-ink mb-16">Common questions.</h2>
-        </Reveal>
-        <div className="max-w-3xl space-y-2">
-          {FAQS.map((faq, i) => (
-            <Reveal key={i} delay={i * 50}>
-              <div className="border border-rule overflow-hidden">
-                <button
-                  onClick={() => setOpen(open === i ? null : i)}
-                  aria-expanded={open === i}
-                  aria-controls={`faq-answer-${i}`}
-                  className="w-full flex justify-between items-center px-6 py-5 text-left transition-colors"
-                  style={{ backgroundColor: open === i ? 'var(--bg)' : 'var(--bg-2)', color: 'var(--ink)' }}
-                >
-                  <span className="text-sm font-medium pr-4">{faq.q}</span>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 font-mono text-lg text-green transition-transform duration-200"
-                    style={{ transform: open === i ? 'rotate(45deg)' : 'rotate(0deg)', display: 'inline-block' }}
-                  >
-                    +
+    <section className="bg-[--green] py-20 md:py-28 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          <Reveal>
+            <p className="font-mono text-xs uppercase tracking-widest text-[--gold] mb-4">Initial focus</p>
+            <h2 className="font-serif text-3xl md:text-4xl text-[--bg] mb-6 leading-tight">
+              Starting with UK media and advertising compliance. Built to expand.
+            </h2>
+            <p className="text-[--bg] opacity-75 leading-relaxed mb-6">
+              Regis AI is initially focused on UK-based media and advertising companies because this sector regularly deals with client pitches, hospitality, gifts and entertainment, agency relationships, vendor onboarding, personal data handling, employee-related obligations, sanctions exposure, and anti-bribery risk.
+            </p>
+            <p className="text-sm text-[--bg] opacity-50 leading-relaxed border-t border-white/10 pt-5">
+              Future sectors may include financial services, banking, investment management, technology, healthcare, education, public sector, and professional services.
+            </p>
+          </Reveal>
+          <Reveal delay={120}>
+            <p className="font-mono text-xs uppercase tracking-widest text-[--gold] mb-5">
+              Common compliance areas in this sector
+            </p>
+            <ul className="space-y-2.5">
+              {MEDIA_AD_AREAS.map(area => (
+                <li key={area} className="flex items-start gap-3 text-sm text-[--bg] opacity-80">
+                  <span className="mt-1 shrink-0 text-[--gold]">
+                    <CheckIcon />
                   </span>
-                </button>
-                {open === i && (
-                  <div id={`faq-answer-${i}`} role="region" className="px-6 py-5 border-t border-rule bg-bg">
-                    <p className="text-sm leading-relaxed text-ink-2">{faq.a}</p>
-                  </div>
-                )}
-              </div>
-            </Reveal>
-          ))}
+                  {area}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
         </div>
       </div>
     </section>
   )
 }
 
-function CTAFooter() {
+// ─── Compliance Areas ─────────────────────────────────────────────────────────
+
+const COMPLIANCE_AREAS = [
+  'Bribery and corruption',
+  'Gifts and hospitality',
+  'UK sanctions exposure',
+  'UK GDPR and data protection',
+  'HR and employment compliance',
+  'Fraud risk',
+  'Financial governance',
+  'Vendor / client onboarding',
+  'Conflict of interest',
+  'Reputational risk',
+]
+
+const POLICY_TYPES = [
+  'Anti-bribery and corruption policy',
+  'Gifts and hospitality policy',
+  'Sanctions policy',
+  'Data protection / GDPR policy',
+  'HR policy',
+  'Fraud policy',
+  'Whistleblowing policy',
+  'Vendor onboarding policy',
+  'Conflict of interest policy',
+]
+
+function ComplianceAndPolicySection() {
   return (
-    <section
-      className="py-28 border-t border-green-2 bg-green"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 440px' } as React.CSSProperties}
-    >
-      <div className="max-w-content mx-auto px-4 md:px-6 text-center">
-        <Reveal>
-          <RegisLogo className="text-3xl" light />
-          <h2 className="font-serif text-3xl md:text-5xl text-bg mt-8 mb-5 leading-tight">
-            Your next FCA review is coming.
-            <br />
-            <em className="not-italic text-gold">Are your documents ready?</em>
-          </h2>
-          <p className="text-base text-green-tint max-w-xl mx-auto mb-10" style={{ opacity: 0.78 }}>
-            Join our design partner programme and get early access to the compliance review
-            platform built for FCA-regulated firms.
-          </p>
-          <div className="flex flex-col xs:flex-row flex-wrap gap-3 justify-center">
-            <Link
-              href="/demo/clearview"
-              className="min-h-[48px] w-full xs:w-auto flex items-center justify-center px-8 py-3.5 text-sm font-medium bg-bg text-green hover:bg-green-tint transition-colors"
-            >
-              Run Sample FCA Review
-            </Link>
-            <span className="min-h-[48px] w-full xs:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-medium border border-green-2 text-green-tint opacity-60 cursor-not-allowed select-none">
-              Book a Demo
-              <span className="text-[10px] font-semibold tracking-wide uppercase bg-green-2 text-bg px-1.5 py-0.5 leading-none">Soon</span>
-            </span>
+    <section className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div>
+            <Reveal>
+              <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Compliance coverage</p>
+              <h2 className="font-serif text-2xl md:text-3xl text-[--ink] mb-8 leading-tight">
+                UK compliance areas covered in the MVP.
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {COMPLIANCE_AREAS.map(area => (
+                  <span
+                    key={area}
+                    className="text-sm text-[--ink-2] border border-[--rule] bg-[--bg] px-3 py-1.5 rounded"
+                  >
+                    {area}
+                  </span>
+                ))}
+              </div>
+            </Reveal>
           </div>
+          <div>
+            <Reveal delay={100}>
+              <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Policy review</p>
+              <h2 className="font-serif text-2xl md:text-3xl text-[--ink] mb-8 leading-tight">
+                Review the policies your teams already rely on.
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {POLICY_TYPES.map(policy => (
+                  <span
+                    key={policy}
+                    className="text-sm text-[--ink-2] border border-[--rule] bg-[--bg] px-3 py-1.5 rounded"
+                  >
+                    {policy}
+                  </span>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Responsible AI ───────────────────────────────────────────────────────────
+
+const RESPONSIBLE_POINTS = [
+  'AI outputs are marked as draft and require human review',
+  'Risk ratings include rationale and are not final determinations',
+  'Missing facts and information gaps are highlighted',
+  'Escalation guidance is provided, not compliance decisions',
+  'Audit history records inputs, outputs, edits, and decisions',
+  'No output should be acted upon without authorised review',
+]
+
+function ResponsibleAI() {
+  return (
+    <section className="bg-[--bg] py-20 md:py-28 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          <Reveal>
+            <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Responsible AI</p>
+            <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-6 leading-tight">
+              AI-assisted. Human-reviewed. Audit-ready.
+            </h2>
+            <p className="text-[--ink-2] leading-relaxed">
+              Regis AI does not provide legal advice and does not replace compliance professionals. It creates structured draft assessments that must be reviewed by authorised compliance, legal, or risk professionals before decisions are made.
+            </p>
+            <p className="text-sm text-[--ink-3] leading-relaxed mt-4">
+              All outputs use careful language: <em>potential risk</em>, <em>consider</em>, <em>requires review</em>. Regis never states that an activity is compliant, approved, safe, or legal.
+            </p>
+          </Reveal>
+          <Reveal delay={100}>
+            <ul className="space-y-4">
+              {RESPONSIBLE_POINTS.map(point => (
+                <li key={point} className="flex items-start gap-3 text-sm text-[--ink-2] leading-relaxed">
+                  <span className="mt-0.5 shrink-0 text-[--green]">
+                    <CheckIcon />
+                  </span>
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Early Access Form ────────────────────────────────────────────────────────
+
+type FormFields = {
+  name: string
+  email: string
+  company: string
+  role: string
+  industry: string
+  challenge: string
+  scenarioType: string
+  policyType: string
+  ukBased: string
+  complianceTeam: string
+  consent: boolean
+}
+
+const EMPTY_FORM: FormFields = {
+  name: '',
+  email: '',
+  company: '',
+  role: '',
+  industry: '',
+  challenge: '',
+  scenarioType: '',
+  policyType: '',
+  ukBased: '',
+  complianceTeam: '',
+  consent: false,
+}
+
+const INDUSTRIES = [
+  'Media and advertising',
+  'Financial services',
+  'Technology',
+  'Healthcare',
+  'Legal and professional services',
+  'Education',
+  'Public sector',
+  'Other',
+]
+
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null
+  return <p className="text-xs text-[--red] mt-1" role="alert">{msg}</p>
+}
+
+function EarlyAccessForm() {
+  const [form, setForm] = useState<FormFields>(EMPTY_FORM)
+  const [errors, setErrors] = useState<Partial<Record<keyof FormFields, string>>>({})
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [serverError, setServerError] = useState('')
+
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const { name, value, type } = e.target
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined
+    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
+    if (errors[name as keyof FormFields]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }))
+    }
+  }
+
+  function validate(): boolean {
+    const next: Partial<Record<keyof FormFields, string>> = {}
+    if (!form.name.trim()) next.name = 'Full name is required.'
+    if (!form.email.trim()) {
+      next.email = 'Work email is required.'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      next.email = 'Please enter a valid email address.'
+    }
+    if (!form.company.trim()) next.company = 'Company name is required.'
+    if (!form.role.trim()) next.role = 'Role is required.'
+    if (!form.consent) next.consent = 'You must confirm this before submitting.'
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!validate()) return
+    setStatus('submitting')
+    setServerError('')
+
+    try {
+      const res = await fetch('/api/request-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.success) {
+        setServerError(json.error || 'Something went wrong. Please try again.')
+        setStatus('error')
+      } else {
+        setStatus('success')
+      }
+    } catch {
+      setServerError('Something went wrong. Please try again.')
+      setStatus('error')
+    }
+  }
+
+  const inputClass = (field: keyof FormFields) =>
+    `w-full border rounded px-3 py-2.5 text-sm bg-[--bg] text-[--ink] placeholder-[--ink-3] focus:outline-none focus:ring-2 focus:ring-[--green] transition-shadow ${
+      errors[field] ? 'border-[--red]' : 'border-[--rule]'
+    }`
+
+  if (status === 'success') {
+    return (
+      <section id="access" className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
+        <div className="max-w-xl mx-auto text-center">
+          <div className="w-12 h-12 rounded-full bg-[--green-tint] border border-[--green]/20 flex items-center justify-center mx-auto mb-6 text-[--green]">
+            <CheckIcon />
+          </div>
+          <h2 className="font-serif text-2xl md:text-3xl text-[--ink] mb-4">Request received.</h2>
+          <p className="text-[--ink-2] leading-relaxed">
+            Thank you. Your request has been received. We'll contact you about early access to Regis AI.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section id="access" className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
+      <div className="max-w-2xl mx-auto">
+        <Reveal>
+          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Design partner programme</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-4 leading-tight">
+            Join the Regis AI design partner programme.
+          </h2>
+          <p className="text-[--ink-2] leading-relaxed mb-10">
+            We're onboarding a small group of UK compliance and legal teams to shape the product. Tell us about your team and what you need.
+          </p>
+        </Reveal>
+
+        <Reveal delay={80}>
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label htmlFor="name" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                  Full name <span aria-hidden="true" className="text-[--red]">*</span>
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  aria-required="true"
+                  aria-describedby={errors.name ? 'name-error' : undefined}
+                  className={inputClass('name')}
+                  placeholder="Jane Smith"
+                />
+                <FieldError msg={errors.name} />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                  Work email <span aria-hidden="true" className="text-[--red]">*</span>
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  aria-required="true"
+                  aria-describedby={errors.email ? 'email-error' : undefined}
+                  className={inputClass('email')}
+                  placeholder="jane@company.com"
+                />
+                <FieldError msg={errors.email} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label htmlFor="company" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                  Company name <span aria-hidden="true" className="text-[--red]">*</span>
+                </label>
+                <input
+                  id="company"
+                  name="company"
+                  type="text"
+                  autoComplete="organization"
+                  value={form.company}
+                  onChange={handleChange}
+                  aria-required="true"
+                  className={inputClass('company')}
+                  placeholder="Acme Media Ltd"
+                />
+                <FieldError msg={errors.company} />
+              </div>
+              <div>
+                <label htmlFor="role" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                  Role <span aria-hidden="true" className="text-[--red]">*</span>
+                </label>
+                <input
+                  id="role"
+                  name="role"
+                  type="text"
+                  autoComplete="organization-title"
+                  value={form.role}
+                  onChange={handleChange}
+                  aria-required="true"
+                  className={inputClass('role')}
+                  placeholder="Head of Compliance"
+                />
+                <FieldError msg={errors.role} />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="industry" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                Industry
+              </label>
+              <select
+                id="industry"
+                name="industry"
+                value={form.industry}
+                onChange={handleChange}
+                className={inputClass('industry')}
+              >
+                <option value="">Select industry</option>
+                {INDUSTRIES.map(ind => (
+                  <option key={ind} value={ind}>{ind}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="challenge" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                Primary compliance challenge
+              </label>
+              <textarea
+                id="challenge"
+                name="challenge"
+                rows={3}
+                value={form.challenge}
+                onChange={handleChange}
+                className={`${inputClass('challenge')} resize-none`}
+                placeholder="Briefly describe the compliance challenge you're trying to solve..."
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label htmlFor="scenarioType" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                  Main scenario type you want to assess
+                </label>
+                <input
+                  id="scenarioType"
+                  name="scenarioType"
+                  type="text"
+                  value={form.scenarioType}
+                  onChange={handleChange}
+                  className={inputClass('scenarioType')}
+                  placeholder="e.g. Gifts and hospitality"
+                />
+              </div>
+              <div>
+                <label htmlFor="policyType" className="block text-xs font-medium text-[--ink-2] mb-1.5 uppercase tracking-wide font-mono">
+                  Main policy type you want to review
+                </label>
+                <input
+                  id="policyType"
+                  name="policyType"
+                  type="text"
+                  value={form.policyType}
+                  onChange={handleChange}
+                  className={inputClass('policyType')}
+                  placeholder="e.g. Anti-bribery policy"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <fieldset>
+                <legend className="block text-xs font-medium text-[--ink-2] mb-2 uppercase tracking-wide font-mono">
+                  Are you UK-based?
+                </legend>
+                <div className="flex gap-6">
+                  {['Yes', 'No'].map(opt => (
+                    <label key={opt} className="flex items-center gap-2 text-sm text-[--ink-2] cursor-pointer">
+                      <input
+                        type="radio"
+                        name="ukBased"
+                        value={opt}
+                        checked={form.ukBased === opt}
+                        onChange={handleChange}
+                        className="accent-[--green]"
+                      />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend className="block text-xs font-medium text-[--ink-2] mb-2 uppercase tracking-wide font-mono">
+                  Part of a compliance, legal, risk, or governance team?
+                </legend>
+                <div className="flex gap-6">
+                  {['Yes', 'No'].map(opt => (
+                    <label key={opt} className="flex items-center gap-2 text-sm text-[--ink-2] cursor-pointer">
+                      <input
+                        type="radio"
+                        name="complianceTeam"
+                        value={opt}
+                        checked={form.complianceTeam === opt}
+                        onChange={handleChange}
+                        className="accent-[--green]"
+                      />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+
+            <div className="border-t border-[--rule] pt-5">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="consent"
+                  checked={form.consent}
+                  onChange={handleChange}
+                  aria-required="true"
+                  className="mt-0.5 accent-[--green] shrink-0"
+                />
+                <span className="text-sm text-[--ink-2] leading-relaxed">
+                  I understand Regis AI provides AI-assisted compliance review support only and does not provide legal or regulatory advice.
+                  <span aria-hidden="true" className="text-[--red] ml-1">*</span>
+                </span>
+              </label>
+              <FieldError msg={errors.consent} />
+            </div>
+
+            {status === 'error' && serverError && (
+              <p className="text-sm text-[--red] bg-red-50 border border-[--red]/20 rounded px-4 py-3" role="alert">
+                {serverError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={status === 'submitting'}
+              className="w-full sm:w-auto px-8 py-3 bg-[--green] text-[--bg] font-medium text-sm rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {status === 'submitting' ? 'Sending…' : 'Request Early Access'}
+            </button>
+          </form>
         </Reveal>
       </div>
     </section>
   )
 }
+
+// ─── Site Footer ──────────────────────────────────────────────────────────────
+
+const FOOTER_LINKS = [
+  { label: 'About', href: '/about' },
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Service', href: '/terms' },
+  { label: 'Security', href: '/security' },
+  { label: 'Contact', href: '#access' },
+]
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-green-2 bg-green">
-      <div className="max-w-content mx-auto px-4 md:px-6 pt-8 pb-4">
-        <p className="text-xs text-green-tint text-center max-w-2xl mx-auto mb-6 pb-6 border-b border-green-2" style={{ opacity: 0.7 }}>
-          Regis AI provides AI-assisted compliance review support and does not provide legal or regulatory advice.
-          All findings and recommendations should be reviewed by qualified compliance and legal professionals before use.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4">
-          <RegisLogo className="text-sm" light href="/" />
-          <div className="flex items-center gap-6">
-            {[
-              { label: 'About', href: '/about' },
-              { label: 'Privacy Policy', href: '/privacy' },
-              { label: 'Terms of Service', href: '/terms' },
-              { label: 'Security', href: '/security' },
-            ].map(({ label, href }) => (
-              <Link key={href} href={href} className="text-xs py-1.5 text-green-tint transition-colors hover:text-bg">
-                {label}
-              </Link>
+    <footer className="bg-[--green] py-12 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
+          <RegisLogo href="/" light />
+          <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-6 gap-y-2">
+            {FOOTER_LINKS.map(l => (
+              l.href.startsWith('/') ? (
+                <Link
+                  key={l.label}
+                  href={l.href}
+                  className="text-xs text-[--bg] opacity-60 hover:opacity-100 transition-opacity"
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  className="text-xs text-[--bg] opacity-60 hover:opacity-100 transition-opacity"
+                >
+                  {l.label}
+                </a>
+              )
             ))}
-          </div>
-          <p className="text-xs text-green-tint">
-            © 2026 Regis AI. All rights reserved.
+          </nav>
+        </div>
+        <div className="border-t border-white/10 pt-8">
+          <p className="text-xs text-[--bg] opacity-45 leading-relaxed max-w-3xl mb-4">
+            Regis AI provides AI-assisted compliance review support and internal risk assessment guidance only. It does not provide legal or regulatory advice. All findings and recommendations should be reviewed by authorised compliance, legal, or risk professionals before use.
+          </p>
+          <p className="text-xs text-[--bg] opacity-30">
+            © {new Date().getFullYear()} Regis AI. All rights reserved.
           </p>
         </div>
       </div>
@@ -1451,13 +1213,13 @@ function SiteFooter() {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
-export function LandingPage({ defaultCurrency = 'USD' }: { defaultCurrency?: Currency }) {
+export function LandingPage({ defaultCurrency: _ = 'USD' }: { defaultCurrency?: string }) {
   return (
     <div className="min-h-screen">
       {/* Skip to main content for keyboard users */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:text-sm focus:bg-bg focus:text-green focus:font-medium focus:shadow-lg"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:text-sm focus:bg-[--bg] focus:text-[--green] focus:font-medium focus:shadow-lg focus:rounded"
       >
         Skip to main content
       </a>
@@ -1465,18 +1227,14 @@ export function LandingPage({ defaultCurrency = 'USD' }: { defaultCurrency?: Cur
       <main id="main-content">
         <Hero />
         <Problem />
-        <Features />
+        <WhatRegisDoes />
         <HowItWorks />
-        <UseCases />
-        <DocumentTypes />
-        <FrameworkCoverage />
-        <ExampleFindings />
-        <TrustSection />
-        <Testimonials />
-        <FutureExpansion />
-        <Pricing defaultCurrency={defaultCurrency} />
-        <FAQ />
-        <CTAFooter />
+        <CoreModules />
+        <ExampleScenarios />
+        <IndustryFocus />
+        <ComplianceAndPolicySection />
+        <ResponsibleAI />
+        <EarlyAccessForm />
       </main>
       <SiteFooter />
     </div>
