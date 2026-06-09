@@ -48,7 +48,7 @@ export default function PrivacyPage() {
       </header>
 
       <Section title="1. Information We Collect">
-        <p><strong className="text-ink">Account information.</strong> When you create an account, we collect your email address and, during onboarding, your firm name, firm type, AUM range, and primary regulator. This information is used to personalise every analysis to your regulatory context.</p>
+        <p><strong className="text-ink">Account information.</strong> When you create an account, we collect your email address and, during onboarding, your organisation name, sector, and jurisdiction. This information is used to personalise every analysis to your regulatory context.</p>
         <p><strong className="text-ink">Documents you upload.</strong> Compliance documents (PDFs) you upload for gap analysis are stored in encrypted cloud storage. The extracted text is sent to our AI provider for analysis and then stored alongside your audit results.</p>
         <p><strong className="text-ink">Analysis and drafted content.</strong> The findings produced by an analysis, and any AI-drafted policy language you generate to remediate a finding, are stored with your account&rsquo;s audit history so you can return to them. Drafted content is associated only with your account and is never shared across accounts.</p>
         <p><strong className="text-ink">Usage data.</strong> We collect information about how you use Regis — pages visited, features used, audit frequency — to improve the product and diagnose issues.</p>
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
       <Section title="2. How We Use Your Information">
         <List items={[
           'To provide the Regis service: running gap analyses, surfacing regulatory monitoring updates, and storing your audit history.',
-          'To personalise your experience: every audit and monitoring feed is scoped to your firm type, AUM range, and jurisdiction.',
+          'To personalise your experience: every audit and monitoring feed is scoped to your sector, jurisdiction, and applicable regulatory frameworks.',
           'To send email alerts: regulatory monitoring notifications and, if opted in, the weekly digest.',
           'To improve the product: aggregate, anonymised usage patterns inform feature development.',
           'For security and fraud prevention: log data is reviewed when anomalous access patterns are detected.',

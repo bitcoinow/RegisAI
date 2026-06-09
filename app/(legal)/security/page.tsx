@@ -81,7 +81,7 @@ export default function SecurityPage() {
       </Section>
 
       <Section title="Authentication">
-        <p><strong className="text-ink">Passwordless magic-link.</strong> Regis uses magic-link email authentication exclusively. There are no passwords to steal, reuse, or brute-force. Each magic link is single-use, expires after 60 minutes, and is cryptographically signed by Supabase Auth.</p>
+        <p><strong className="text-ink">Authentication methods.</strong> Regis supports email and password sign-in and Google OAuth. Optional TOTP multi-factor authentication (MFA) can be enrolled in account settings; once a verified factor exists, an AAL2 challenge is required before dashboard access. Passwords are never stored by Regis — they are hashed and managed entirely by Supabase Auth.</p>
         <p><strong className="text-ink">Session management.</strong> Sessions are managed server-side via the <span className="font-mono text-sm">@supabase/ssr</span> library using httpOnly cookies. Session tokens cannot be accessed by browser JavaScript, which eliminates XSS-based session hijacking as an attack vector.</p>
         <p><strong className="text-ink">Route protection.</strong> All authenticated routes are protected at two independent layers: the Next.js middleware (which runs at the edge before any page renders) and the application layout (which performs a server-side auth check). An invalid or expired session at either layer redirects immediately to the login page.</p>
       </Section>

@@ -53,13 +53,13 @@ export default function TermsPage() {
       </Section>
 
       <Section title="2. Description of Service">
-        <p>Regis is a compliance operations platform for regulated financial firms that provides:</p>
+        <p>Regis is a compliance operations platform for organisations operating in regulated industries that provides:</p>
         <List items={[
-          'AI-powered gap analysis of compliance documents against regulatory requirements.',
+          'AI-powered gap analysis of compliance documents and scenarios against regulatory requirements.',
           'AI-generated draft policy language intended to remediate identified findings.',
           'Real-time monitoring of regulatory publications across US, EU, and UK jurisdictions.',
           'Audit report generation and findings management.',
-          'Firm-specific regulatory context based on your firm type, AUM, and primary regulator.',
+          'Organisation-specific regulatory context based on your sector, jurisdiction, and applicable frameworks.',
         ]} />
         <Warning>
           <strong>Important: Regis is not a law firm and does not provide legal advice.</strong> The gap analysis and regulatory monitoring outputs are AI-generated informational tools. They are not a substitute for advice from qualified legal counsel or a licensed compliance professional. Your firm is solely responsible for its own compliance obligations.

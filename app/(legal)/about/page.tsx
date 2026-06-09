@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'About — Regis',
   description:
-    'Regis is an AI-powered compliance gap analysis platform for financial firms. Learn who we build for, what we do, and the principles behind the product.',
+    'Regis is an AI-powered compliance scenario risk assessment and policy gap analysis platform. Learn who we build for, what we do, and the principles behind the product.',
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -40,18 +40,19 @@ export default function AboutPage() {
         <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-4">Company</p>
         <h1 className="font-serif text-4xl text-ink mb-4">About Regis</h1>
         <p className="text-base text-ink-2 mt-4 max-w-xl leading-relaxed">
-          Regis is an AI-powered compliance gap analysis platform built for the people who carry
-          regulatory risk on their shoulders — compliance officers at financial firms who need to
-          know where their documents fall short before a regulator does.
+          Regis is an AI-powered compliance platform built for the people who carry regulatory risk
+          on their shoulders — compliance officers, legal teams, risk managers, and governance
+          professionals who need to know where their policies fall short before a regulator does.
         </p>
       </header>
 
       <Section title="Why we exist">
         <p>
-          Compliance teams at registered investment advisers, fintechs, insurance carriers, and
-          banks operate in high-stakes regulatory environments where a single missed gap can mean a
-          fine, an enforcement action, or licence risk. Reviewing a compliance manual against the
-          full body of applicable rules is slow, manual work — and the rules keep moving.
+          Compliance teams across regulated industries operate in high-stakes environments where a
+          single missed policy gap can mean a fine, an enforcement action, or reputational risk.
+          Whether in media and advertising, professional services, financial services, or any other
+          regulated sector — reviewing policies and procedures against the full body of applicable
+          rules is slow, manual work, and the rules keep moving.
         </p>
         <Callout>
           Regis replaces days of manual line-by-line review with a focused, actionable report that
@@ -67,13 +68,13 @@ export default function AboutPage() {
           built to be read and acted on, not filed away.
         </p>
         <p>
-          The platform covers three regulatory jurisdictions, each backed by its own curated
-          requirements library:
+          The platform analyses compliance documents and scenarios against jurisdiction-specific
+          regulatory requirements across three geographies:
         </p>
         <div className="grid sm:grid-cols-3 gap-3 my-4">
-          <PrincipleCard title="United States" body="FINRA, SEC, AML/BSA, Reg BI, and business continuity requirements." />
-          <PrincipleCard title="European Union" body="MiFID II, GDPR, AMLD6, DORA, SFDR, and MAR requirements." />
-          <PrincipleCard title="United Kingdom" body="FCA rules, UK AML, UK GDPR, SM&CR, and FCA operational resilience." />
+          <PrincipleCard title="United Kingdom" body="UK GDPR, anti-bribery and corruption, sanctions obligations, FCA rules, SM&CR, and operational resilience." />
+          <PrincipleCard title="European Union" body="GDPR, anti-money laundering (AMLD6), DORA, SFDR, MiFID II, and MAR requirements." />
+          <PrincipleCard title="United States" body="Anti-money laundering (AML/BSA), SEC and FINRA rules, Reg BI, and business continuity requirements." />
         </div>
         <p>
           Regis does not stop at finding the gap. For any finding, it drafts ready-to-paste
@@ -127,9 +128,9 @@ export default function AboutPage() {
 
       <Section title="Get in touch">
         <p>
-          Regis is in active development through a design partner program. If you run compliance at a
-          financial firm and want early access — or simply want to talk about what we are building —
-          we would like to hear from you.
+          Regis is in active development through an early access programme. If you work in
+          compliance, legal, risk, or governance and want early access — or simply want to talk
+          about what we are building — we would like to hear from you.
         </p>
         <div className="p-5 border border-rule bg-bg-2 mt-2">
           <p className="text-sm font-medium text-ink">Contact</p>
@@ -138,10 +139,10 @@ export default function AboutPage() {
           </p>
           <p className="text-sm text-ink-2 mt-2">
             Or{' '}
-            <Link href="/login" className="text-green underline underline-offset-2 hover:text-green-2">
-              request access
+            <Link href="/#access" className="text-green underline underline-offset-2 hover:text-green-2">
+              request early access
             </Link>{' '}
-            to join the design partner program.
+            to join the programme.
           </p>
         </div>
       </Section>
