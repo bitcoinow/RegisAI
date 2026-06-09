@@ -70,8 +70,17 @@ export async function POST(
       .eq('id', document_id)
       .eq('user_id', user.id)
       .single(),
-    supabase.from('profiles').select('firm_name').eq('id', user.id).single(),
+    supabase.from('profiles').select('firm_name, is_dev').eq('id', user.id).single(),
   ])
+
+  // ── 2a. Jurisdiction access check ────────────────────────────────────────
+  const isDevUser = (profile as { is_dev?: boolean } | null)?.is_dev ?? false
+  if (!isDevUser && jurisdiction !== 'UK') {
+    return NextResponse.json(
+      { error: 'This jurisdiction is not yet available. Please select United Kingdom.' },
+      { status: 403 }
+    )
+  }
 
   if (docError || !document) {
     return NextResponse.json({ error: 'Document not found' }, { status: 404 })

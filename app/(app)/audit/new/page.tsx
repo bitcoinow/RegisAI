@@ -64,6 +64,15 @@ export default async function NewAuditPage({ searchParams }: PageProps) {
     // Fall through to a fresh audit if the parent can't be loaded.
   }
 
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const { data: devProfile } = user
+    ? await supabase.from('profiles').select('is_dev').eq('id', user.id).single()
+    : { data: null }
+  const isDevUser = (devProfile as { is_dev?: boolean } | null)?.is_dev ?? false
+
   return (
     <div className="max-w-content mx-auto px-4 md:px-6 py-10">
       <div className="mb-8">
@@ -80,7 +89,7 @@ export default async function NewAuditPage({ searchParams }: PageProps) {
           risk-rated gaps, rule citations, and remediation recommendations.
         </p>
 
-        <NewAuditForm />
+        <NewAuditForm isDevUser={isDevUser} />
       </div>
     </div>
   )

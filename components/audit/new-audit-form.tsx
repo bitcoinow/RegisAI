@@ -61,9 +61,11 @@ const FRAMEWORK_ITEMS: Record<Jurisdiction, string[]> = {
   ],
 }
 
-export function NewAuditForm() {
-  const [jurisdiction, setJurisdiction] = useState<Jurisdiction>('EU')
-  const [framework, setFramework] = useState<RegulatoryFramework | ''>(DEFAULT_FRAMEWORK['EU'])
+export function NewAuditForm({ isDevUser }: { isDevUser: boolean }) {
+  const [jurisdiction, setJurisdiction] = useState<Jurisdiction>(isDevUser ? 'EU' : 'UK')
+  const [framework, setFramework] = useState<RegulatoryFramework | ''>(
+    DEFAULT_FRAMEWORK[isDevUser ? 'EU' : 'UK']
+  )
   const selected = JURISDICTIONS.find((j) => j.id === jurisdiction)!
 
   function selectJurisdiction(id: Jurisdiction) {
@@ -78,24 +80,34 @@ export function NewAuditForm() {
     <>
       {/* Jurisdiction tabs */}
       <div className="flex gap-0 mb-4 border border-rule">
-        {JURISDICTIONS.map((j) => (
-          <button
-            key={j.id}
-            type="button"
-            onClick={() => selectJurisdiction(j.id)}
-            className={[
-              'flex-1 py-3 px-4 text-left border-r border-rule last:border-r-0 transition-colors',
-              jurisdiction === j.id
-                ? 'bg-green text-white'
-                : 'bg-bg-2 text-ink-2 hover:bg-bg',
-            ].join(' ')}
-          >
-            <span className="block text-xs font-mono tracking-widest uppercase mb-0.5">
-              {j.id}
-            </span>
-            <span className="block text-sm">{j.label}</span>
-          </button>
-        ))}
+        {JURISDICTIONS.map((j) => {
+          const isLocked = !isDevUser && j.id !== 'UK'
+          const isActive = jurisdiction === j.id
+          return (
+            <button
+              key={j.id}
+              type="button"
+              onClick={() => !isLocked && selectJurisdiction(j.id)}
+              disabled={isLocked}
+              className={[
+                'flex-1 py-3 px-4 text-left border-r border-rule last:border-r-0 transition-colors',
+                isActive && !isLocked
+                  ? 'bg-green text-white'
+                  : isLocked
+                    ? 'bg-bg-2 text-ink-3 opacity-50 cursor-not-allowed'
+                    : 'bg-bg-2 text-ink-2 hover:bg-bg',
+              ].join(' ')}
+            >
+              <span className="block text-xs font-mono tracking-widest uppercase mb-0.5">
+                {j.id}
+              </span>
+              <span className="block text-sm">{j.label}</span>
+              {isLocked && (
+                <span className="block text-xs font-mono text-ink-3 mt-0.5">Coming soon</span>
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {/* Framework focus selector */}

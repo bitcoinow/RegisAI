@@ -69,6 +69,7 @@ export interface Profile {
   aum_range: string | null
   regulator: Regulator | null
   plan: string
+  is_dev: boolean
   created_at: string
 }
 
