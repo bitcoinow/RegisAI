@@ -1,17 +1,17 @@
 # RegisAI — Project Status & Living Document
 
-> **Last updated:** 2026-06-05
+> **Last updated:** 2026-06-09
 > This file is the single source of truth for project state, feature history, and planned work. Updated at the end of every session with new plans and changes.
 
 ---
 
 ## What Is RegisAI
 
-AI-powered compliance review platform for FCA-regulated UK financial services firms. Users upload compliance manuals, Consumer Duty policies, SMCR documentation, and operational resilience plans. Regis maps content against FCA expectations, surfaces potential gaps with risk ratings, generates remediation recommendations, drafts compliance-manual language, and presents findings in an actionable human review workflow.
+UK Compliance Scenario & Policy Risk Engine. AI-assisted compliance scenario risk assessment, policy gap analysis, and human review workflows for UK compliance, legal, risk, and governance teams. Initial vertical: UK media and advertising companies (hospitality/gifts, agency relationships, vendor onboarding, personal data, anti-bribery, sanctions). FCA/financial services is future expansion.
 
-**Beachhead:** UK financial services (FCA). Platform supports US and EU frameworks — UK is the primary market focus.
+**Beachhead:** UK media & advertising compliance teams. Platform supports US and EU frameworks — UK is the primary market focus.
 
-**Stack:** Next.js 14 (App Router) · TypeScript · Supabase (Auth + DB + Storage) · Anthropic Claude API · Tailwind CSS · Vercel
+**Stack:** Next.js 16 (App Router) · TypeScript · Supabase (Auth + DB + Storage) · Anthropic Claude API · Tailwind CSS · Vercel
 
 ---
 
@@ -37,7 +37,7 @@ AI-powered compliance review platform for FCA-regulated UK financial services fi
 | Document library | ✅ Live | List, view/download original PDF, delete |
 | Authentication (email + Google) | ✅ Live | Supabase Auth, PKCE, MFA (TOTP), password reset |
 | Demo pages (public) | ✅ Live | `/demo/clearview` (US RIA), `/demo/gdpr` (GDPR re-scan lifecycle) |
-| Landing page | ✅ Live | Hero, Features, FAQ, CTA; 85 requirements, both demo CTAs |
+| Landing page | ✅ Live | UK media & advertising MVP positioning; 11 sections; early access form |
 
 ---
 
@@ -122,6 +122,19 @@ components/
 - Demo nav bars: breadcrumbs + cross-demo links on both `/demo/clearview` and `/demo/gdpr`
 - GDPR Re-scan Demo CTA added to CTAFooter alongside "View Sample Audit"
 
+### 2026-06-09 — MVP landing page redesign (UK compliance scenario & policy risk engine)
+- Complete rewrite of `components/marketing/landing-page.tsx` (~1485 → ~850 lines)
+- Product repositioned from FCA-only financial services to UK compliance scenario & policy risk engine targeting media and advertising companies
+- Removed: fake testimonials, public pricing (3 tiers), FAQ, FCA framework coverage grid, document types grid, future expansion roadmap, 6-card FCA features, enterprise claims, CTAFooter
+- New 11-section structure: Hero → Problem → What Regis Does → How It Works → Core MVP Modules → Example Scenarios → Industry Focus → Compliance Areas & Policy Types → Responsible AI → Early Access Form → Footer
+- `ModuleStatusBadge` component: Scenario Risk Analyzer marked "Coming soon"; all other modules marked "Live"
+- New `app/api/request-access/route.ts` — Resend email handler for early access form → wordroom33@gmail.com
+- Updated `app/layout.tsx` metadata: title + description reflect new positioning
+- Deleted untracked `middleware.ts` (was re-exporting proxy.ts, caused pre-existing build conflict)
+- Build: `tsc --noEmit` passes, `next build` passes (27 pages, 11 API routes)
+- Primary CTA "Analyse a Sample Scenario" routes to `/demo/gdpr`
+- Set `RESEND_FROM_EMAIL` env var to a verified Resend domain for production email delivery
+
 ### 2026-06-05 — UK/FCA market repositioning
 - Landing page repositioned for UK financial services beachhead market
 - Hero: new FCA-focused headline ("AI-Assisted FCA Compliance Reviews for UK Financial Firms"), subheadline, CTAs
@@ -143,11 +156,13 @@ components/
 
 > Move items here when agreed with user; strike through when shipped.
 
-**Phase 1 (UK beachhead — immediate):**
+**Phase 1 (UK media & advertising beachhead — immediate):**
+- [ ] Scenario Risk Analyzer module (currently marked "Coming soon" on landing page)
+- [ ] Set `RESEND_FROM_EMAIL` to verified Resend sender domain for production early access emails
+- [ ] UK media & advertising demo page (currently using `/demo/gdpr` as primary CTA target — mismatch)
 - [ ] Profile management UI in Settings (currently only MFA; onboarding promises profile editing)
 - [ ] Export audit report as PDF (currently display-only; print-via-browser available)
 - [ ] Stripe billing integration (early access → paid tiers)
-- [ ] UK-specific demo page (`/demo/fca`) to replace US Clearview demo as primary CTA target
 
 **Phase 2 (platform maturity):**
 - [ ] Multi-user team support (currently 1 user = 1 firm)
