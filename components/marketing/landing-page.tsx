@@ -137,7 +137,7 @@ const NAV_LINKS = [
   { label: 'Features', href: '#features' },
   { label: 'How it Works', href: '#how-it-works' },
   { label: 'Use Cases', href: '#use-cases' },
-  { label: 'Request Access', href: '#access' },
+  { label: 'Get Access', href: '#access' },
 ]
 
 function LandingNav() {
@@ -152,7 +152,7 @@ function LandingNav() {
 
   const navBg = scrolled || menuOpen
     ? 'bg-[--bg] border-b border-[--rule] shadow-sm'
-    : 'bg-transparent'
+    : 'bg-[--bg] border-b border-[--rule]'
 
   return (
     <nav
@@ -182,12 +182,12 @@ function LandingNav() {
           >
             Sign in
           </Link>
-          <a
-            href="#access"
+          <Link
+            href="/signup"
             className="text-sm font-medium bg-[--green] text-[--bg] px-4 py-2 rounded hover:opacity-90 transition-opacity"
           >
-            Request Early Access
-          </a>
+            Get Started
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -221,13 +221,13 @@ function LandingNav() {
             >
               Sign in
             </Link>
-            <a
-              href="#access"
+            <Link
+              href="/signup"
               onClick={() => setMenuOpen(false)}
               className="py-2.5 text-sm text-center font-medium bg-[--green] text-[--bg] rounded hover:opacity-90 transition-opacity"
             >
-              Request Early Access
-            </a>
+              Get Started
+            </Link>
           </div>
         </div>
       )}
@@ -260,12 +260,12 @@ function Hero() {
                 >
                   Analyse a Sample Scenario
                 </Link>
-                <a
-                  href="#access"
+                <Link
+                  href="/signup"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/30 text-[--bg] font-medium text-sm rounded hover:bg-white/10 transition-colors"
                 >
-                  Request Early Access
-                </a>
+                  Get Started Free
+                </Link>
               </div>
               <p className="text-xs text-[--bg] opacity-45 max-w-sm leading-relaxed">
                 AI-assisted guidance only. Final decisions remain with authorised compliance, legal, or risk professionals.
@@ -928,12 +928,12 @@ function EarlyAccessForm() {
     <section id="access" className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
       <div className="max-w-2xl mx-auto">
         <Reveal>
-          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Design partner programme</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Early access</p>
           <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-4 leading-tight">
-            Join the Regis AI design partner programme.
+            Get early access to Regis AI.
           </h2>
           <p className="text-[--ink-2] leading-relaxed mb-10">
-            We're onboarding a small group of UK compliance and legal teams to shape the product. Tell us about your team and what you need.
+            Tell us about your team and what you're looking to solve. We'll get you set up with access to the platform.
           </p>
         </Reveal>
 
