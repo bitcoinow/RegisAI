@@ -34,12 +34,20 @@ Regis replaces days of manual review with a focused, actionable report, and repl
 
 ### Compliance Gap Analysis
 - PDF upload → server-side text extraction → Claude-powered gap analysis
-- Three jurisdiction libraries: 32 US requirements (FINRA, SEC, AML/BSA, Reg BI, BCP), 23 EU requirements (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR), 19 UK requirements (FCA Rules, UK AML, UK GDPR, SM&CR, FCA OpRes)
+- Three jurisdiction libraries: 32 US requirements (FINRA, SEC, AML/BSA, Reg BI, BCP), 34 EU requirements (MiFID II, GDPR, AMLD6, DORA, SFDR, MAR), 19 UK requirements (FCA Rules, UK AML, UK GDPR, SM&CR, FCA OpRes)
 - Structured output: executive summary, gap findings with risk level (High / Medium / Low), rule citations, remediation recommendations, strengths, priority action list
 
 ### Finding Management
-- Per-finding status tracking: open / in-progress / resolved
+- Per-finding status tracking: open / in-progress / resolved / risk_accepted (documented residual risk)
+- Reviewer attribution — name, timestamp, rationale recorded on any status change (full audit trail)
 - Per-finding policy drafting: Claude generates compliant policy language that closes the specific gap, persisted to the database
+
+### Framework Scoping & Re-scan
+- Single-framework analysis (e.g. GDPR-only, SMCR-only) via `framework` param
+- Re-scan support: pass `parent_audit_id` to compare before/after remediation
+- Delta classification: gaps marked closed / persisting / improved / new
+- Posture score (0–100, risk-weighted: High=3, Med=2, Low=1)
+- Coverage matrix: every in-scope requirement tagged met/gap
 
 ### Regulatory Monitoring
 - Live feed from Federal Register (US), ESMA + EBA (EU), FCA + PRA (UK)
@@ -48,7 +56,7 @@ Regis replaces days of manual review with a focused, actionable report, and repl
 - Weekly email digest via Resend
 
 ### Platform
-- Magic link authentication (no passwords)
+- Email + password authentication, Google OAuth, optional TOTP MFA, password recovery
 - Design partner onboarding flow (firm name, type, AUM range, regulator)
 - PDF export of audit reports (browser print stylesheet)
 - Demo environment at `/demo/clearview` — no login required

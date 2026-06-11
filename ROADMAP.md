@@ -94,13 +94,15 @@ The underlying architecture evolves into a full compliance operating system (AIO
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| PDF export for review reports | High | Currently display-only; print-ready export in roadmap |
+| Stripe billing integration | High | Gated behind design partner access currently |
+| PDF export for review reports | High | Print-via-browser available; structured PDF export planned |
+| Profile management UI in Settings | Medium | Currently only MFA settings; onboarding promises profile editing |
+| Scenario Risk Analyzer module | Medium | Marked "Coming soon" on landing page |
 | DOCX document support | Medium | Currently PDF only |
 | Bulk document upload | Medium | Single upload per audit today |
 | Role-based access controls | Medium | Multi-user without granular roles today |
-| Stripe billing integration | High | Gated behind design partner access currently |
 | Email notifications on findings | Medium | Monitoring digest exists; per-finding alerts pending |
-| Re-scan for EU/UK frameworks | Low | Currently implemented for US only |
+| UK media & advertising demo page | Low | Currently `/demo/gdpr` is primary CTA target — mismatch with landing page |
 
 ---
 

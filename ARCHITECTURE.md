@@ -80,12 +80,16 @@ PATCH /api/findings/[id]/status
 ## Database Schema
 
 ```
-profiles         — user/firm context (firm_name, firm_type, aum_range, regulator, plan)
+profiles         — user/firm context (firm_name, firm_type, aum_range, regulator, plan, is_dev)
 documents        — uploaded PDFs (file_name, extracted_text, page_count, status)
-audits           — analysis runs (jurisdiction, framework, findings JSON, compliance_score, parent_audit_id)
-findings         — individual gaps (req_id, risk, gap, recommendation, status, drafted_policy, review metadata)
+audits           — analysis runs (jurisdiction, framework, parent_audit_id, compliance_score, requirements_total/met, gaps_closed/new/persisting)
+findings         — individual gaps (req_id, risk, gap, recommendation, status, drafted_policy, reviewed_by, reviewed_at, review_note)
 regulatory_updates — monitoring feed (regulator, jurisdiction, title, url, relevance_score)
 ```
+
+`profiles.is_dev` controls jurisdiction access. Regular users are locked to UK; `is_dev = true` grants US/EU/UK access (enforced in `NewAuditForm`, `MonitoringClient`, and `/api/analyse`).
+
+`findings.status` values: `open` | `in_progress` | `resolved` | `risk_accepted`. Any move away from `open` records the reviewer's name, timestamp, and an optional rationale note.
 
 All tables have Row-Level Security (RLS) policies enforcing user isolation. No cross-user data access is possible.
 
@@ -109,9 +113,18 @@ All tables have Row-Level Security (RLS) policies enforcing user isolation. No c
 ```
 app/
   (app)/              Protected routes (dashboard, audit, documents, monitoring, settings)
+    monitoring/
+      page.tsx              Thin RSC wrapper — fetches is_dev, passes to MonitoringClient
+      monitoring-client.tsx Client component with jurisdiction locking
   (auth)/             Public auth routes (login, signup, forgot-password)
   (legal)/            Legal pages (about, privacy, terms, security)
-  api/                API routes (documents, analyse, findings, monitoring, profile)
+  api/
+    analyse/          POST — gap analysis pipeline (jurisdiction enforcement, re-scan delta)
+    documents/        POST — upload; [id]/ DELETE + download/GET
+    findings/[id]/    draft/POST + status/PATCH (incl. risk_accepted)
+    monitoring/       feed/GET, refresh/POST, digest/POST
+    profile/          PATCH — upsert firm profile
+    request-access/   POST — early access form → Resend email
   auth/               Auth flow handlers (callback, reset-password, mfa)
   demo/               Public demos (clearview, gdpr)
   onboarding/         Post-signup onboarding
@@ -128,15 +141,17 @@ lib/
   pdf.ts              PDF text extraction
   currency.ts         Country-to-currency mapping
   env.ts              Startup environment variable validation
-  demo-data.ts        Seeded demo audit data
+  demo-data.ts        Seeded demo audit data (Clearview Capital + Northwind GDPR)
 
 components/
-  marketing/          Landing page
-  audit/              Audit report, upload form, coverage matrix, comparison
+  marketing/          Landing page (UK compliance scenario & policy risk engine)
+  audit/              AuditReport, UploadForm, CoverageMatrix, AuditComparison, NewAuditForm
+  documents/          DocumentActions (download + delete)
+  settings/           MfaSettings (TOTP enrol/manage)
   ui/                 Shared UI primitives (logo, nav, risk-badge, sign-out-button)
 
 types/
-  index.ts            All shared TypeScript types and enums
+  index.ts            All shared TypeScript types and enums (Jurisdiction, RegulatoryFramework, Profile incl. is_dev)
 
 supabase/
   migrations/         SQL migration files (applied in order)

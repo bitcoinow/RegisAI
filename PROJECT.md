@@ -1,6 +1,6 @@
 # RegisAI — Project Status & Living Document
 
-> **Last updated:** 2026-06-09
+> **Last updated:** 2026-06-11
 > This file is the single source of truth for project state, feature history, and planned work. Updated at the end of every session with new plans and changes.
 
 ---
@@ -81,7 +81,8 @@ components/
 | `20260601000000_findings_add_drafted_policy.sql` | `drafted_policy` col on `findings` |
 | `20260603000000_audits_add_framework_and_rescan.sql` | Framework, re-scan, posture score cols |
 | `20260603000001_findings_add_review_and_riskaccept.sql` | Review/risk-accept audit trail cols |
-| `20260603000002_documents_add_delete_rls.sql` | RLS policies for document deletion |
+| `20260604000000_documents_delete_policies.sql` | RLS policies for document deletion |
+| `20260610000000_profiles_add_is_dev.sql` | `is_dev` boolean flag for jurisdiction access control |
 
 ---
 
@@ -122,6 +123,14 @@ components/
 - Demo nav bars: breadcrumbs + cross-demo links on both `/demo/clearview` and `/demo/gdpr`
 - GDPR Re-scan Demo CTA added to CTAFooter alongside "View Sample Audit"
 
+### 2026-06-09 — Jurisdiction access control (UK-only for regular users)
+- `is_dev` boolean column added to `profiles` table (`20260610000000_profiles_add_is_dev.sql`)
+- `NewAuditForm` locks jurisdiction tabs to UK for non-dev users; dev team retains US/EU/UK
+- `/api/analyse` enforces UK-only jurisdiction server-side (HTTP 403 for non-dev US/EU attempts)
+- `MonitoringClient` component created — jurisdiction locking in monitoring feed for regular users
+- Monitoring page refactored from 266-line page to thin RSC wrapper passing `isDevUser` to client
+- Two Diamen accounts (`is_dev = true`) enabled in Supabase production
+
 ### 2026-06-09 — MVP landing page redesign (UK compliance scenario & policy risk engine)
 - Complete rewrite of `components/marketing/landing-page.tsx` (~1485 → ~850 lines)
 - Product repositioned from FCA-only financial services to UK compliance scenario & policy risk engine targeting media and advertising companies
@@ -149,6 +158,14 @@ components/
 - Testimonials: updated to FCA/UK context
 - CTAFooter: "Book a Demo" replaces "GDPR Re-scan Demo" (with "Soon" badge)
 - New docs: ROADMAP.md, MVP_SCOPE.md, ARCHITECTURE.md
+
+### 2026-06-10 — Nav visibility and signup flow fixes
+- `LandingNav` always visible — removed transparent-at-top behaviour that hid the nav on page load
+- Nav CTA changed from "Request Early Access" anchor-scroll to "Get Started" link → `/signup`
+- Mobile nav CTA also updated to "Get Started" → `/signup`
+- Hero secondary CTA updated to "Get Started Free" → `/signup`
+- Early access form section reframed: "Design Partner Programme" → "Early Access"
+- Nav link label updated: "Request Access" → "Get Access"
 
 ---
 
