@@ -4,5 +4,9 @@
       "mcp__supabase__apply_migration",
       "PowerShell(vercel env ls 2>&1)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "enableAllProjectMcpServers": true
 }
