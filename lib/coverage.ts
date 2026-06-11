@@ -1,6 +1,7 @@
 import { REGULATORY_LIBRARY } from '@/lib/regulatory-library'
 import { EU_REGULATORY_LIBRARY } from '@/lib/eu-regulatory-library'
 import { UK_REGULATORY_LIBRARY } from '@/lib/uk-regulatory-library'
+import { UK_WORKPLACE_LIBRARY } from '@/lib/uk-workplace-library'
 import type {
   Finding,
   Jurisdiction,
@@ -18,7 +19,7 @@ export function getJurisdictionLibrary(jurisdiction: Jurisdiction): RegulatoryRe
   return jurisdiction === 'EU'
     ? EU_REGULATORY_LIBRARY
     : jurisdiction === 'UK'
-    ? UK_REGULATORY_LIBRARY
+    ? [...UK_WORKPLACE_LIBRARY, ...UK_REGULATORY_LIBRARY]
     : REGULATORY_LIBRARY
 }
 

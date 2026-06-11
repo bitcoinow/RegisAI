@@ -87,8 +87,13 @@ export default function SignupPage() {
       </div>
 
       <div className="border border-rule bg-bg-2 p-8">
-        <h2 className="text-ink text-lg mb-1">Create account</h2>
-        <p className="text-ink-3 text-sm mb-6">Start your compliance audit workflow</p>
+        <h2 className="text-ink text-lg mb-1">Create your Regis AI account</h2>
+        <p className="text-ink-3 text-sm mb-1">
+          Analyse UK compliance scenarios, test policies, and prepare clearer escalation notes.
+        </p>
+        <p className="text-ink-3 text-xs mb-6">
+          Regis AI supports early risk identification and does not provide legal advice.
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

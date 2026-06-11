@@ -48,7 +48,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full module map. See [ROADMAP.md]
 | Layer | Choice | Notes |
 |---|---|---|
 | Framework | Next.js 16 (App Router) | TypeScript strict mode throughout |
-| Database & Auth | Supabase | Postgres + Storage + Magic Link auth |
+| Database & Auth | Supabase | Postgres + Storage + email/password auth (with Google OAuth and optional MFA) |
 | AI | Anthropic Claude API | `claude-sonnet-4-20250514` for gap analysis and policy drafting |
 | PDF Parsing | `pdf-parse` | Server-side only — do not use pdf.js server-side |
 | Styling | Tailwind CSS | Custom design system (editorial compliance aesthetic) |
@@ -74,7 +74,7 @@ RegisAI/
 │   │   └── monitoring/page.tsx       # Regulatory feed — US / EU / UK tabs
 │   ├── (auth)/
 │   │   ├── layout.tsx
-│   │   └── login/page.tsx            # Magic link OTP login
+│   │   └── login/page.tsx            # Email/password + Google OAuth login
 │   ├── (legal)/
 │   │   ├── layout.tsx                # Shared legal page wrapper
 │   │   ├── about/page.tsx            # About page
@@ -451,7 +451,7 @@ Or run each file in `supabase/migrations/` in chronological order via the Supaba
 - [x] PDF upload + server-side text extraction
 - [x] Gap analysis API route (`/api/analyse`)
 - [x] Audit report page with expandable findings
-- [x] Supabase auth (magic link OTP)
+- [x] Supabase auth (email/password + Google OAuth)
 - [x] User dashboard (audit history with risk summary)
 - [x] Demo environment (`/demo/clearview` — no login required)
 - [x] Deployed to Vercel (auto-deploy from `main`)

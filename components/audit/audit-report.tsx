@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Audit, Finding, FindingStatus, RiskLevel } from '@/types'
 import { RiskBadge } from '@/components/ui/risk-badge'
+import { AiDisclaimer } from '@/components/ui/ai-disclaimer'
 import { CoverageMatrix } from '@/components/audit/coverage-matrix'
 import { AuditComparison, type ComparisonData } from '@/components/audit/audit-comparison'
 import type { CoverageItem } from '@/lib/coverage'
@@ -13,7 +14,7 @@ const RISK_ORDER: Record<RiskLevel, number> = { High: 0, Medium: 1, Low: 2 }
 const JURISDICTION_FRAMEWORKS: Record<string, string> = {
   US: 'FINRA · SEC · AML/BSA · Reg BI · BCP',
   EU: 'MiFID II · GDPR · AMLD6 · DORA · SFDR · MAR',
-  UK: 'FCA Rules · UK AML · UK GDPR · SM&CR · FCA OpRes',
+  UK: 'UK Workplace · FCA Rules · UK AML · UK GDPR · SM&CR',
 }
 
 const STATUS_CONFIG: Record<FindingStatus, { label: string; color: string }> = {
@@ -491,9 +492,10 @@ export function AuditReport({
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <div className="pt-8 border-t border-rule">
-        <p className="font-mono text-xs text-ink-3">
-          Prepared by Regis &nbsp;·&nbsp; All findings are recommendations, not legal advice.
-          High-risk findings require human review before remediation.
+        <AiDisclaimer />
+        <p className="font-mono text-xs text-ink-3 mt-4">
+          Prepared by Regis &nbsp;·&nbsp; High-risk findings should be escalated before further
+          action is taken.
         </p>
       </div>
     </div>

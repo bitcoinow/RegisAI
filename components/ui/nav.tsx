@@ -91,25 +91,6 @@ function DocIcon() {
   )
 }
 
-function BellIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="w-5 h-5"
-    >
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  )
-}
-
 function SettingsIcon() {
   return (
     <svg
@@ -129,10 +110,31 @@ function SettingsIcon() {
   )
 }
 
+function ScaleIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-5 h-5"
+    >
+      <path d="M12 3v18" />
+      <path d="M5 7l7-4 7 4" />
+      <path d="M5 7l-3 7a4 4 0 0 0 6 0z" />
+      <path d="M19 7l-3 7a4 4 0 0 0 6 0z" />
+    </svg>
+  )
+}
+
 const bottomTabs = [
   { href: '/dashboard', label: 'Dashboard', Icon: HomeIcon },
-  { href: '/documents', label: 'Documents', Icon: DocIcon },
-  { href: '/monitoring', label: 'Monitoring', Icon: BellIcon },
+  { href: '/scenario', label: 'Scenario', Icon: ScaleIcon },
+  { href: '/audit/new', label: 'Policy', Icon: DocIcon },
   { href: '/settings', label: 'Settings', Icon: SettingsIcon },
 ]
 
@@ -153,6 +155,18 @@ export function Nav({ email, firmName }: NavProps) {
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-6">
             <Link
+              href="/scenario"
+              className="text-sm text-ink-2 hover:text-ink transition-colors"
+            >
+              Scenario Analyzer
+            </Link>
+            <Link
+              href="/audit/new"
+              className="text-sm text-ink-2 hover:text-ink transition-colors"
+            >
+              Policy Analyzer
+            </Link>
+            <Link
               href="/documents"
               className="text-sm text-ink-2 hover:text-ink transition-colors"
             >
@@ -169,12 +183,6 @@ export function Nav({ email, firmName }: NavProps) {
               className="text-sm text-ink-2 hover:text-ink transition-colors"
             >
               Settings
-            </Link>
-            <Link
-              href="/audit/new"
-              className="text-sm text-green hover:opacity-80 transition-colors"
-            >
-              New Audit
             </Link>
             <span className="text-ink-3 text-sm">{firmName ?? email}</span>
             <SignOutButton />
@@ -201,6 +209,20 @@ export function Nav({ email, firmName }: NavProps) {
               Dashboard
             </Link>
             <Link
+              href="/scenario"
+              className="flex items-center min-h-[48px] text-sm text-ink-2 hover:text-ink transition-colors"
+              onClick={() => setOpen(false)}
+            >
+              Scenario Analyzer
+            </Link>
+            <Link
+              href="/audit/new"
+              className="flex items-center min-h-[48px] text-sm text-ink-2 hover:text-ink transition-colors"
+              onClick={() => setOpen(false)}
+            >
+              Policy Analyzer
+            </Link>
+            <Link
               href="/documents"
               className="flex items-center min-h-[48px] text-sm text-ink-2 hover:text-ink transition-colors"
               onClick={() => setOpen(false)}
@@ -220,13 +242,6 @@ export function Nav({ email, firmName }: NavProps) {
               onClick={() => setOpen(false)}
             >
               Settings
-            </Link>
-            <Link
-              href="/audit/new"
-              className="flex items-center min-h-[48px] text-sm text-green hover:opacity-80 transition-colors"
-              onClick={() => setOpen(false)}
-            >
-              New Audit
             </Link>
             <div className="border-t border-rule mt-1 pt-2 pb-1 flex items-center justify-between">
               <span className="text-ink-3 text-sm">{firmName ?? email}</span>

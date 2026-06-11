@@ -60,7 +60,7 @@ export default function SecurityPage() {
         <Callout>
           Regis is built on a strict multi-tenant architecture. Every customer account is completely isolated from every other. This isolation is enforced at the database layer — not just the application layer — making it structurally impossible for one account to access another's data.
         </Callout>
-        <p>The platform is built on Next.js (App Router) deployed on Vercel, with Supabase as the database and file storage layer. All components are cloud-native and operate under the security controls of their respective providers, both of which hold SOC 2 Type II certification.</p>
+        <p>The platform is built on Next.js (App Router) deployed on Vercel, with Supabase as the database and file storage layer. All components are cloud-native and operate under the security controls of their respective providers; Vercel and Supabase each hold SOC 2 Type II certification as infrastructure subprocessors. Regis itself has not yet undergone an independent certification audit.</p>
       </Section>
 
       <Section title="Data Isolation (Multi-Tenant)">
@@ -91,11 +91,16 @@ export default function SecurityPage() {
         <List items={[
           'Document text is extracted server-side using a local PDF parser (pdf-parse). The raw file is never sent to Anthropic.',
           'Extracted text is truncated to 12,000 characters before being sent to the Anthropic API. This minimises the amount of firm data transmitted per request.',
-          'Anthropic\'s API operates under a zero-data-retention policy for API-submitted content. Content submitted via the API is not used to train models.',
+          'Per Anthropic\'s API data usage terms, content submitted via the API is not used to train models. See Anthropic\'s published commercial terms for current detail on API data handling.',
           'All API calls to Anthropic are made over TLS from Regis\'s server environment. The Anthropic API key is stored as a server-side environment variable and is never exposed to the browser.',
           'When drafting remediation policy language, only the relevant finding\'s details are sent to the API — never the full source document.',
           'Analysis results and any AI-drafted policy language (the findings, not the original document text) are stored in your account\'s audit history under the same row-level security guarantees as all other data.',
         ]} />
+        <p>
+          Users should not upload highly sensitive personal, legal, financial, medical, or
+          confidential client information unless proper agreements and controls are in place.
+          Regis AI outputs are informational and should be reviewed by qualified professionals.
+        </p>
       </Section>
 
       <Section title="Infrastructure and Providers">
@@ -104,8 +109,8 @@ export default function SecurityPage() {
           {[
             { name: 'Vercel', cert: 'SOC 2 Type II', desc: 'Application hosting, edge network, and DDoS protection. Production deployments are immutable and built from a locked dependency tree.' },
             { name: 'Supabase', cert: 'SOC 2 Type II', desc: 'PostgreSQL database, file storage, and authentication. Hosted on AWS with encryption at rest and in transit.' },
-            { name: 'Anthropic', cert: 'Enterprise API agreement', desc: 'AI inference for gap analysis. Zero-data-retention API policy. No model training on submitted content.' },
-            { name: 'Resend', cert: 'SOC 2 Type II', desc: 'Transactional email delivery for magic-link authentication and regulatory monitoring digests.' },
+            { name: 'Anthropic', cert: 'Commercial API agreement', desc: 'AI inference for scenario and policy analysis. Per Anthropic\'s API terms, submitted content is not used for model training.' },
+            { name: 'Resend', cert: 'SOC 2 Type II', desc: 'Transactional email delivery for account verification emails and regulatory monitoring digests.' },
           ].map((p) => (
             <div key={p.name} className="p-4 border border-rule bg-bg-2">
               <div className="flex items-baseline justify-between mb-1">

@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { Profile, FirmType, Regulator } from '@/types'
 
-const VALID_FIRM_TYPES: FirmType[] = ['RIA', 'Fintech', 'Insurance', 'Bank']
-const VALID_REGULATORS: Regulator[] = ['FINRA', 'SEC', 'State', 'Multiple']
+const VALID_FIRM_TYPES: FirmType[] = [
+  'Financial Services',
+  'Professional Services',
+  'Technology',
+  'Public Sector',
+  'Other',
+]
+const VALID_REGULATORS: Regulator[] = ['FCA', 'ICO', 'Multiple', 'None / Other']
 
 export async function PATCH(req: NextRequest): Promise<NextResponse> {
   const supabase = await createClient()

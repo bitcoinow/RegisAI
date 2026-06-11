@@ -57,7 +57,7 @@ export default function TermsPage() {
         <List items={[
           'AI-powered gap analysis of compliance documents and scenarios against regulatory requirements.',
           'AI-generated draft policy language intended to remediate identified findings.',
-          'Real-time monitoring of regulatory publications across US, EU, and UK jurisdictions.',
+          'Monitoring of regulatory publications, with a current focus on UK requirements (EU and US coverage is planned for future releases).',
           'Audit report generation and findings management.',
           'Organisation-specific regulatory context based on your sector, jurisdiction, and applicable frameworks.',
         ]} />
@@ -68,7 +68,7 @@ export default function TermsPage() {
 
       <Section title="3. Accounts and Access">
         <p><strong className="text-ink">Account creation.</strong> You must provide accurate information when creating your account, including your firm name, type, and regulatory context. Keeping this information current is your responsibility.</p>
-        <p><strong className="text-ink">Account security.</strong> You are responsible for maintaining the security of your account. Regis uses passwordless magic-link authentication to eliminate password breach risk. If you believe your account has been compromised, contact us immediately at <span className="font-mono text-sm">security@regis.ai</span>.</p>
+        <p><strong className="text-ink">Account security.</strong> You are responsible for maintaining the security of your account, including your password. Regis uses email and password authentication with email verification, with Google sign-in and optional multi-factor authentication also available. If you believe your account has been compromised, contact us immediately at <span className="font-mono text-sm">security@regis.ai</span>.</p>
         <p><strong className="text-ink">One account per firm.</strong> Each firm should operate under a single account. Sharing accounts across unrelated firms or individuals is not permitted.</p>
       </Section>
 

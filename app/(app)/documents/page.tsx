@@ -6,6 +6,7 @@ import type { DocumentStatus } from '@/types'
 interface DocumentRow {
   id: string
   file_name: string
+  file_path: string | null
   page_count: number | null
   status: DocumentStatus
   created_at: string
@@ -48,7 +49,7 @@ export default async function DocumentsPage() {
 
   const { data: documents } = await supabase
     .from('documents')
-    .select('id, file_name, page_count, status, created_at')
+    .select('id, file_name, file_path, page_count, status, created_at')
     .order('created_at', { ascending: false })
 
   const rows = (documents ?? []) as DocumentRow[]
@@ -172,7 +173,11 @@ export default async function DocumentsPage() {
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      <DocumentActions documentId={doc.id} auditCount={docAudits.length} />
+                      <DocumentActions
+                        documentId={doc.id}
+                        auditCount={docAudits.length}
+                        hasFile={doc.file_path != null}
+                      />
                     </td>
                   </tr>
                 )

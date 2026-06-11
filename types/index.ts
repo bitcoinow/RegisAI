@@ -1,8 +1,8 @@
 export type RiskLevel = 'High' | 'Medium' | 'Low'
 
-export type FirmType = 'RIA' | 'Fintech' | 'Insurance' | 'Bank'
+export type FirmType = 'Financial Services' | 'Professional Services' | 'Technology' | 'Public Sector' | 'Other'
 
-export type Regulator = 'FINRA' | 'SEC' | 'State' | 'Multiple'
+export type Regulator = 'FCA' | 'ICO' | 'Multiple' | 'None / Other'
 
 export type DocumentStatus = 'uploaded' | 'analysing' | 'complete' | 'error'
 
@@ -15,8 +15,38 @@ export type RegulatoryFramework =
   | 'MiFID II' | 'GDPR' | 'AMLD' | 'DORA' | 'SFDR' | 'MAR'
   // UK
   | 'SM&CR' | 'FCA Conduct' | 'FCA Systems' | 'UK AML' | 'UK GDPR' | 'FCA OpRes'
+  | 'UK Workplace'
 
 export type Jurisdiction = 'US' | 'EU' | 'UK'
+
+// ── Scenario analysis types ───────────────────────────────────────────────────
+
+export type ScenarioRiskRating = 'Low' | 'Medium' | 'High' | 'Critical'
+
+export type ScenarioCategory =
+  | 'Bribery & Corruption'
+  | 'Gifts & Hospitality'
+  | 'Conflict of Interest'
+  | 'Procurement Fairness'
+  | 'Sanctions'
+  | 'Data Protection'
+  | 'HR & Workplace Conduct'
+  | 'Reputational Risk'
+  | 'Escalation Requirement'
+
+export interface ScenarioResult {
+  risk_rating: ScenarioRiskRating
+  risk_categories: ScenarioCategory[]
+  // Plain-English description of the risk and why it matters (2–4 paragraphs).
+  explanation: string
+  // Ordered, concrete recommended actions.
+  next_steps: string[]
+  // Neutral, factual note the user can send to compliance/legal — no admissions
+  // or legal conclusions.
+  escalation_note: string
+  // Facts a human reviewer should establish before deciding.
+  key_questions?: string[]
+}
 
 // ── Regulatory library ────────────────────────────────────────────────────────
 

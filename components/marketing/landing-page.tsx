@@ -74,26 +74,6 @@ function ReviewIcon() {
   )
 }
 
-function DashboardIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="14" width="7" height="7" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
-    </svg>
-  )
-}
-
-function AuditIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-      <polyline points="9 11 12 14 22 4" />
-      <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-    </svg>
-  )
-}
-
 function AlertIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
@@ -134,10 +114,11 @@ function CheckIcon() {
 // ─── LandingNav ───────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-  { label: 'Features', href: '#features' },
-  { label: 'How it Works', href: '#how-it-works' },
-  { label: 'Use Cases', href: '#use-cases' },
-  { label: 'Get Access', href: '#access' },
+  { label: 'Home', href: '/' },
+  { label: 'Scenario Analyzer', href: '/scenario' },
+  { label: 'Policy Analyzer', href: '/audit/new' },
+  { label: 'Demo', href: '/demo/uk-gifts-hospitality' },
+  { label: 'About', href: '/about' },
 ]
 
 function LandingNav() {
@@ -165,13 +146,13 @@ function LandingNav() {
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map(l => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               className="text-sm text-[--ink-2] hover:text-[--ink] transition-colors"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -182,12 +163,12 @@ function LandingNav() {
           >
             Sign in
           </Link>
-          <Link
-            href="/signup"
+          <a
+            href="#access"
             className="text-sm font-medium bg-[--green] text-[--bg] px-4 py-2 rounded hover:opacity-90 transition-opacity"
           >
-            Get Started
-          </Link>
+            Request Access
+          </a>
         </div>
 
         {/* Mobile hamburger */}
@@ -205,14 +186,14 @@ function LandingNav() {
       {menuOpen && (
         <div className="md:hidden bg-[--bg] border-t border-[--rule] px-4 py-4 flex flex-col gap-1">
           {NAV_LINKS.map(l => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               onClick={() => setMenuOpen(false)}
               className="py-3 text-sm text-[--ink-2] hover:text-[--ink] border-b border-[--rule] last:border-0 transition-colors"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
           <div className="pt-3 flex flex-col gap-2">
             <Link
@@ -221,13 +202,13 @@ function LandingNav() {
             >
               Sign in
             </Link>
-            <Link
-              href="/signup"
+            <a
+              href="#access"
               onClick={() => setMenuOpen(false)}
               className="py-2.5 text-sm text-center font-medium bg-[--green] text-[--bg] rounded hover:opacity-90 transition-opacity"
             >
-              Get Started
-            </Link>
+              Request Access
+            </a>
           </div>
         </div>
       )}
@@ -248,27 +229,27 @@ function Hero() {
                 UK Compliance Intelligence Platform
               </p>
               <h1 className="font-serif text-4xl md:text-5xl xl:text-6xl text-[--bg] leading-tight mb-6">
-                Assess UK compliance risks before they become problems.
+                Spot compliance risk before it becomes a problem.
               </h1>
               <p className="text-base md:text-lg text-[--bg] opacity-75 leading-relaxed mb-8 max-w-lg">
-                Regis AI helps compliance, legal, risk, and governance teams analyse real-world business scenarios, review internal policies, identify potential gaps, and produce structured risk assessments with human oversight.
+                Regis AI helps UK teams analyse workplace scenarios, review policies, and identify early compliance red flags before escalation.
               </p>
               <div className="flex flex-col xs:flex-row gap-3 mb-5">
                 <Link
-                  href="/demo/gdpr"
+                  href="/demo/uk-gifts-hospitality"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[--gold] text-white font-medium text-sm rounded hover:opacity-90 transition-opacity"
                 >
                   Analyse a Sample Scenario
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/audit/new"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/30 text-[--bg] font-medium text-sm rounded hover:bg-white/10 transition-colors"
                 >
-                  Get Started Free
+                  Upload a Policy for Review
                 </Link>
               </div>
               <p className="text-xs text-[--bg] opacity-45 max-w-sm leading-relaxed">
-                AI-assisted guidance only. Final decisions remain with authorised compliance, legal, or risk professionals.
+                Built for early risk identification. Not a substitute for legal or compliance advice.
               </p>
             </Reveal>
           </div>
@@ -286,13 +267,13 @@ function Hero() {
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-[--bg] opacity-50">Risk level</span>
                   <span className="font-mono text-[10px] font-bold text-red-300 bg-red-950/40 border border-red-700/30 px-2.5 py-1 rounded uppercase tracking-wider">
-                    ● Critical
+                    ● High
                   </span>
                 </div>
                 <div className="border-t border-white/10 pt-3">
                   <p className="font-mono text-[10px] uppercase tracking-wider text-[--bg] opacity-50 mb-2">Risk areas</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {['Bribery', 'Gifts & Hospitality', 'Conflict of Interest', 'Reputational Risk'].map(tag => (
+                    {['Bribery', 'Gifts & Hospitality', 'Procurement Fairness', 'Conflict of Interest', 'Reputational Risk'].map(tag => (
                       <span
                         key={tag}
                         className="text-xs text-[--bg] opacity-75 border border-white/20 px-2 py-0.5 rounded"
@@ -318,121 +299,28 @@ function Hero() {
   )
 }
 
-// ─── Problem ──────────────────────────────────────────────────────────────────
-
-const PROBLEMS = [
-  {
-    title: 'Grey-area decisions',
-    text: 'Real-world scenarios often require judgement, context, and escalation — not a simple yes or no answer.',
-  },
-  {
-    title: 'Inconsistent guidance',
-    text: 'Different teams may interpret the same risk differently without a structured, repeatable process.',
-  },
-  {
-    title: 'Weak audit trail',
-    text: 'Decisions often live in email threads, spreadsheets, or verbal conversations instead of a reviewable compliance record.',
-  },
-]
-
-function Problem() {
-  return (
-    <section className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6">
-      <div className="max-w-6xl mx-auto">
-        <Reveal>
-          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">The problem</p>
-          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-6 max-w-2xl leading-tight">
-            Compliance risk rarely arrives as a simple yes-or-no question.
-          </h2>
-          <p className="text-[--ink-2] leading-relaxed mb-12 max-w-2xl">
-            Teams face practical situations where policy, law, and business pressure overlap. A client offers hospitality. A vendor has sanctions exposure. A policy is outdated. A business unit wants to know whether an activity is acceptable, risky, or requires escalation.
-          </p>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {PROBLEMS.map((p, i) => (
-            <Reveal key={p.title} delay={i * 70}>
-              <div className="border border-[--rule] bg-[--bg] rounded p-6 h-full">
-                <h3 className="font-serif text-lg text-[--ink] mb-3">{p.title}</h3>
-                <p className="text-sm text-[--ink-2] leading-relaxed">{p.text}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ─── What Regis Does ──────────────────────────────────────────────────────────
-
-const WHAT_REGIS_DOES = [
-  {
-    icon: <ScenarioIcon />,
-    title: 'Analyse business scenarios',
-    text: 'Enter a real-world scenario in plain English. Regis identifies key facts, missing information, risk categories, evidence needed, and next steps.',
-  },
-  {
-    icon: <PolicyIcon />,
-    title: 'Review internal policies',
-    text: 'Upload or paste policies such as anti-bribery, gifts and hospitality, sanctions, GDPR, HR, fraud, vendor onboarding, and conflict of interest policies.',
-  },
-  {
-    icon: <AuditIcon />,
-    title: 'Create review-ready outputs',
-    text: 'Generate structured assessments with risk ratings, rationale, escalation guidance, human review status, and exportable reports.',
-  },
-]
-
-function WhatRegisDoes() {
-  return (
-    <section id="features" className="bg-[--bg] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
-      <div className="max-w-6xl mx-auto">
-        <Reveal>
-          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">What Regis does</p>
-          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-16 max-w-xl leading-tight">
-            From scenario to structured risk assessment.
-          </h2>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {WHAT_REGIS_DOES.map((item, i) => (
-            <Reveal key={item.title} delay={i * 80}>
-              <div className="flex flex-col gap-4">
-                <div className="w-10 h-10 rounded border border-[--rule] bg-[--bg-2] flex items-center justify-center text-[--green]">
-                  {item.icon}
-                </div>
-                <h3 className="font-serif text-xl text-[--ink]">{item.title}</h3>
-                <p className="text-sm text-[--ink-2] leading-relaxed">{item.text}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // ─── How It Works ─────────────────────────────────────────────────────────────
 
 const STEPS = [
   {
     num: '01',
-    title: 'Describe the scenario or upload a policy',
-    text: 'Enter a real-world business situation in plain English, or upload your internal policy document for gap analysis.',
+    title: 'Submit a scenario or policy',
+    text: 'Describe a real-world situation in plain English, or upload or paste an internal policy document.',
   },
   {
     num: '02',
-    title: 'Regis analyses against UK compliance expectations',
-    text: 'The AI identifies risk categories, potential gaps, missing information, relevant UK regulations, and required evidence.',
+    title: 'AI identifies risk signals',
+    text: 'Regis flags risk categories, potential gaps, and missing information against UK workplace compliance expectations.',
   },
   {
     num: '03',
-    title: 'Review the draft risk assessment',
-    text: 'A structured draft output is generated with risk ratings, rationale, escalation guidance, and recommended next steps — all marked as AI-assisted and requiring human review.',
+    title: 'Review structured findings',
+    text: 'You get a risk rating, plain-English explanation, recommended next steps, and a draft escalation note — all marked as requiring human review.',
   },
   {
     num: '04',
-    title: 'Approve, escalate, or close — with full audit trail',
-    text: 'Compliance reviewers edit, approve, reject, or escalate. Every action is timestamped and recorded in the audit history.',
+    title: 'Escalate to the right decision-maker',
+    text: 'High-risk matters are flagged for escalation to qualified compliance, legal, HR, or governance professionals before any action is taken.',
   },
 ]
 
@@ -463,10 +351,10 @@ function HowItWorks() {
         </div>
         <Reveal delay={320} className="mt-12">
           <Link
-            href="/demo/gdpr"
+            href="/demo/uk-gifts-hospitality"
             className="inline-flex items-center gap-2 text-sm font-medium text-[--bg] border border-white/30 px-5 py-2.5 rounded hover:bg-white/10 transition-colors"
           >
-            See a sample review →
+            See a sample scenario analysis →
           </Link>
         </Reveal>
       </div>
@@ -480,78 +368,53 @@ const MODULES = [
   {
     icon: <ScenarioIcon />,
     title: 'Scenario Risk Analyzer',
-    text: 'Analyse grey-area scenarios involving bribery, hospitality, sanctions, data protection, HR, fraud, vendor onboarding, and reputational risk.',
-    status: 'planned' as const,
+    text: 'Describe a real-world workplace scenario in plain English. Regis returns a risk rating, UK compliance categories, a plain-English explanation, and recommended next steps.',
+    href: '/scenario',
+    cta: 'Analyse a scenario',
   },
   {
     icon: <PolicyIcon />,
     title: 'Policy Gap Analyzer',
-    text: 'Review internal policies against UK compliance expectations and identify missing clauses, weak wording, outdated language, and priority actions.',
-    status: 'live' as const,
+    text: 'Upload or paste an internal policy. Regis identifies missing clauses, weak wording, escalation gaps, and ownership gaps against UK workplace compliance expectations.',
+    href: '/audit/new',
+    cta: 'Review a policy',
   },
   {
     icon: <ReviewIcon />,
-    title: 'Human Review Workflow',
-    text: 'Mark AI outputs as draft, review findings, edit recommendations, approve, reject, escalate, and close assessments.',
-    status: 'live' as const,
-  },
-  {
-    icon: <DashboardIcon />,
-    title: 'Compliance Dashboard',
-    text: 'Track open assessments, high-risk cases, pending reviews, policy gaps, recent activity, and risk by category.',
-    status: 'live' as const,
-  },
-  {
-    icon: <AuditIcon />,
-    title: 'Audit Trail & Reporting',
-    text: 'Maintain a record of user inputs, AI outputs, reviewer edits, decisions, timestamps, escalation history, and exported reports.',
-    status: 'live' as const,
+    title: 'Escalation Note Generator',
+    text: 'Every scenario analysis includes a neutral, factual draft escalation note — ready to review, edit, and send to compliance, legal, HR, or governance.',
+    href: '/scenario',
+    cta: 'See how it works',
   },
 ]
 
-function ModuleStatusBadge({ status }: { status: 'live' | 'planned' }) {
-  if (status === 'live') {
-    return (
-      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[--green] border border-[--green]/30 bg-[--green-tint] px-2 py-0.5 rounded">
-        <span className="w-1.5 h-1.5 rounded-full bg-[--green] inline-block" />
-        Live
-      </span>
-    )
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[--amber] border border-[--amber]/30 bg-amber-50 px-2 py-0.5 rounded">
-      Coming soon
-    </span>
-  )
-}
-
 function CoreModules() {
   return (
-    <section className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6">
+    <section id="features" className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
       <div className="max-w-6xl mx-auto">
         <Reveal>
-          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Core MVP modules</p>
-          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-4 max-w-xl leading-tight">
+          <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">What Regis does</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-12 max-w-xl leading-tight">
             Built around the work compliance teams actually do.
           </h2>
-          <p className="text-sm text-[--ink-3] mb-12 max-w-lg leading-relaxed">
-            Modules marked <span className="font-medium text-[--ink-2]">Live</span> are available now. Modules marked <span className="font-medium text-[--ink-2]">Coming soon</span> are planned for the MVP.
-          </p>
         </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {MODULES.map((m, i) => (
             <Reveal key={m.title} delay={i * 60}>
               <div className="border border-[--rule] bg-[--bg] rounded p-6 flex flex-col gap-4 h-full">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="w-9 h-9 rounded border border-[--rule] bg-[--bg-2] flex items-center justify-center text-[--green] shrink-0">
-                    {m.icon}
-                  </div>
-                  <ModuleStatusBadge status={m.status} />
+                <div className="w-9 h-9 rounded border border-[--rule] bg-[--bg-2] flex items-center justify-center text-[--green] shrink-0">
+                  {m.icon}
                 </div>
-                <div>
+                <div className="flex-1">
                   <h3 className="font-serif text-lg text-[--ink] mb-2">{m.title}</h3>
                   <p className="text-sm text-[--ink-2] leading-relaxed">{m.text}</p>
                 </div>
+                <Link
+                  href={m.href}
+                  className="text-sm font-medium text-[--green] hover:opacity-80 transition-opacity"
+                >
+                  {m.cta} →
+                </Link>
               </div>
             </Reveal>
           ))}
@@ -567,7 +430,7 @@ const SCENARIOS = [
   {
     title: 'Hospitality during a pitch process',
     text: 'A prospective client is taken to dinner and a hotel during a live pitch, then asks for recurring monthly benefits before approving the vendor relationship.',
-    tags: ['Bribery risk', 'Gifts & hospitality', 'Conflict of interest', 'Escalation required'],
+    tags: ['Bribery risk', 'Gifts & hospitality', 'Procurement fairness', 'Conflict of interest', 'Reputational risk'],
     risk: 'High',
   },
   {
@@ -625,173 +488,122 @@ function ExampleScenarios() {
             </Reveal>
           ))}
         </div>
+        <Reveal delay={280} className="mt-10">
+          <Link
+            href="/demo/uk-gifts-hospitality"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[--green] hover:opacity-80 transition-opacity"
+          >
+            View the full sample analysis →
+          </Link>
+        </Reveal>
       </div>
     </section>
   )
 }
 
-// ─── Industry Focus ───────────────────────────────────────────────────────────
+// ─── Who It's For ─────────────────────────────────────────────────────────────
 
-const MEDIA_AD_AREAS = [
-  'Client pitches and entertainment',
-  'Hospitality, gifts and events',
-  'Agency and vendor relationships',
-  'Vendor onboarding and due diligence',
-  'Personal data handling (UK GDPR)',
-  'Employee-related obligations',
-  'Global parent-company exposure',
-  'Sanctions and anti-bribery risk',
-  'Contractual compliance obligations',
+const AUDIENCES = [
+  {
+    title: 'Compliance teams',
+    text: 'Structure grey-area scenarios and triage what genuinely needs escalation.',
+  },
+  {
+    title: 'HR leaders',
+    text: 'Sense-check workplace conduct situations and policy wording before they grow.',
+  },
+  {
+    title: 'SMEs',
+    text: 'Get a first structured read on risk without a full in-house compliance function.',
+  },
+  {
+    title: 'Agencies and consultancies',
+    text: 'Navigate pitches, client hospitality, and procurement processes with confidence.',
+  },
+  {
+    title: 'Governance teams',
+    text: 'Test policies for ownership, review cycles, and escalation gaps.',
+  },
+  {
+    title: 'Founders and operations leaders',
+    text: 'Spot red flags early and know who to take them to.',
+  },
 ]
 
-function IndustryFocus() {
+function WhoItsFor() {
   return (
-    <section className="bg-[--green] py-20 md:py-28 px-4 md:px-6">
+    <section id="use-cases" className="bg-[--green] py-20 md:py-28 px-4 md:px-6 scroll-mt-16">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-          <Reveal>
-            <p className="font-mono text-xs uppercase tracking-widest text-[--gold] mb-4">Initial focus</p>
-            <h2 className="font-serif text-3xl md:text-4xl text-[--bg] mb-6 leading-tight">
-              Starting with UK media and advertising compliance. Built to expand.
-            </h2>
-            <p className="text-[--bg] opacity-75 leading-relaxed mb-6">
-              Regis AI is initially focused on UK-based media and advertising companies because this sector regularly deals with client pitches, hospitality, gifts and entertainment, agency relationships, vendor onboarding, personal data handling, employee-related obligations, sanctions exposure, and anti-bribery risk.
-            </p>
-            <p className="text-sm text-[--bg] opacity-50 leading-relaxed border-t border-white/10 pt-5">
-              Future sectors may include financial services, banking, investment management, technology, healthcare, education, public sector, and professional services.
-            </p>
-          </Reveal>
-          <Reveal delay={120}>
-            <p className="font-mono text-xs uppercase tracking-widest text-[--gold] mb-5">
-              Common compliance areas in this sector
-            </p>
-            <ul className="space-y-2.5">
-              {MEDIA_AD_AREAS.map(area => (
-                <li key={area} className="flex items-start gap-3 text-sm text-[--bg] opacity-80">
-                  <span className="mt-1 shrink-0 text-[--gold]">
-                    <CheckIcon />
-                  </span>
-                  {area}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+        <Reveal>
+          <p className="font-mono text-xs uppercase tracking-widest text-[--gold] mb-4">Who it&rsquo;s for</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-[--bg] mb-12 max-w-xl leading-tight">
+            For UK teams who carry the risk when something goes wrong.
+          </h2>
+        </Reveal>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
+          {AUDIENCES.map((a, i) => (
+            <Reveal key={a.title} delay={i * 60}>
+              <div className="flex items-start gap-3">
+                <span className="mt-1 shrink-0 text-[--gold]">
+                  <CheckIcon />
+                </span>
+                <div>
+                  <h3 className="font-serif text-lg text-[--bg] mb-1">{a.title}</h3>
+                  <p className="text-sm text-[--bg] opacity-70 leading-relaxed">{a.text}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
   )
 }
 
-// ─── Compliance Areas ─────────────────────────────────────────────────────────
+// ─── What Regis AI Is Not ─────────────────────────────────────────────────────
 
-const COMPLIANCE_AREAS = [
-  'Bribery and corruption',
-  'Gifts and hospitality',
-  'UK sanctions exposure',
-  'UK GDPR and data protection',
-  'HR and employment compliance',
-  'Fraud risk',
-  'Financial governance',
-  'Vendor / client onboarding',
-  'Conflict of interest',
-  'Reputational risk',
+const NOT_POINTS = [
+  {
+    title: 'Not legal advice',
+    text: 'Regis AI provides structured risk information for review, not legal opinions or advice.',
+  },
+  {
+    title: 'Not a replacement for compliance professionals',
+    text: 'It helps teams prepare better questions and escalation notes for qualified people — it does not replace them.',
+  },
+  {
+    title: 'Not a final decision-maker',
+    text: 'Final decisions should be reviewed by qualified legal, compliance, HR, or governance professionals.',
+  },
+  {
+    title: 'Not a guarantee of regulatory compliance',
+    text: 'The absence of a flag does not mean an activity is compliant, approved, safe, or legal.',
+  },
 ]
 
-const POLICY_TYPES = [
-  'Anti-bribery and corruption policy',
-  'Gifts and hospitality policy',
-  'Sanctions policy',
-  'Data protection / GDPR policy',
-  'HR policy',
-  'Fraud policy',
-  'Whistleblowing policy',
-  'Vendor onboarding policy',
-  'Conflict of interest policy',
-]
-
-function ComplianceAndPolicySection() {
-  return (
-    <section className="bg-[--bg-2] py-20 md:py-28 px-4 md:px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <div>
-            <Reveal>
-              <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Compliance coverage</p>
-              <h2 className="font-serif text-2xl md:text-3xl text-[--ink] mb-8 leading-tight">
-                UK compliance areas covered in the MVP.
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {COMPLIANCE_AREAS.map(area => (
-                  <span
-                    key={area}
-                    className="text-sm text-[--ink-2] border border-[--rule] bg-[--bg] px-3 py-1.5 rounded"
-                  >
-                    {area}
-                  </span>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-          <div>
-            <Reveal delay={100}>
-              <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Policy review</p>
-              <h2 className="font-serif text-2xl md:text-3xl text-[--ink] mb-8 leading-tight">
-                Review the policies your teams already rely on.
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {POLICY_TYPES.map(policy => (
-                  <span
-                    key={policy}
-                    className="text-sm text-[--ink-2] border border-[--rule] bg-[--bg] px-3 py-1.5 rounded"
-                  >
-                    {policy}
-                  </span>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ─── Responsible AI ───────────────────────────────────────────────────────────
-
-const RESPONSIBLE_POINTS = [
-  'AI outputs are marked as draft and require human review',
-  'Risk ratings include rationale and are not final determinations',
-  'Missing facts and information gaps are highlighted',
-  'Escalation guidance is provided, not compliance decisions',
-  'Audit history records inputs, outputs, edits, and decisions',
-  'No output should be acted upon without authorised review',
-]
-
-function ResponsibleAI() {
+function WhatRegisIsNot() {
   return (
     <section className="bg-[--bg] py-20 md:py-28 px-4 md:px-6">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           <Reveal>
-            <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Responsible AI</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-[--ink-3] mb-4">Honest boundaries</p>
             <h2 className="font-serif text-3xl md:text-4xl text-[--ink] mb-6 leading-tight">
-              AI-assisted. Human-reviewed. Audit-ready.
+              What Regis AI is not.
             </h2>
             <p className="text-[--ink-2] leading-relaxed">
-              Regis AI does not provide legal advice and does not replace compliance professionals. It creates structured draft assessments that must be reviewed by authorised compliance, legal, or risk professionals before decisions are made.
+              Regis AI supports early-stage compliance risk identification. It helps teams structure scenarios, identify potential red flags, and prepare better escalation notes — with human professionals making the decisions.
             </p>
             <p className="text-sm text-[--ink-3] leading-relaxed mt-4">
               All outputs use careful language: <em>potential risk</em>, <em>consider</em>, <em>requires review</em>. Regis never states that an activity is compliant, approved, safe, or legal.
             </p>
           </Reveal>
           <Reveal delay={100}>
-            <ul className="space-y-4">
-              {RESPONSIBLE_POINTS.map(point => (
-                <li key={point} className="flex items-start gap-3 text-sm text-[--ink-2] leading-relaxed">
-                  <span className="mt-0.5 shrink-0 text-[--green]">
-                    <CheckIcon />
-                  </span>
-                  {point}
+            <ul className="space-y-6">
+              {NOT_POINTS.map(point => (
+                <li key={point.title} className="border-l-2 border-[--rule] pl-4">
+                  <h3 className="text-sm font-medium text-[--ink] mb-1">{point.title}</h3>
+                  <p className="text-sm text-[--ink-2] leading-relaxed">{point.text}</p>
                 </li>
               ))}
             </ul>
@@ -1174,6 +986,18 @@ function SiteFooter() {
   return (
     <footer className="bg-[--green] py-12 px-4 md:px-6">
       <div className="max-w-6xl mx-auto">
+        {/* Footer CTA */}
+        <div className="border-b border-white/10 pb-10 mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <p className="font-serif text-2xl text-[--bg]">
+            Start with a sample UK compliance scenario.
+          </p>
+          <Link
+            href="/demo/uk-gifts-hospitality"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[--gold] text-white font-medium text-sm rounded hover:opacity-90 transition-opacity shrink-0"
+          >
+            View the sample scenario
+          </Link>
+        </div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
           <RegisLogo href="/" light />
           <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-6 gap-y-2">
@@ -1226,14 +1050,11 @@ export function LandingPage({ defaultCurrency: _ = 'USD' }: { defaultCurrency?: 
       <LandingNav />
       <main id="main-content">
         <Hero />
-        <Problem />
-        <WhatRegisDoes />
-        <HowItWorks />
         <CoreModules />
         <ExampleScenarios />
-        <IndustryFocus />
-        <ComplianceAndPolicySection />
-        <ResponsibleAI />
+        <HowItWorks />
+        <WhoItsFor />
+        <WhatRegisIsNot />
         <EarlyAccessForm />
       </main>
       <SiteFooter />

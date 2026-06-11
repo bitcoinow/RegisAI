@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import { UploadForm } from '@/components/audit/upload-form'
+import { PasteTextForm } from '@/components/audit/paste-text-form'
 import { getScopedRequirements } from '@/lib/coverage'
 import type { Jurisdiction, RegulatoryFramework } from '@/types'
 
-const JURISDICTIONS: { id: Jurisdiction; label: string; count: number; frameworks: string }[] = [
-  { id: 'US', label: 'United States', count: 32, frameworks: 'FINRA · SEC · AML/BSA · Reg BI · BCP' },
-  { id: 'EU', label: 'European Union', count: 34, frameworks: 'MiFID II · GDPR · AMLD6 · DORA · SFDR · MAR' },
-  { id: 'UK', label: 'United Kingdom', count: 19, frameworks: 'FCA Rules · UK AML · UK GDPR · SM&CR · OpRes' },
+const JURISDICTIONS: { id: Jurisdiction; label: string; frameworks: string }[] = [
+  { id: 'UK', label: 'United Kingdom', frameworks: 'UK Workplace · FCA Rules · UK AML · UK GDPR · SM&CR' },
+  { id: 'EU', label: 'European Union', frameworks: 'MiFID II · GDPR · AMLD6 · DORA · SFDR · MAR' },
+  { id: 'US', label: 'United States', frameworks: 'FINRA · SEC · AML/BSA · Reg BI · BCP' },
 ]
 
 // Single-framework options per jurisdiction. The empty value scopes the analysis
@@ -16,15 +17,15 @@ const JURISDICTIONS: { id: Jurisdiction; label: string; count: number; framework
 const FRAMEWORKS_BY_JURISDICTION: Record<Jurisdiction, RegulatoryFramework[]> = {
   US: ['FINRA', 'SEC', 'AML', 'RegBI', 'BCP'],
   EU: ['MiFID II', 'GDPR', 'AMLD', 'DORA', 'SFDR', 'MAR'],
-  UK: ['SM&CR', 'FCA Conduct', 'FCA Systems', 'UK AML', 'UK GDPR', 'FCA OpRes'],
+  UK: ['UK Workplace', 'SM&CR', 'FCA Conduct', 'FCA Systems', 'UK AML', 'UK GDPR', 'FCA OpRes'],
 }
 
 // Default single-framework focus per jurisdiction (empty = whole jurisdiction).
-// EU defaults to GDPR — the flagship single-framework proof point.
+// UK defaults to the workplace-compliance library — the MVP's core scope.
 const DEFAULT_FRAMEWORK: Record<Jurisdiction, RegulatoryFramework | ''> = {
   US: '',
   EU: 'GDPR',
-  UK: '',
+  UK: 'UK Workplace',
 }
 
 // Per-jurisdiction framework bullets for the "What we analyse" grid
@@ -50,14 +51,14 @@ const FRAMEWORK_ITEMS: Record<Jurisdiction, string[]> = {
     'SFDR — ESG Disclosure',
   ],
   UK: [
-    'FCA SM&CR — Senior Manager Responsibilities',
-    'FCA Consumer Duty — Four Outcomes',
-    'FCA COBS — Suitability & Best Interests',
-    'FCA SYSC — Compliance & Risk Functions',
-    'MLR 2017 — AML Policies & CDD',
-    'MLR 2017 — EDD for PEPs',
-    'UK GDPR — Processing & Security',
-    'FCA PS21/3 — Operational Resilience',
+    'Gifts & Hospitality — Thresholds & Register',
+    'Anti-Bribery — Bribery Act 2010 Adequate Procedures',
+    'Conflicts of Interest — Declarations',
+    'Procurement & Pitch-Process Fairness',
+    'Sanctions & Restricted-Party Screening',
+    'UK GDPR — Data Protection Basics',
+    'Escalation & Incident Reporting',
+    'Policy Ownership, Training & Audit Trail',
   ],
 }
 
@@ -66,6 +67,7 @@ export function NewAuditForm({ isDevUser }: { isDevUser: boolean }) {
   const [framework, setFramework] = useState<RegulatoryFramework | ''>(
     DEFAULT_FRAMEWORK[isDevUser ? 'EU' : 'UK']
   )
+  const [inputMode, setInputMode] = useState<'upload' | 'paste'>('upload')
   const selected = JURISDICTIONS.find((j) => j.id === jurisdiction)!
 
   function selectJurisdiction(id: Jurisdiction) {
@@ -141,7 +143,35 @@ export function NewAuditForm({ isDevUser }: { isDevUser: boolean }) {
         <span className="font-mono text-xs">{framework || selected.frameworks}</span>
       </p>
 
-      <UploadForm jurisdiction={jurisdiction} framework={framework || null} />
+      {/* Input mode toggle: PDF upload or pasted text */}
+      <div className="flex border border-rule mb-4" role="tablist" aria-label="Policy input method">
+        {(
+          [
+            { id: 'upload', label: 'Upload PDF' },
+            { id: 'paste', label: 'Paste text' },
+          ] as const
+        ).map((mode) => (
+          <button
+            key={mode.id}
+            type="button"
+            role="tab"
+            aria-selected={inputMode === mode.id}
+            onClick={() => setInputMode(mode.id)}
+            className={[
+              'flex-1 py-2.5 px-4 text-sm border-r border-rule last:border-r-0 transition-colors',
+              inputMode === mode.id ? 'bg-green text-white' : 'bg-bg-2 text-ink-2 hover:bg-bg',
+            ].join(' ')}
+          >
+            {mode.label}
+          </button>
+        ))}
+      </div>
+
+      {inputMode === 'upload' ? (
+        <UploadForm jurisdiction={jurisdiction} framework={framework || null} />
+      ) : (
+        <PasteTextForm jurisdiction={jurisdiction} framework={framework || null} />
+      )}
 
       {/* What we analyse — updates per jurisdiction */}
       <div className="mt-6 pt-6 border-t border-rule">

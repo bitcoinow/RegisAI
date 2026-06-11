@@ -32,7 +32,11 @@ export async function GET(
   return NextResponse.json(documents)
 }
 
-// POST /api/documents — upload a PDF and extract text
+const MAX_PASTED_CHARS = 50_000
+
+// POST /api/documents — upload a PDF (multipart/form-data) or paste policy
+// text (application/json: { text, title? }). Both paths return { document_id },
+// so the downstream analyse flow is identical.
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<DocumentUploadResponse | ApiError>> {
@@ -47,6 +51,55 @@ export async function POST(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // ── Pasted-text path ───────────────────────────────────────────────────────
+  if (req.headers.get('content-type')?.includes('application/json')) {
+    let text: string
+    let title: string | null = null
+    try {
+      const body = (await req.json()) as { text?: unknown; title?: unknown }
+      if (typeof body.text !== 'string' || body.text.trim().length === 0) {
+        return NextResponse.json({ error: 'text is required' }, { status: 400 })
+      }
+      text = body.text.trim()
+      if (typeof body.title === 'string' && body.title.trim()) {
+        title = body.title.trim().slice(0, 200)
+      }
+    } catch {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    }
+
+    if (text.length > MAX_PASTED_CHARS) {
+      return NextResponse.json(
+        { error: `Pasted text must be ${MAX_PASTED_CHARS.toLocaleString()} characters or fewer.` },
+        { status: 400 }
+      )
+    }
+
+    const { data: document, error: insertError } = await supabase
+      .from('documents')
+      .insert({
+        user_id: user.id,
+        file_name: title ?? 'Pasted policy text',
+        file_path: null,
+        extracted_text: text,
+        page_count: null,
+        status: 'uploaded',
+      })
+      .select('id, page_count')
+      .single()
+
+    if (insertError || !document) {
+      console.error('Failed to insert pasted document record:', insertError)
+      return NextResponse.json({ error: 'Failed to save document record.' }, { status: 500 })
+    }
+
+    return NextResponse.json(
+      { document_id: document.id, page_count: document.page_count ?? 0 },
+      { status: 201 }
+    )
+  }
+
+  // ── PDF upload path ────────────────────────────────────────────────────────
   const formData = await req.formData()
   const file = formData.get('file')
 

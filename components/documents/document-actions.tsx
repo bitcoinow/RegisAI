@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation'
 interface DocumentActionsProps {
   documentId: string
   auditCount: number
+  // Pasted-text documents have no stored PDF to view.
+  hasFile?: boolean
 }
 
-export function DocumentActions({ documentId, auditCount }: DocumentActionsProps) {
+export function DocumentActions({ documentId, auditCount, hasFile = true }: DocumentActionsProps) {
   const router = useRouter()
   const [deleting, setDeleting] = useState(false)
 
@@ -39,14 +41,16 @@ export function DocumentActions({ documentId, auditCount }: DocumentActionsProps
 
   return (
     <div className="flex items-center justify-end gap-4">
-      <a
-        href={`/api/documents/${documentId}/download`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-green text-xs font-mono tracking-wide hover:underline"
-      >
-        View PDF →
-      </a>
+      {hasFile && (
+        <a
+          href={`/api/documents/${documentId}/download`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-green text-xs font-mono tracking-wide hover:underline"
+        >
+          View PDF →
+        </a>
+      )}
       <button
         type="button"
         onClick={handleDelete}

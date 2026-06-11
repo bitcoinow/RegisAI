@@ -25,10 +25,27 @@ export default function ClearviewDemoPage() {
             href="/demo/gdpr"
             className="font-mono text-[10px] tracking-widest uppercase text-ink-3 hover:text-ink transition-colors"
           >
-            GDPR Re-scan Demo →
+            EU Legacy Demo →
           </Link>
         </div>
       </div>
+
+      {/* Legacy demo banner */}
+      <div className="border-b border-rule bg-bg-2">
+        <div className="max-w-content mx-auto px-6 py-3">
+          <p className="text-xs text-ink-2 leading-relaxed">
+            <span className="font-mono tracking-widest uppercase text-ink-3 mr-2">
+              Legacy demo — future jurisdiction example (US RIA).
+            </span>
+            The Regis AI MVP is currently focused on UK workplace compliance scenarios and
+            policy-risk review.{' '}
+            <Link href="/demo/uk-gifts-hospitality" className="text-green hover:underline">
+              See the current UK sample scenario →
+            </Link>
+          </p>
+        </div>
+      </div>
+
       <AuditReport audit={CLEARVIEW_DEMO} isDemo />
     </>
   )

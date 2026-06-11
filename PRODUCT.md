@@ -48,10 +48,10 @@ Regis replaces days of manual review with a focused, actionable report, and repl
 - Weekly email digest via Resend
 
 ### Platform
-- Magic link authentication (no passwords)
-- Design partner onboarding flow (firm name, type, AUM range, regulator)
+- Email/password authentication with email verification, plus Google OAuth and optional MFA
+- Design partner onboarding flow (organisation name, type, size, regulator)
 - PDF export of audit reports (browser print stylesheet)
-- Demo environment at `/demo/clearview` — no login required
+- UK demo at `/demo/uk-gifts-hospitality` — no login required (legacy demos at `/demo/clearview` and `/demo/gdpr`)
 - Marketing landing page with geo-based default pricing currency (USD / EUR / GBP)
 
 ---

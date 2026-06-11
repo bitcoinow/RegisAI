@@ -68,13 +68,17 @@ export default function AboutPage() {
           built to be read and acted on, not filed away.
         </p>
         <p>
-          The platform analyses compliance documents and scenarios against jurisdiction-specific
-          regulatory requirements across three geographies:
+          Alongside policy review, the Scenario Risk Analyzer lets teams describe real-world
+          workplace situations — a hospitality offer during a pitch, a potential conflict of
+          interest, a sanctions question — and receive a structured risk assessment with a draft
+          escalation note.
         </p>
-        <div className="grid sm:grid-cols-3 gap-3 my-4">
-          <PrincipleCard title="United Kingdom" body="UK GDPR, anti-bribery and corruption, sanctions obligations, FCA rules, SM&CR, and operational resilience." />
-          <PrincipleCard title="European Union" body="GDPR, anti-money laundering (AMLD6), DORA, SFDR, MiFID II, and MAR requirements." />
-          <PrincipleCard title="United States" body="Anti-money laundering (AML/BSA), SEC and FINRA rules, Reg BI, and business continuity requirements." />
+        <p>
+          The MVP is focused on UK workplace compliance:
+        </p>
+        <div className="grid sm:grid-cols-2 gap-3 my-4">
+          <PrincipleCard title="United Kingdom — current focus" body="Gifts and hospitality, anti-bribery and corruption (Bribery Act 2010), conflicts of interest, sanctions screening, procurement fairness, UK GDPR basics, escalation and audit trail." />
+          <PrincipleCard title="Future jurisdictions" body="EU and US regulatory libraries exist as legacy demo examples and are planned for future releases. They are not part of the current MVP." />
         </div>
         <p>
           Regis does not stop at finding the gap. For any finding, it drafts ready-to-paste
@@ -83,9 +87,8 @@ export default function AboutPage() {
           starts with a draft in hand rather than a blank page.
         </p>
         <p>
-          Beyond point-in-time audits, Regis monitors regulatory sources across all three
-          jurisdictions, so teams can see relevant updates as the rules they are measured against
-          change.
+          Beyond point-in-time reviews, Regis monitors regulatory sources so teams can see
+          relevant updates as the rules they are measured against change.
         </p>
       </Section>
 
@@ -113,9 +116,15 @@ export default function AboutPage() {
       <Section title="How we handle your data">
         <p>
           Compliance documents are sensitive, and we treat them that way. Regis is built on a strict
-          multi-tenant architecture with data isolation enforced at the database layer, passwordless
-          magic-link authentication, and encryption in transit and at rest. Document analysis is run
-          under a zero-data-retention policy — submitted content is never used to train models.
+          multi-tenant architecture with data isolation enforced at the database layer, email and
+          password authentication with email verification (plus Google sign-in and optional
+          multi-factor authentication), and encryption in transit and at rest. Data is processed to
+          provide scenario and policy analysis; per Anthropic&rsquo;s API terms, submitted content
+          is not used to train models.
+        </p>
+        <p>
+          Users should not upload highly sensitive personal, legal, financial, medical, or
+          confidential client information unless proper agreements and controls are in place.
         </p>
         <p>
           For the full technical detail, see our{' '}

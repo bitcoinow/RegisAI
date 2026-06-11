@@ -6,24 +6,26 @@ import { RegisLogo } from '@/components/ui/logo'
 import type { FirmType, Regulator } from '@/types'
 
 const FIRM_TYPES: { id: FirmType; label: string }[] = [
-  { id: 'RIA', label: 'RIA' },
-  { id: 'Fintech', label: 'Fintech' },
-  { id: 'Insurance', label: 'Insurance' },
-  { id: 'Bank', label: 'Bank' },
+  { id: 'Financial Services', label: 'Financial Services' },
+  { id: 'Professional Services', label: 'Professional Services' },
+  { id: 'Technology', label: 'Technology' },
+  { id: 'Public Sector', label: 'Public Sector' },
+  { id: 'Other', label: 'Other' },
 ]
 
+// Stored in profiles.aum_range (free-text column); now captures organisation size.
 const AUM_RANGES: { id: string; label: string }[] = [
-  { id: '<$100M', label: 'Under $100M' },
-  { id: '$100M–$1B', label: '$100M – $1B' },
-  { id: '$1B–$10B', label: '$1B – $10B' },
-  { id: '$10B+', label: '$10B+' },
+  { id: '1–50', label: '1 – 50 people' },
+  { id: '51–250', label: '51 – 250 people' },
+  { id: '251–1000', label: '251 – 1,000 people' },
+  { id: '1000+', label: '1,000+ people' },
 ]
 
 const REGULATORS: { id: Regulator; label: string }[] = [
-  { id: 'FINRA', label: 'FINRA' },
-  { id: 'SEC', label: 'SEC' },
-  { id: 'State', label: 'State' },
+  { id: 'FCA', label: 'FCA' },
+  { id: 'ICO', label: 'ICO' },
   { id: 'Multiple', label: 'Multiple' },
+  { id: 'None / Other', label: 'None / Other' },
 ]
 
 export default function OnboardingPage() {
@@ -81,9 +83,9 @@ export default function OnboardingPage() {
         </div>
 
         <div className="border border-rule bg-bg-2 p-8">
-          <h1 className="font-serif text-2xl text-ink mb-1">Set up your firm</h1>
+          <h1 className="font-serif text-2xl text-ink mb-1">Set up your organisation</h1>
           <p className="text-ink-3 text-sm mb-8">
-            This takes 30 seconds and tailors every audit to your regulatory context.
+            This takes 30 seconds and tailors every analysis to your organisation&rsquo;s context.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-7">
@@ -93,7 +95,7 @@ export default function OnboardingPage() {
                 className="block font-mono text-xs tracking-widest uppercase text-ink-3 mb-2"
                 htmlFor="firm-name"
               >
-                Firm name
+                Organisation name
               </label>
               <input
                 id="firm-name"
@@ -101,23 +103,23 @@ export default function OnboardingPage() {
                 required
                 value={firmName}
                 onChange={(e) => setFirmName(e.target.value)}
-                placeholder="Acme Capital Management"
+                placeholder="Acme Media Ltd"
                 className="w-full border border-rule bg-bg px-3 py-2.5 text-ink text-sm focus:outline-none focus:border-green placeholder:text-ink-3"
               />
             </div>
 
             <div>
               <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-2">
-                Firm type
+                Organisation type
               </p>
-              <div className="flex border border-rule">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-px border border-rule bg-rule">
                 {FIRM_TYPES.map((ft) => (
                   <button
                     key={ft.id}
                     type="button"
                     onClick={() => setFirmType(ft.id)}
                     className={[
-                      'flex-1 py-2.5 px-3 text-sm transition-colors border-r border-rule last:border-r-0',
+                      'py-2.5 px-3 text-sm transition-colors',
                       firmType === ft.id
                         ? 'bg-green text-white'
                         : 'bg-bg-2 text-ink-2 hover:bg-bg',
@@ -131,7 +133,7 @@ export default function OnboardingPage() {
 
             <div>
               <p className="font-mono text-xs tracking-widest uppercase text-ink-3 mb-2">
-                Assets under management
+                Organisation size
               </p>
               <div className="flex border border-rule">
                 {AUM_RANGES.map((a) => (

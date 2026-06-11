@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { getScopedRequirements } from '@/lib/coverage'
-import type { AuditResult, Finding, Jurisdiction, RegulatoryFramework } from '@/types'
+import { sanitizeScenarioResult, SCENARIO_CATEGORIES, SCENARIO_MAX_CHARS } from '@/lib/scenario'
+import type { AuditResult, Finding, Jurisdiction, RegulatoryFramework, ScenarioResult } from '@/types'
 
 // All Claude API calls live here. Do not call the Anthropic SDK from API routes or components.
 
@@ -21,7 +22,7 @@ function jurisdictionExpertise(jurisdiction: Jurisdiction): string {
   return jurisdiction === 'EU'
     ? 'MiFID II, GDPR, AMLD6, DORA, SFDR, and MAR requirements for EU financial services firms'
     : jurisdiction === 'UK'
-    ? 'FCA Rules (SYSC, COBS, SM&CR), UK AML (MLR 2017), UK GDPR, FCA Consumer Duty, and FCA Operational Resilience requirements for UK financial services firms'
+    ? 'UK workplace compliance (Bribery Act 2010, gifts & hospitality, conflicts of interest, sanctions screening, UK GDPR) alongside FCA Rules (SYSC, COBS, SM&CR), UK AML (MLR 2017), FCA Consumer Duty, and FCA Operational Resilience requirements'
     : 'FINRA, SEC, AML/BSA, Regulation Best Interest, and business continuity requirements for mid-market firms'
 }
 
@@ -125,6 +126,75 @@ export async function runGapAnalysis(
     console.error('Failed to parse Claude response as JSON:', err)
     console.error('Raw Claude response:', rawText)
     throw new Error('Claude returned invalid JSON. See server logs for raw response.')
+  }
+}
+
+// ── Scenario risk analysis ────────────────────────────────────────────────────
+
+const SCENARIO_SYSTEM_PROMPT = `You are a senior UK compliance analyst. You assess real-world workplace scenarios for compliance risk under UK law and standard corporate policy expectations. You are familiar with the Bribery Act 2010 (including section 7 adequate procedures and the gifts and hospitality implications), UK GDPR and the Data Protection Act 2018, UK sanctions regimes (OFSI), and common UK workplace policy frameworks: conflicts of interest, procurement and pitch-process fairness, and whistleblowing/escalation.
+
+You provide structured risk information for review by qualified professionals. You do NOT provide legal advice and you do NOT make final compliance decisions. Never state that conduct is or is not lawful; describe the risk and what should happen next.
+
+ASSESSMENT RULES:
+1. "risk_rating" must be exactly one of: "Low", "Medium", "High", "Critical".
+2. "risk_categories" must ONLY use values from this fixed list: ${SCENARIO_CATEGORIES.map((c) => `"${c}"`).join(', ')}. Include every category that genuinely applies; omit ones that do not.
+3. Anything resembling a request for a personal benefit in exchange for business (a quid pro quo) is at minimum High and normally Critical. Hospitality offered during a live tender, pitch, or procurement decision raises the rating.
+4. "explanation" must be plain English (2-4 short paragraphs): what the risk is, why it matters, and what makes it better or worse. No statutory citations presented as advice.
+5. "next_steps" must be concrete and ordered (e.g. do not commit to anything with the counterparty, preserve records and correspondence, declare to line manager or compliance, check the gifts and hospitality policy and register).
+6. "escalation_note" must be a short, neutral, factual note the employee could send to compliance or legal: what happened, when, who was involved, what was offered or requested, and what has been done so far. No admissions, no legal conclusions.
+7. "key_questions" (optional, max 6) lists facts a human reviewer should establish before deciding.
+8. For genuinely low-risk scenarios, say so plainly and avoid exaggerated language — but still point to the relevant policy check (e.g. the gifts and hospitality policy).
+
+You MUST return ONLY valid JSON, no markdown fences, in this exact shape:
+{
+  "risk_rating": "Low | Medium | High | Critical",
+  "risk_categories": ["..."],
+  "explanation": "string",
+  "next_steps": ["..."],
+  "escalation_note": "string",
+  "key_questions": ["..."]
+}`
+
+// Analyses a free-text workplace scenario and returns a structured, sanitised
+// risk assessment. Stateless — persistence is a later phase.
+export async function runScenarioAnalysis(scenarioText: string): Promise<ScenarioResult> {
+  const client = getClient()
+
+  const truncated =
+    scenarioText.length > SCENARIO_MAX_CHARS ? scenarioText.slice(0, SCENARIO_MAX_CHARS) : scenarioText
+
+  const message = await client.messages.create({
+    model: MODEL,
+    max_tokens: 2048,
+    system: [
+      {
+        type: 'text',
+        text: SCENARIO_SYSTEM_PROMPT,
+        cache_control: { type: 'ephemeral' },
+      },
+    ],
+    messages: [
+      {
+        role: 'user',
+        content: `--- SCENARIO START ---\n${truncated}\n--- SCENARIO END ---\n\nAssess this scenario.`,
+      },
+    ],
+  })
+
+  const rawContent = message.content[0]
+  if (rawContent?.type !== 'text') {
+    throw new Error('Unexpected response type from Claude API')
+  }
+
+  const rawText = rawContent.text.trim()
+  const cleanText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
+
+  try {
+    return sanitizeScenarioResult(JSON.parse(cleanText))
+  } catch (err) {
+    console.error('Failed to parse scenario response as JSON:', err)
+    console.error('Raw Claude response:', rawText)
+    throw new Error('Claude returned invalid JSON for scenario analysis. See server logs.')
   }
 }
 

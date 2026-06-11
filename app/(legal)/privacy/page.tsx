@@ -72,7 +72,7 @@ export default function PrivacyPage() {
           {[
             { name: 'Supabase', role: 'Database, file storage, and authentication. Your account data and uploaded documents are stored in Supabase. Supabase is SOC 2 Type II certified.' },
             { name: 'Anthropic', role: 'AI analysis. Extracted document text is sent to Anthropic\'s Claude API to perform the gap analysis. Anthropic\'s API does not use submitted data to train models. See Anthropic\'s privacy policy for details.' },
-            { name: 'Resend', role: 'Transactional email delivery. Used for magic-link authentication emails and regulatory monitoring digests.' },
+            { name: 'Resend', role: 'Transactional email delivery. Used for account verification and password reset emails and regulatory monitoring digests.' },
             { name: 'Vercel', role: 'Application hosting and global CDN. Vercel is SOC 2 Type II certified.' },
           ].map((p) => (
             <div key={p.name} className="p-4 border border-rule bg-bg-2">
@@ -103,7 +103,7 @@ export default function PrivacyPage() {
       <Section title="6. AI and Your Documents">
         <p>This section matters particularly for compliance professionals handling sensitive firm documents.</p>
         <List items={[
-          'Your documents are never used to train AI models — by Regis or Anthropic. Anthropic\'s API operates under a zero-data-retention policy for API requests.',
+          'Your documents are not used to train AI models — by Regis or, per Anthropic\'s API data usage terms, by Anthropic. See Anthropic\'s commercial terms for current detail on API data handling.',
           'Document text is extracted server-side by Regis and transmitted to Anthropic\'s API over an encrypted connection (TLS 1.3).',
           'The extracted text is scoped to 12,000 characters per analysis to minimise data exposure.',
           'When you generate draft policy language for a finding, only that finding\'s details (the rule, the gap, and the suggested remediation) are sent to Anthropic\'s API — not your full document.',

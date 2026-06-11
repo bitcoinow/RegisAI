@@ -1,4 +1,41 @@
-import type { Audit } from '@/types'
+import type { Audit, ScenarioResult } from '@/types'
+
+// Pre-computed UK gifts & hospitality scenario analysis — shown at
+// /demo/uk-gifts-hospitality without login or API calls.
+export const UK_GIFTS_DEMO: { scenario: string; result: ScenarioResult } = {
+  scenario:
+    'A sales team is pitching for a new contract with a major UK retailer. During the pitch process, one team member takes the client contact to dinner, then offers hotel accommodation. The client later suggests they will accept the vendor if this hospitality continues every month.',
+  result: {
+    risk_rating: 'High',
+    risk_categories: [
+      'Bribery & Corruption',
+      'Gifts & Hospitality',
+      'Procurement Fairness',
+      'Conflict of Interest',
+      'Reputational Risk',
+      'Escalation Requirement',
+    ],
+    explanation:
+      'This scenario has moved beyond ordinary relationship-building. Hospitality offered during a live pitch or tender already carries elevated risk, because it can be seen as an attempt to influence a procurement decision. The dinner alone might have been defensible under a typical gifts and hospitality policy, but adding hotel accommodation increases the value and the appearance of influence.\n\nThe most serious element is the client contact\'s suggestion that the contract will be awarded if the hospitality continues every month. That is a request for an ongoing personal benefit in exchange for a business decision — a classic quid pro quo pattern. If the team agrees, the organisation could face exposure under anti-bribery rules, and the individual client contact may be acting against their own employer\'s procurement policies.\n\nThere is also a reputational dimension: if the arrangement became known, it could damage the relationship with the retailer, disqualify the company from the tender, and undermine trust in its sales practices. The situation needs to be paused and escalated before anyone responds to the client\'s suggestion.',
+    next_steps: [
+      'Do not agree to, or act on, the client contact\'s suggestion — and do not offer any further hospitality while the pitch process is live.',
+      'Preserve all records and correspondence relating to the dinner, the hotel accommodation, and the client\'s request.',
+      'Check the gifts and hospitality policy and register: confirm whether the dinner and accommodation were within thresholds and properly recorded.',
+      'Declare the situation to your line manager and the compliance function today, before any further client contact.',
+      'Let compliance decide how to respond to the client contact and whether the retailer\'s own procurement team should be informed.',
+      'Review who on the team knew about the offer and whether any commitments were implied, so the escalation note is complete.',
+    ],
+    escalation_note:
+      'During our pitch for the [retailer] contract, a member of our team took the client contact to dinner and subsequently offered hotel accommodation. The client contact has since indicated that the vendor decision would go in our favour if similar hospitality continued on a monthly basis. No agreement has been made and no further hospitality has been offered. We are raising this for review before any further contact with the client. Relevant records and correspondence have been preserved.',
+    key_questions: [
+      'What was the approximate value of the dinner and the hotel accommodation, and were they recorded in the gifts and hospitality register?',
+      'Was any approval sought before the hospitality was offered, and at what level?',
+      'Did anyone on the team make or imply any commitment in response to the client contact\'s suggestion?',
+      'Is the tender still live, and what stage has the procurement process reached?',
+      'Does the retailer have its own supplier code of conduct that this conduct may breach?',
+    ],
+  },
+}
 
 // Pre-seeded demo audit for Clearview Capital — shown at /demo/clearview without login.
 export const CLEARVIEW_DEMO: Audit = {

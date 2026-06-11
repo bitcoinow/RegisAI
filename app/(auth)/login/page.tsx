@@ -113,7 +113,10 @@ export default function LoginPage() {
 
       <div className="border border-rule bg-bg-2 p-8">
         <h2 className="text-ink text-lg mb-1">Sign in</h2>
-        <p className="text-ink-3 text-sm mb-6">Enter your credentials to continue</p>
+        <p className="text-ink-3 text-sm mb-1">Enter your credentials to continue</p>
+        <p className="text-ink-3 text-xs mb-6">
+          Regis AI supports early risk identification and does not provide legal advice.
+        </p>
 
         <form onSubmit={handlePasswordSignIn} className="space-y-4">
           <div>
